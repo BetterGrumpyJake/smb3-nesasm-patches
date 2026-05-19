@@ -936,6 +936,7 @@ PRG008_A472:
 	JSR Player_DoVibration		; Shake the screen when required to do so!
 	JSR Player_SetSpecialFrames	; Set special Player frames
 	JSR Player_Draw29	 	; ... and if you get through all that, draw the Player!!
+	JSR SpawnShell_30
 
 	LDA #$00
 	STA Player_XVelAdj	 ; Player_XVelAdj = 0
@@ -1309,7 +1310,7 @@ Player_ControlJmp:
 
 ; FIXME: Anybody want to claim this?
 ; $A6AD
-	.byte $35, $35, $03
+;	.byte $35, $35, $03
 
 ; FIXME: Anybody want to claim this?
 ; $A6B0 

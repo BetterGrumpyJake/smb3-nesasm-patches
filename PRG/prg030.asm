@@ -5938,4 +5938,18 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
-
+SpawnShell_30:
+	;check for input, A button is N flag, B button is V flag
+    BIT <Pad_Input
+	;if V flag is clear (b wasn't pressed), don't spawn shell
+    BVC SpawnShellNo
+	;use this subroutine(prg8) to find a free object slot
+    JSR Level_IceBlock_GrabNew
+	;if it couldn't find a free slot(FF), don't spawn shell
+    CPX #$FF
+    BEQ SpawnShellNo
+	;otherwise overwrite the ice block with a held green shell in the object slot found
+    LDA #OBJ_GREENTROOPA
+    STA Level_ObjectID,X
+SpawnShellNo:
+    RTS

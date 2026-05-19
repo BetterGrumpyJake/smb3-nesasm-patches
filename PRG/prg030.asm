@@ -1770,11 +1770,11 @@ PRG030_8B9A:
 	; This is the init code for the level "boxing out" effect removed in the US release
 
 	; US VERSION DOES THIS:
-	JMP PRG030_8CB8	 ; Jump to PRG030_8CB8 (skipping code related to the "Boxing out" effect, removed in US version)
+	;JMP PRG030_8CB8	 ; Jump to PRG030_8CB8 (skipping code related to the "Boxing out" effect, removed in US version)
 
 	; Leftover optional code, see below
-	LDA #$00
-	STA <Map_EnterLevelFX		 ; Map_EnterLevelFX = 0
+	;LDA #$00
+	;STA <Map_EnterLevelFX		 ; Map_EnterLevelFX = 0
 
 	; ORIGINAL VERSION DID THIS (addresses relate to original code!):
 ;	LDA Level_Tileset
@@ -1792,173 +1792,173 @@ PRG030_8B9A:
 ;	STA <Map_EnterLevelFX		 ; Map_EnterLevelFX = 0
 ;PRG030_8CC9:
 
-	JSR Map_Clear_EntTranMem	 ; Clear entrance transition memory
-
-	LDA #$ff
-	STA Map_EntTran_Temp	 ; Map_EntTran_Temp = $ff
-
-	LDA Level_7Vertical
-	BEQ PRG030_8BD5	 	; If not a vertical level, jump to PRG030_8BD5
-
-	; Set address as appropriate for vertical
-	LDY Level_SizeOrig
-	LDA Tile_Mem_AddrVL,Y
-	STA <Map_Tile_AddrL
-	LDA Tile_Mem_AddrVH,Y
-	STA <Map_Tile_AddrH
-
-	JMP PRG030_8BDF	; Jump to PRG030_8BDF
-
-PRG030_8BD5: 
-
-	; First screen is always where non-vertical maps start
-	LDA Tile_Mem_Addr
-	STA <Map_Tile_AddrL
-	LDA Tile_Mem_Addr+1
-	STA <Map_Tile_AddrH
-
-PRG030_8BDF:
-	LDA #$00	
-	STA Map_EntTran_VLHalf	 ; Map_EntTran_VLHalf = 0
-
-	LDA <Vert_Scroll
-	BEQ PRG030_8BF4	 	; If Vert_Scroll = 0, jump to PRG030_8BF4
-
-	; Otherwise, offset initial address by $F0 (15 rows) and
-	; flag we're performing this on the lower vertical
-	LDA <Map_Tile_AddrL
-	ADD #$f0	 
-	STA <Map_Tile_AddrL	; Map_Tile_AddrL += $F0
-
-	LDA #$01
-	STA Map_EntTran_VLHalf	 ; Map_EntTran_VLHalf = 1
-
-PRG030_8BF4:
-	LDY #$04	; Y = 4 (search begin)
-
-PRG030_8BF6:
-	LDA <Vert_Scroll
-	CMP BoxOut_ByVStart,Y
-	BEQ PRG030_8C00
-	DEY		 ; Y--
-	BPL PRG030_8BF6	 ; While Y >= 0, loop
-
-PRG030_8C00:
-	STY Map_EntTran_InitValIdx ; Store initial value index
-
-	LDA BoxOut_InitVAddrH,Y	 ; Get initial high part of VRAM address
-	STA Map_EntTran_BVAddrH
-	STA Map_EntTran_BVAddrH+1
-	STA Map_EntTran_BVAddrH+2
-	STA Map_EntTran_BVAddrH+3
-
-	; Copy in the four low bytes
-	LDA BoxOut_InitVAddrL0,Y
-	STA Map_EntTran_BVAddrL	
-
-	LDA BoxOut_InitVAddrL2,Y
-	STA Map_EntTran_BVAddrL+2
-
-	LDA BoxOut_InitVAddrL1,Y
-	STA Map_EntTran_BVAddrL+1
-
-	LDA BoxOut_InitVAddrL3,Y
-	STA Map_EntTran_BVAddrL+3
-
-	LDA #$00
-	STA Map_EntTran_BorderLoop	 ; Map_EntTran_BorderLoop = 0
-
-	LDA #$04
-	STA Map_EntTran_TBCnt	 ; Map_EntTran_TBCnt = 4
-
-	LDY #$01	
-	STY Map_EntTran_LRCnt	 ; Map_EntTran_LRCnt= 1
-
-	LDA #$00	 
-	STA Update_Select	; Insist (again!) that Update_Select = 0
-
-PRG030_8C3E:
-	JSR GraphicsBuf_Prep_And_WaitVSync	; VSync
-
-	; Set page @ A000 as appropriate by Level_Tileset
-	LDY Level_Tileset
-	LDA PAGE_A000_ByTileset,Y
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-	LDX Map_EntTran_BorderLoop	 ; X = current border index (0-3: Top 0, bottom 1, right 2, left 3)
-
-	LDA Map_EntTran_BVAddrH,X	 ; Get high byte of VRAM addres
-	STA Map_EntTran_VAddrH	 	; Store it
-
-	LDA Map_EntTran_BVAddrL,X	 ; Get low byte of VRAM address
-	STA Map_EntTran_VAddrL	 	; Store it
-
-	LDA Map_EntTran_BorderLoop	 ; A = current border index (0-3: Top 0, bottom 1, right 2, left 3)
-	AND #$02
-	BNE PRG030_8C74	 		; If not updating top/bottom, jump to PRG030_8C74
-
-	; top/bottom update...
-	LDX Map_EntTran_TBCnt
-
-	LDA #$01
-	STA Map_EntTran_VRAMGap	 ; Map_EntTran_VRAMGap = 1
-
-	LDA Map_EntTran_VAddrL
-	AND #$01
-	BEQ PRG030_8C8C	 ; If on even address, jump to PRG030_8C8C
-	BNE PRG030_8C83	 ; If on odd address, jump to PRG030_8C83
-
-PRG030_8C74:
-
-	; left/right update...
-	LDX Map_EntTran_LRCnt
-
-	LDA #32
-	STA Map_EntTran_VRAMGap	 ; PRG030_8C8C = 32
-
-	LDA Map_EntTran_VAddrL
-	AND #$20
-	BEQ PRG030_8C8C	 ; If on 32 byte aligned address, jump to PRG030_8C8C
-
-PRG030_8C83:
-	JSR BoxOut_PutPatternInStrip	 ; Put an 8x8 pattern into the strip
-	JSR BoxOut_SetThisBorderVRAM	 ; Set the VRAM offset for this border
-	DEX		 		; X-- (counter decrement)
-	BMI PRG030_8CAA	 		; If X < 0, jump to PRG030_8CAA
-
-PRG030_8C8C:
-	JSR BoxOut_PutPatternInStrip	 ; Put an 8x8 pattern into the strip
-	DEX		 		; X-- (counter decrement)
-	BMI PRG030_8CAA	 		; If X < 0, jump to PRG030_8CAA
-
-	INC <Temp_Var14		 ; Temp_Var14++ (tile pattern layout high, jump to next pattern)
-
-	LDA Map_EntTran_VRAMGap
-	AND #$01	
-	BEQ PRG030_8C9D	 	; If Map_EntTran_VRAMGap & 1 jump to PRG030_8C9D
-
-	INC <Temp_Var14		 ; Temp_Var14++ (tile pattern layout high, jump to next pattern)
-
-PRG030_8C9D:
-	LDA [Temp_Var13],Y	 ; Get 8x8 pattern
-	STA <Scroll_ColorStrip,X	 ; Store into strip
-
-	JSR BoxOut_SetThisBorderVRAM	; Set border VRAM
-	JSR BoxOut_SetThisBorderVRAM	; Called twice??
-	DEX		 ; X--
-	BPL PRG030_8C8C	 ; While X >= 0, loop!
-
-PRG030_8CAA:
-	LDA #$02
-	STA <Map_EnterLevelFX	 ; Map_EnterLevelFX = 2 (begin the proper box out effect!)
-
-	LDA Map_EntTran_Cnt
-	CMP #$34	 
-	BEQ PRG030_8CB8	 ; If Map_EntTran_Cnt = $34, jump to PRG030_8CB8
-	JMP PRG030_8C3E	 ; Otherwise, loop!
-
-PRG030_8CB8:
+;	JSR Map_Clear_EntTranMem	 ; Clear entrance transition memory
+;
+;	LDA #$ff
+;	STA Map_EntTran_Temp	 ; Map_EntTran_Temp = $ff
+;
+;	LDA Level_7Vertical
+;	BEQ PRG030_8BD5	 	; If not a vertical level, jump to PRG030_8BD5
+;
+;	; Set address as appropriate for vertical
+;	LDY Level_SizeOrig
+;	LDA Tile_Mem_AddrVL,Y
+;	STA <Map_Tile_AddrL
+;	LDA Tile_Mem_AddrVH,Y
+;	STA <Map_Tile_AddrH
+;
+;	JMP PRG030_8BDF	; Jump to PRG030_8BDF
+;
+;PRG030_8BD5: 
+;
+;	; First screen is always where non-vertical maps start
+;	LDA Tile_Mem_Addr
+;	STA <Map_Tile_AddrL
+;	LDA Tile_Mem_Addr+1
+;	STA <Map_Tile_AddrH
+;
+;PRG030_8BDF:
+;	LDA #$00	
+;	STA Map_EntTran_VLHalf	 ; Map_EntTran_VLHalf = 0
+;
+;	LDA <Vert_Scroll
+;	BEQ PRG030_8BF4	 	; If Vert_Scroll = 0, jump to PRG030_8BF4
+;
+;	; Otherwise, offset initial address by $F0 (15 rows) and
+;	; flag we're performing this on the lower vertical
+;	LDA <Map_Tile_AddrL
+;	ADD #$f0	 
+;	STA <Map_Tile_AddrL	; Map_Tile_AddrL += $F0
+;
+;	LDA #$01
+;	STA Map_EntTran_VLHalf	 ; Map_EntTran_VLHalf = 1
+;
+;PRG030_8BF4:
+;	LDY #$04	; Y = 4 (search begin)
+;
+;PRG030_8BF6:
+;	LDA <Vert_Scroll
+;	CMP BoxOut_ByVStart,Y
+;	BEQ PRG030_8C00
+;	DEY		 ; Y--
+;	BPL PRG030_8BF6	 ; While Y >= 0, loop
+;
+;PRG030_8C00:
+;	STY Map_EntTran_InitValIdx ; Store initial value index
+;
+;	LDA BoxOut_InitVAddrH,Y	 ; Get initial high part of VRAM address
+;	STA Map_EntTran_BVAddrH
+;	STA Map_EntTran_BVAddrH+1
+;	STA Map_EntTran_BVAddrH+2
+;	STA Map_EntTran_BVAddrH+3
+;
+;	; Copy in the four low bytes
+;	LDA BoxOut_InitVAddrL0,Y
+;	STA Map_EntTran_BVAddrL	
+;
+;	LDA BoxOut_InitVAddrL2,Y
+;	STA Map_EntTran_BVAddrL+2
+;
+;	LDA BoxOut_InitVAddrL1,Y
+;	STA Map_EntTran_BVAddrL+1
+;
+;	LDA BoxOut_InitVAddrL3,Y
+;	STA Map_EntTran_BVAddrL+3
+;
+;	LDA #$00
+;	STA Map_EntTran_BorderLoop	 ; Map_EntTran_BorderLoop = 0
+;
+;	LDA #$04
+;	STA Map_EntTran_TBCnt	 ; Map_EntTran_TBCnt = 4
+;
+;	LDY #$01	
+;	STY Map_EntTran_LRCnt	 ; Map_EntTran_LRCnt= 1
+;
+;	LDA #$00	 
+;	STA Update_Select	; Insist (again!) that Update_Select = 0
+;
+;PRG030_8C3E:
+;	JSR GraphicsBuf_Prep_And_WaitVSync	; VSync
+;
+;	; Set page @ A000 as appropriate by Level_Tileset
+;	LDY Level_Tileset
+;	LDA PAGE_A000_ByTileset,Y
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	LDX Map_EntTran_BorderLoop	 ; X = current border index (0-3: Top 0, bottom 1, right 2, left 3)
+;
+;	LDA Map_EntTran_BVAddrH,X	 ; Get high byte of VRAM addres
+;	STA Map_EntTran_VAddrH	 	; Store it
+;
+;	LDA Map_EntTran_BVAddrL,X	 ; Get low byte of VRAM address
+;	STA Map_EntTran_VAddrL	 	; Store it
+;
+;	LDA Map_EntTran_BorderLoop	 ; A = current border index (0-3: Top 0, bottom 1, right 2, left 3)
+;	AND #$02
+;	BNE PRG030_8C74	 		; If not updating top/bottom, jump to PRG030_8C74
+;
+;	; top/bottom update...
+;	LDX Map_EntTran_TBCnt
+;
+;	LDA #$01
+;	STA Map_EntTran_VRAMGap	 ; Map_EntTran_VRAMGap = 1
+;
+;	LDA Map_EntTran_VAddrL
+;	AND #$01
+;	BEQ PRG030_8C8C	 ; If on even address, jump to PRG030_8C8C
+;	BNE PRG030_8C83	 ; If on odd address, jump to PRG030_8C83
+;
+;PRG030_8C74:
+;
+;	; left/right update...
+;	LDX Map_EntTran_LRCnt
+;
+;	LDA #32
+;	STA Map_EntTran_VRAMGap	 ; PRG030_8C8C = 32
+;
+;	LDA Map_EntTran_VAddrL
+;	AND #$20
+;	BEQ PRG030_8C8C	 ; If on 32 byte aligned address, jump to PRG030_8C8C
+;
+;PRG030_8C83:
+;	JSR BoxOut_PutPatternInStrip	 ; Put an 8x8 pattern into the strip
+;	JSR BoxOut_SetThisBorderVRAM	 ; Set the VRAM offset for this border
+;	DEX		 		; X-- (counter decrement)
+;	BMI PRG030_8CAA	 		; If X < 0, jump to PRG030_8CAA
+;
+;PRG030_8C8C:
+;	JSR BoxOut_PutPatternInStrip	 ; Put an 8x8 pattern into the strip
+;	DEX		 		; X-- (counter decrement)
+;	BMI PRG030_8CAA	 		; If X < 0, jump to PRG030_8CAA
+;
+;	INC <Temp_Var14		 ; Temp_Var14++ (tile pattern layout high, jump to next pattern)
+;
+;	LDA Map_EntTran_VRAMGap
+;	AND #$01	
+;	BEQ PRG030_8C9D	 	; If Map_EntTran_VRAMGap & 1 jump to PRG030_8C9D
+;
+;	INC <Temp_Var14		 ; Temp_Var14++ (tile pattern layout high, jump to next pattern)
+;
+;PRG030_8C9D:
+;	LDA [Temp_Var13],Y	 ; Get 8x8 pattern
+;	STA <Scroll_ColorStrip,X	 ; Store into strip
+;
+;	JSR BoxOut_SetThisBorderVRAM	; Set border VRAM
+;	JSR BoxOut_SetThisBorderVRAM	; Called twice??
+;	DEX		 ; X--
+;	BPL PRG030_8C8C	 ; While X >= 0, loop!
+;
+;PRG030_8CAA:
+;	LDA #$02
+;	STA <Map_EnterLevelFX	 ; Map_EnterLevelFX = 2 (begin the proper box out effect!)
+;
+;	LDA Map_EntTran_Cnt
+;	CMP #$34	 
+;	BEQ PRG030_8CB8	 ; If Map_EntTran_Cnt = $34, jump to PRG030_8CB8
+;	JMP PRG030_8C3E	 ; Otherwise, loop!
+;
+;PRG030_8CB8:
 	; End of box-out effect (removed in US version)
 
 	; Set page @ A000 as appropriate for Tileset
@@ -2334,27 +2334,27 @@ PRG030_8E79:
 	; When game is paused...
 
 	; Wow, what the heck did they remove here??
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
+;	NOP
 
 	LDA #$32
 	STA PatTable_BankSel+5	; Set patterns needed for P A U S E sprites
@@ -3604,14 +3604,14 @@ PRG030_952C:
 	
 	; This one selects the appropriate init values for everything
 	; else based on what the vertical start position is...
-BoxOut_ByVStart:	.byte $00, $30, $70, $B0, $EF	; Needs to sync with GamePlay_VStart
+;BoxOut_ByVStart:	.byte $00, $30, $70, $B0, $EF	; Needs to sync with GamePlay_VStart
 
 	; The init values, each column links to an above vertical start position
-BoxOut_InitVAddrH:	.byte $21, $22, $23, $28, $29
-BoxOut_InitVAddrL0:	.byte $6E, $2E, $2E, $6E, $6E
-BoxOut_InitVAddrL1:	.byte $8E, $4E, $4E, $8E, $8E
-BoxOut_InitVAddrL2:	.byte $73, $33, $33, $73, $73
-BoxOut_InitVAddrL3:	.byte $6D, $2D, $2D, $6D, $6D
+;BoxOut_InitVAddrH:	.byte $21, $22, $23, $28, $29
+;BoxOut_InitVAddrL0:	.byte $6E, $2E, $2E, $6E, $6E
+;BoxOut_InitVAddrL1:	.byte $8E, $4E, $4E, $8E, $8E
+;BoxOut_InitVAddrL2:	.byte $73, $33, $33, $73, $73
+;BoxOut_InitVAddrL3:	.byte $6D, $2D, $2D, $6D, $6D
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Map_Clear_EntTranMem
@@ -3628,104 +3628,104 @@ PRG030_9555:
 	RTS		 ; Return
 
 
-BoxOut_SetThisBorderVRAM:
-	; Map_EntTran_VAddrL/H += Map_EntTran_VRAMGap
-	LDA Map_EntTran_VAddrL
-	ADD Map_EntTran_VRAMGap
-	STA Map_EntTran_VAddrL
-	LDA Map_EntTran_VAddrH
-	ADC #$00
-	STA Map_EntTran_VAddrH
-
-	LDA Map_EntTran_InitValIdx
-	CMP #$04
-	BEQ PRG030_95AD	 ; If the initial index was 4, jump to PRG030_95AD (RTS)
-
-	LDA Map_EntTran_Temp
-	CMP #$ff	 
-	BNE PRG030_95AD	 ; If Map_EntTran_Temp <> $FF, jump to PRG030_95AD (RTS)
-
-	LDY Map_EntTran_BorderLoop	 ; Y = current border index (0-3: Top 0, bottom 1, right 2, left 3)
-
-	; Prevent out of range video writes
-	LDA Map_EntTran_BVAddrH,Y
-	CMP #$28	 
-	BGE PRG030_95AD	 	; If border's VRAM high address >= $28, jump to PRG030_95AD (RTS)
- 
-	LDA Map_EntTran_VAddrH
-	CMP #$23
-	BLT PRG030_95AD	 	; If border's VRAM high address < $23, jump to PRG030_95AD (RTS)
-
-	LDA Map_EntTran_VAddrL
-	CMP #$c0
-	BLT PRG030_95AD	 	; If border's VRAM low address < $C0, jump to PRG030_95AD (RTS)
-
-	; Set VRAM address to [$28][Map_EntTran_BVAddrL & $1f]
-	LDA #$28
-	STA Map_EntTran_VAddrH
-
-	LDA Map_EntTran_VAddrL
-	AND #$1f
-	STA Map_EntTran_VAddrL
-
-	LDA Map_EntTran_BorderLoop	 ; A = current border index (0-3: Top 0, bottom 1, right 2, left 3)
-	AND #$02	
-	BEQ PRG030_95AD	 	; If not doing right side update, jump to PRG030_95AD (RTS)
-
-	STX Map_EntTran_Temp	 ; Store X (LRCnt) into Map_EntTran_Temp
-
-PRG030_95AD:
-	RTS		 ; Return
-
-
-	; As part of the "boxing out" effect, calculate adjusted VRAM 
-	; addresses as fit to the arbitrary positioning of the screen
-BoxOut_CalcOffsets:
-	; I'll let someone else figure this out in particular,
-	; I'm not as concerned about a removed effect...
-
-	LDA Map_EntTran_VAddrL
-	AND #$c0
-	STA Map_EntTran_TileOff
-
-	LDA Map_EntTran_VAddrH
-	AND #$0f
-	STA Map_EntTran_VAddrHAdj
-
-	CLC
-	ROR Map_EntTran_VAddrHAdj
-	ROR Map_EntTran_TileOff
-	CLC
-	ROR Map_EntTran_VAddrHAdj
-	ROR Map_EntTran_TileOff
-	LDA Map_EntTran_VAddrL
-	AND #$1f
-	LSR A	
-	ADD Map_EntTran_TileOff
-	STA Map_EntTran_TileOff
-
-	RTS		 ; Return
-
-
-	; Determine which 8x8 of the tile layout we're going to need
-BoxOut_CalcWhich8x8:
-	LDA Map_EntTran_VAddrL
-	AND #$01
-	STA Map_EntTran_Tile8x8
-
-	LDA Map_EntTran_VAddrL
-	AND #$20	 
-	BNE PRG030_95EF	
-
-	ASL Map_EntTran_Tile8x8
-	JMP PRG030_95F3	 	; Jump to PRG030_95F3
-
-PRG030_95EF: 
-	SEC		 
-	ROL Map_EntTran_Tile8x8
-
-PRG030_95F3:
-	RTS		 ; Return
+;BoxOut_SetThisBorderVRAM:
+;	; Map_EntTran_VAddrL/H += Map_EntTran_VRAMGap
+;	LDA Map_EntTran_VAddrL
+;	ADD Map_EntTran_VRAMGap
+;	STA Map_EntTran_VAddrL
+;	LDA Map_EntTran_VAddrH
+;	ADC #$00
+;	STA Map_EntTran_VAddrH
+;
+;	LDA Map_EntTran_InitValIdx
+;	CMP #$04
+;	BEQ PRG030_95AD	 ; If the initial index was 4, jump to PRG030_95AD (RTS)
+;
+;	LDA Map_EntTran_Temp
+;	CMP #$ff	 
+;	BNE PRG030_95AD	 ; If Map_EntTran_Temp <> $FF, jump to PRG030_95AD (RTS)
+;
+;	LDY Map_EntTran_BorderLoop	 ; Y = current border index (0-3: Top 0, bottom 1, right 2, left 3)
+;
+;	; Prevent out of range video writes
+;	LDA Map_EntTran_BVAddrH,Y
+;	CMP #$28	 
+;	BGE PRG030_95AD	 	; If border's VRAM high address >= $28, jump to PRG030_95AD (RTS)
+; 
+;	LDA Map_EntTran_VAddrH
+;	CMP #$23
+;	BLT PRG030_95AD	 	; If border's VRAM high address < $23, jump to PRG030_95AD (RTS)
+;
+;	LDA Map_EntTran_VAddrL
+;	CMP #$c0
+;	BLT PRG030_95AD	 	; If border's VRAM low address < $C0, jump to PRG030_95AD (RTS)
+;
+;	; Set VRAM address to [$28][Map_EntTran_BVAddrL & $1f]
+;	LDA #$28
+;	STA Map_EntTran_VAddrH
+;
+;	LDA Map_EntTran_VAddrL
+;	AND #$1f
+;	STA Map_EntTran_VAddrL
+;
+;	LDA Map_EntTran_BorderLoop	 ; A = current border index (0-3: Top 0, bottom 1, right 2, left 3)
+;	AND #$02	
+;	BEQ PRG030_95AD	 	; If not doing right side update, jump to PRG030_95AD (RTS)
+;
+;	STX Map_EntTran_Temp	 ; Store X (LRCnt) into Map_EntTran_Temp
+;
+;PRG030_95AD:
+;	RTS		 ; Return
+;
+;
+;	; As part of the "boxing out" effect, calculate adjusted VRAM 
+;	; addresses as fit to the arbitrary positioning of the screen
+;BoxOut_CalcOffsets:
+;	; I'll let someone else figure this out in particular,
+;	; I'm not as concerned about a removed effect...
+;
+;	LDA Map_EntTran_VAddrL
+;	AND #$c0
+;	STA Map_EntTran_TileOff
+;
+;	LDA Map_EntTran_VAddrH
+;	AND #$0f
+;	STA Map_EntTran_VAddrHAdj
+;
+;	CLC
+;	ROR Map_EntTran_VAddrHAdj
+;	ROR Map_EntTran_TileOff
+;	CLC
+;	ROR Map_EntTran_VAddrHAdj
+;	ROR Map_EntTran_TileOff
+;	LDA Map_EntTran_VAddrL
+;	AND #$1f
+;	LSR A	
+;	ADD Map_EntTran_TileOff
+;	STA Map_EntTran_TileOff
+;
+;	RTS		 ; Return
+;
+;
+;	; Determine which 8x8 of the tile layout we're going to need
+;BoxOut_CalcWhich8x8:
+;	LDA Map_EntTran_VAddrL
+;	AND #$01
+;	STA Map_EntTran_Tile8x8
+;
+;	LDA Map_EntTran_VAddrL
+;	AND #$20	 
+;	BNE PRG030_95EF	
+;
+;	ASL Map_EntTran_Tile8x8
+;	JMP PRG030_95F3	 	; Jump to PRG030_95F3
+;
+;PRG030_95EF: 
+;	SEC		 
+;	ROL Map_EntTran_Tile8x8
+;
+;PRG030_95F3:
+;	RTS		 ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Map_Calc_NT2Addr_By_XY
@@ -3783,103 +3783,103 @@ Map_Calc_NT2Addr_By_XY:
 ; think that memory space was once home to some other idea...
 ; And not that it'd make sense to "increment" your card storage either!!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Bonus_Prize1:
-
-	; Backup Y/X
-	TYA
-	PHA
-	TXA
-	PHA
-
-	; Temp_Var16 = 0 (offset to Mario's Inventory)
-	LDA #$00
-	STA <Temp_Var16
-
-	LDY Player_Current
-	CPY #$00
-	BEQ PRG030_962C	; If Player is Mario, jump to PRG030_962C
-
-PRG030_9622:
-	; Offset to Luigi's Inventory
-	LDA <Temp_Var16
-	ADD #(Inventory_Items2 - Inventory_Items)
-	STA <Temp_Var16
-
-	DEY		 ; Y will equal 1 here, so this just makes Y zero
-	BNE PRG030_9622	 ; Jump technically NEVER to PRG030_9622 (?!)
-
-PRG030_962C:
-	TXA		 ; Input value -> 'A'
-
-	ADD <Temp_Var16	 ; Add to offset value
-	TAX		 ; -> 'X'
-
-	INC Inventory_Cards,X	 ; The intention of this is unclear!
-
-	; Restore X/Y
-	PLA
-	TAX
-	PLA
-	TAY
-
-	RTS		 ; Return
-
-BoxOut_PutPatternInStrip:
-	JSR BoxOut_CalcOffsets	 ; Calculate offset to tile
-	JSR BoxOut_CalcWhich8x8	 ; Calculate which 8x8 pattern of the tile layout we're going to use
-
-	LDA Level_7Vertical
-	BEQ PRG030_9654	 	; If level is not vertical, jump to PRG030_9654
-
-	LDY Level_SizeOrig
-
-	; Correct base address for vertical levels
-	LDA Tile_Mem_AddrVL,Y
-	STA <Map_Tile_AddrL
-	LDA Tile_Mem_AddrVH,Y
-	STA <Map_Tile_AddrH
-
-	JMP PRG030_965E	 	; Jump to PRG030_965E
-
-PRG030_9654:
-	; Correct base address for non-vertical levels
-	LDA Tile_Mem_Addr
-	STA <Map_Tile_AddrL
-	LDA Tile_Mem_Addr+1
-	STA <Map_Tile_AddrH
-
-PRG030_965E:
-	LDA Map_EntTran_VAddrH
-	AND #$08	 
-	BEQ PRG030_966C	 ; If "high" address is not halfway through vertically, jump to PRG030_966C
-
-	; Otherwise, offset halfway through screen
-	LDA <Map_Tile_AddrL
-	ADD #$f0
-	STA <Map_Tile_AddrL	; Map_Tile_AddrL += $F0
-
-PRG030_966C:
-	LDA Level_Tileset
-	ASL A		
-	TAY		 
-
-	; Set Temp_Var13/14 to point to the layout data for this Tileset
-	LDA TileLayout_ByTileset,Y
-	STA <Temp_Var13	
-	LDA TileLayout_ByTileset+1,Y
-	STA <Temp_Var14	
-
-	LDY Map_EntTran_TileOff
-	LDA [Map_Tile_AddrL],Y	 ; Get the tile we're working on
-
-	TAY		 
-	LDA Map_EntTran_Tile8x8
-	ADD <Temp_Var14		
-	STA <Temp_Var14		
-	LDA [Temp_Var13],Y	 ; Get the specific 8x8 tile of the tile we're working on
-
-	STA <Scroll_ColorStrip,X ; Store into the strip
-	RTS		 ; Return
+;Bonus_Prize1:
+;
+;	; Backup Y/X
+;	TYA
+;	PHA
+;	TXA
+;	PHA
+;
+;	; Temp_Var16 = 0 (offset to Mario's Inventory)
+;	LDA #$00
+;	STA <Temp_Var16
+;
+;	LDY Player_Current
+;	CPY #$00
+;	BEQ PRG030_962C	; If Player is Mario, jump to PRG030_962C
+;
+;PRG030_9622:
+;	; Offset to Luigi's Inventory
+;	LDA <Temp_Var16
+;	ADD #(Inventory_Items2 - Inventory_Items)
+;	STA <Temp_Var16
+;
+;	DEY		 ; Y will equal 1 here, so this just makes Y zero
+;	BNE PRG030_9622	 ; Jump technically NEVER to PRG030_9622 (?!)
+;
+;PRG030_962C:
+;	TXA		 ; Input value -> 'A'
+;
+;	ADD <Temp_Var16	 ; Add to offset value
+;	TAX		 ; -> 'X'
+;
+;	INC Inventory_Cards,X	 ; The intention of this is unclear!
+;
+;	; Restore X/Y
+;	PLA
+;	TAX
+;	PLA
+;	TAY
+;
+;	RTS		 ; Return
+;
+;BoxOut_PutPatternInStrip:
+;	JSR BoxOut_CalcOffsets	 ; Calculate offset to tile
+;	JSR BoxOut_CalcWhich8x8	 ; Calculate which 8x8 pattern of the tile layout we're going to use
+;
+;	LDA Level_7Vertical
+;	BEQ PRG030_9654	 	; If level is not vertical, jump to PRG030_9654
+;
+;	LDY Level_SizeOrig
+;
+;	; Correct base address for vertical levels
+;	LDA Tile_Mem_AddrVL,Y
+;	STA <Map_Tile_AddrL
+;	LDA Tile_Mem_AddrVH,Y
+;	STA <Map_Tile_AddrH
+;
+;	JMP PRG030_965E	 	; Jump to PRG030_965E
+;
+;PRG030_9654:
+;	; Correct base address for non-vertical levels
+;	LDA Tile_Mem_Addr
+;	STA <Map_Tile_AddrL
+;	LDA Tile_Mem_Addr+1
+;	STA <Map_Tile_AddrH
+;
+;PRG030_965E:
+;	LDA Map_EntTran_VAddrH
+;	AND #$08	 
+;	BEQ PRG030_966C	 ; If "high" address is not halfway through vertically, jump to PRG030_966C
+;
+;	; Otherwise, offset halfway through screen
+;	LDA <Map_Tile_AddrL
+;	ADD #$f0
+;	STA <Map_Tile_AddrL	; Map_Tile_AddrL += $F0
+;
+;PRG030_966C:
+;	LDA Level_Tileset
+;	ASL A		
+;	TAY		 
+;
+;	; Set Temp_Var13/14 to point to the layout data for this Tileset
+;	LDA TileLayout_ByTileset,Y
+;	STA <Temp_Var13	
+;	LDA TileLayout_ByTileset+1,Y
+;	STA <Temp_Var14	
+;
+;	LDY Map_EntTran_TileOff
+;	LDA [Map_Tile_AddrL],Y	 ; Get the tile we're working on
+;
+;	TAY		 
+;	LDA Map_EntTran_Tile8x8
+;	ADD <Temp_Var14		
+;	STA <Temp_Var14		
+;	LDA [Temp_Var13],Y	 ; Get the specific 8x8 tile of the tile we're working on
+;
+;	STA <Scroll_ColorStrip,X ; Store into the strip
+;	RTS		 ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Scroll_Update_Ranges
@@ -5752,7 +5752,7 @@ PRG030_9E9A:
 
 ; FIXME: Anybody want to claim this??
 ; $9E9B
-	.byte $F0, $20
+;	.byte $F0, $20
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Player_GetTileAndSlope_Normal
@@ -5858,9 +5858,9 @@ PRG030_9F0D:
 	RTS		 ; Return
 
 	; Probably unused space
-	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
-	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
-	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+;	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+;	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+;	.byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
 
 
 PRG030_SUB_9F40:
@@ -5871,7 +5871,7 @@ PRG030_SUB_9F40:
 	JMP PRG031_F499
 
 	; Filler space
-	.byte $ff, $ff, $ff, $ff, $ff
+;	.byte $ff, $ff, $ff, $ff, $ff
 
 	; Sub part of A0 mode of IRQ
 PRG030_SUB_9F50:
@@ -5889,8 +5889,8 @@ PRG030_9F52:
 	RTS		 ; Return
 
 	; Probably unused space
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
 IntIRQ_32PixelPartition_Part5:
 
@@ -5911,7 +5911,7 @@ PRG030_9F80:
 	JMP PRG031_FA3C	 ; Jump to PRG031_FA3C
 
 	; Unused space
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
 IntIRQ_32PixelPartition_Part2:	; $9FA0
 	LDA Update_Request	 

@@ -2221,7 +2221,7 @@ Bonus_GetDiePrize:
 	; will be overwritten when the game exits with the "current" score)
 	; In any case, not a "key" :(
 	LDX #$03	 ; X = 3
-	JSR Bonus_Prize1 ; Get your prize?
+	;JSR Bonus_Prize1 ; Get your prize?
 
 	INC Bonus_GameState	 ; Bonus_GameState = 4
 

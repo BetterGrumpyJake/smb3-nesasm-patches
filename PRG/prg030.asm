@@ -5938,4 +5938,21 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
-
+;;; [ORANGE] Allow grabbing shelled objects from any orientation
+;;; as long as the player is holding B
+DoStompComparison:
+    ;;;  27-bytes
+    LDA Objects_State,X
+    CMP #OBJSTATE_SHELLED
+    BNE _not_shelled
+    ; We're shelled and we collided, remove this return address and jmp to Object_HoldKickOrHurtPlayer
+    ; This allows us to grab shelled objects if we're holding B no matter what
+    PLA
+    PLA
+    JMP Object_HoldKickOrHurtPlayer
+_not_shelled:			; For non-shells, do normal stomp comparison
+    LDA <Objects_Y,X	; Get object's Y
+    SUB <Temp_Var2		; Subtract Temp_Var2 (height above object considered "stompable" range)
+    ROL <Temp_Var1		; Stores the carry bit into Temp_Var1 bit 0
+    CMP <Player_Y
+    RTS

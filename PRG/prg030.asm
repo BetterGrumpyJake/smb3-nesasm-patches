@@ -5945,7 +5945,10 @@ DoStompComparison:
     LDA Objects_State,X
     CMP #OBJSTATE_SHELLED
     BNE _not_shelled
-    ; We're shelled and we collided, remove this return address and jmp to Object_HoldKickOrHurtPlayer
+	;if currently holding something, bail. otherwise continue
+	LDA Player_ISHolding_OLD
+	BNE _not_shelled
+    ; We're shelled, we collided, and we aren't already holding something remove this return address and jmp to Object_HoldKickOrHurtPlayer
     ; This allows us to grab shelled objects if we're holding B no matter what
     PLA
     PLA

@@ -2952,7 +2952,8 @@ PRG000_CEBE:
 	; Make sure Player is facing object he's kicking
 	JSR Level_ObjCalcXDiffs
 	LDA PlayerKickFlipBits,Y
-	STA <Player_FlipBits
+	;when bumping a shell, don't flip mario. that way he doesn't kill the kicked shell with a held one
+    ;STA Player_FlipBits
 
 PRG000_CEC6:
 	LDA ObjectKickXVelMoving,Y	 ; Get appropriate base X velocity for kick

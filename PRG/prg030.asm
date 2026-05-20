@@ -5939,10 +5939,17 @@ PRG030_9FAF:
 
 ; NOTE: The remaining ROM space was all blank ($FF)
 SpawnShell_30:
-	;check for input, A button is N flag, B button is V flag
-    BIT <Pad_Input
-	;if V flag is clear (b wasn't pressed), don't spawn shell
-    BVC SpawnShellNo
+	;if up wasn't pressed, bail. otherwise continue
+    LDA <Pad_Input
+	AND #PAD_UP
+	BEQ SpawnShellNo
+	;if b wasn't held, bail. otherwise continue
+	LDA <Pad_Holding
+	AND #PAD_B
+    BEQ SpawnShellNo
+	;if currently holding something, bail. otherwise continue
+	LDA Player_ISHolding_OLD
+    BNE SpawnShellNo
 	;use this subroutine(prg8) to find a free object slot
     JSR Level_IceBlock_GrabNew
 	;if it couldn't find a free slot(FF), don't spawn shell

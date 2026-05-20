@@ -4033,6 +4033,14 @@ PRG000_D323:
 	INC Objects_HitCount,X	 ; Give hit back (restore to zero)
 
 Object_SetShellState:
+	;check if shell is kicked
+	LDA Objects_State,X
+    CMP #OBJSTATE_KICKED
+	;if it's not (regular koopa) shell state it
+    BNE ShellPoofSkip
+	;otherwise poof death it
+	JMP Object_PoofDie
+ShellPoofSkip:
 	; Set Objects_State to Shelled
 	LDA #OBJSTATE_SHELLED
 	STA Objects_State,X
@@ -5427,7 +5435,7 @@ PRG000_D929:
 
 ; FIXME: Anybody want to claim this?
 ; $D92B
-	.byte $F0, $00, $10, $20
+;	.byte $F0, $00, $10, $20
 
 
 	; Calculates the upper-left and returns the lower-right offsets
@@ -6523,16 +6531,16 @@ Object_AnySprOffscreen:
 ; FIXME: Anybody want to claim this?
 ; Appears it would return a free object slot
 ; $DD5B 
-	LDY #$04	; Y = 4
-PRG000_DD5D:
-	LDA Objects_State,Y
-	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
-
-	DEY		 ; Y--
-	BPL PRG000_DD5D	 ; While Y >= 0, loop
-
-PRG000_DD65:
-	RTS		 ; Return
+;	LDY #$04	; Y = 4
+;PRG000_DD5D:
+;	LDA Objects_State,Y
+;	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
+;
+;	DEY		 ; Y--
+;	BPL PRG000_DD5D	 ; While Y >= 0, loop
+;
+;PRG000_DD65:
+;	RTS		 ; Return
 
 
 ; FIXME: Anybody want to claim this?

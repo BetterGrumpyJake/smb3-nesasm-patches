@@ -2814,7 +2814,11 @@ ObjState_Held:
 	JMP PRG000_CF98	 ; Jump to PRG000_CF98 (just draw held object) 
 
 PRG000_CE28:
-	JSR Object_ShellDoWakeUp ; Wake up while Player is holding object... 
+	;don't let held shells wake up
+    ;JSR Object_ShellDoWakeUp ; Wake up while Player is holding object...
+	NOP
+	NOP
+	NOP
 	BIT <Pad_Holding 
 	BVC Player_KickObject	 ; If Player is NOT holding B button, jump to Player_KickObject  
 

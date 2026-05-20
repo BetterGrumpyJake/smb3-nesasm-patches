@@ -5951,5 +5951,8 @@ SpawnShell_30:
 	;otherwise overwrite the ice block with a held green shell in the object slot found
     LDA #OBJ_GREENTROOPA
     STA Level_ObjectID,X
+	;add 16 frames of cooldown, so newly spawned shell doesn't collide with just thrown shell
+	LDA #$10
+    STA Objects_Timer2,X
 SpawnShellNo:
     RTS

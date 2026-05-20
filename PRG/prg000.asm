@@ -2956,7 +2956,8 @@ PRG000_CEBE:
 	; Make sure Player is facing object he's kicking
 	JSR Level_ObjCalcXDiffs
 	LDA PlayerKickFlipBits,Y
-	STA <Player_FlipBits
+	;when bumping a shell, don't flip mario. that way he doesn't kill the kicked shell with a held one
+    ;STA Player_FlipBits
 
 PRG000_CEC6:
 	LDA ObjectKickXVelMoving,Y	 ; Get appropriate base X velocity for kick
@@ -6095,12 +6096,18 @@ PRG000_DBDC:
 ;  'A' = ObjectID of the collided-with object
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	; Enable object-to-object by state (0 = Enabled, 1 = Disabled)
+	;used by
+	;held shell collision
+	;kicked shell collision
+	;tail swipe collision
 Obj2Obj_EnByState:
-	.byte $01	; State 0: Dead/Empty
-	.byte $01	; State 1: Initializing
-	.byte $00	; State 2: Normal
-	.byte $00	; State 3: Shelled
-	.byte $00	; State 4: Held
+    .byte $01   ; State 0: Dead/Empty
+    .byte $01   ; State 1: Initializing
+    .byte $00   ; State 2: Normal
+    .byte $00   ; State 3: Shelled
+	;State 4=01 nothing will interact with a held shell
+	;although a held shell will interact with other things
+    .byte $01   ; State 4: Held
 	.byte $00	; State 5: Kicked
 	.byte $01	; State 6: Killed
 	.byte $01	; State 7: Squashed

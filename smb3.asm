@@ -2466,7 +2466,9 @@ Tile_Mem:	.ds 6480	; $6000-$794F Space used to store the 16x16 "tiles" that make
 	Level_Jct_VSHi:		.ds 1	; Level junction vertical scroll high value
 	Level_Jct_VS:		.ds 1	; Level junction vertical scroll value
 
-				.ds 2	; $7990-7991 unused
+	;			.ds 2	; $7990-7991 unused
+	ThrowDirection:		.ds 1	; $7990 boolean flag whether or not Player_Kick should kick upward
+						.ds 1	; $7991 unused
 
 	Map_Unused7992:			; Value used in some dead code in PRG011; cleared elsewhere (NOT SURE if maybe it sometimes meant Bonus_DiePos?)
 	Bonus_DiePos:		.ds 1	; UNUSED Die in the lost bonus games, counts 0-5

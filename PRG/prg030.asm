@@ -5961,22 +5961,6 @@ SetKickedYVel:
 FirstDivide:
 	ROR A				; mod N,Z,C
 	;after this A= marios speed / 2
-	
-	;Y is still holding ThrowDirection, holding up=divide again, holding down=skip
-	CPY #PAD_UP
-	BNE SetShellVel
-
-	;refresh N from A
-	ORA #$00
-	;divide again
-	CLC
-	BPL SecondDivide
-	SEC
-SecondDivide:
-	ROR A
-	;after this A= marios speed / 4
-
-SetShellVel:
 	;store A into shells x vel
 	STA <Objects_XVel,X
 	

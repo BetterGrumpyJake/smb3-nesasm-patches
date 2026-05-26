@@ -5940,53 +5940,58 @@ PRG030_9FAF:
 ; NOTE: The remaining ROM space was all blank ($FF)
 ThrownYVels:
 	;     n/a  DOWN  UP
-	.byte $00, $04, -$78
+	.byte $00, $00, -$60
 	
 SetKickedYVel:
+	;zero shells y vel, what we removed from prg0
 	LDA #$00
 	STA <Objects_YVel,X
+	;load throw direction into Y
 	LDY ThrowDirection
-	BEQ _post_skyv		; (RTS)
-	STA ThrowDirection	; Zero this back out
+	;if ThrowDirection=$00 RTS, otherwise continue because ThrowDirection=$08 or $04
+	BEQ _post_skyv
+	;zero ThrowDirection
+	STA ThrowDirection
 
-	TYA					; Get throw direction
-	PHA					; Setting a shell down uses Mario's xvel+-8
-						; Throwing a shell up uses Mario's xvel/4
-    AND #PAD_UP
-	BEQ _set_shell_down
-
-_throw_shell_upward:
+	;do x velocity arithmetic
 	CLC
 	LDA <Player_XVel	; Use CLC/SEC and BPL to do an arithmetic right shift
-	BPL _skyv_xvel_ror1	; BPL branch on N=0
+	BPL FirstDivide	; BPL branch on N=0
 	SEC
-_skyv_xvel_ror1:
+FirstDivide:
 	ROR A				; mod N,Z,C
+	;after this A= marios speed / 2
+	
+	;Y is still holding ThrowDirection, holding up=divide again, holding down=skip
+	CPY #PAD_UP
+	BNE SetShellVel
+
+	;refresh N from A
+	ORA #$00
+	;divide again
 	CLC
-	BPL _skyv_xvel_ror2
+	BPL SecondDivide
 	SEC
-_skyv_xvel_ror2:
+SecondDivide:
 	ROR A
-	STA <Objects_XVel,X
-	JMP _skyv_set_yvel
+	;after this A= marios speed / 4
 
-_set_shell_down:
-	;; Override XVel if setting down
-	LDA #-$08
-	LDY <Player_FlipBits
-	BEQ _skyv_shell_down_xvel
-	NEG
-_skyv_shell_down_xvel:
-	ADD <Player_XVel
+SetShellVel:
+	;store A into shells x vel
 	STA <Objects_XVel,X
-
-_skyv_set_yvel:
-	PLA					; Restore shell throw direction
+	
+	; Transfer Y(ThrowDirection) to A, A is now $04 or $08
+	TYA
+	;logical shift rights, $04/4=1, $08/4=2
 	LSR A
 	LSR A
+	;transfer A to Y, either 1 or 2
 	TAY
+	;A= ThrownYVels,1 (00), or ThrownYVels,2 (-60)
 	LDA ThrownYVels,Y
+	;set that to shells y vel
 	STA <Objects_YVel,X
+	;set state to shelled
 	LDA #OBJSTATE_SHELLED
 	STA Objects_State,X
 
@@ -5995,14 +6000,18 @@ _post_skyv:
 	
 SetThrowDirection:
 _check_upthrow:
+	;check if holding up
 	LDA <Pad_Holding
 	AND #PAD_UP
 	BEQ _check_set_down
+	;store PAD_UP=$08 to ThrowDirection
 	STA ThrowDirection
 	RTS
 _check_set_down:
 	;;; ThrowDirection is either zero or down after this, which is what we want
+	;check if holding down
 	LDA <Pad_Holding
 	AND #PAD_DOWN
+	;store PAD_DOWN=$04 or neither held=$00 to ThrowDirection
 	STA ThrowDirection
 	RTS

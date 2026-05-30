@@ -5979,7 +5979,9 @@ FirstDivide:
 	LDA ThrownYVels,Y				;A= ThrownYVels,1 (00), or ThrownYVels,2 (-60)
 	STA <Objects_YVel,X				;set that to shells y vel
 	LDA #OBJSTATE_SHELLED			;set state to shelled
-	STA Objects_State,X	
+	STA Objects_State,X
+	LDA #$ff						;reset wake up timer on shells
+	STA Objects_Timer3,X
 KickedShellReturn:			
 	RTS
 DropTrickVel:

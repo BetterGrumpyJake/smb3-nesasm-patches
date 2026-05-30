@@ -6003,3 +6003,18 @@ ThrowReturn:
 	STA ThrowDirection				;store up=$08, down=$04, or neither=$00 to ThrowDirection
 	STA Objects_UpDrop,X			;store it in the per object slot array, used for other zero/nonzero checks
 	RTS
+	
+HitCeilingBumpBlocks_30:
+	LDA Objects_UpDrop,X			;check if that object slot was up/down kicked
+	BEQ SkipBumpBlocks				;skip bump blocks, but still apply downward y vel for koopas bumped from underneath if hit ceiling
+									;remove this up/drop kick check if you want bumped from underneath
+									;shells to interact with bump blocks above
+
+	LDY #10							;we are only throwing shells up 
+									;so group 1 head row in Object_TileDetectOffsets ($00, $08)
+	JSR Object_DetectTile			;detect the ceiling tile in prg0
+	JSR Object_BumpBlocks			;bump blocks if necessary in prg0
+SkipBumpBlocks:
+	LDA #$10						;velocity shell falls back down, what was removed in prg0
+	STA <Objects_YVel,X
+	RTS

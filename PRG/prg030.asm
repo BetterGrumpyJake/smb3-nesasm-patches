@@ -5938,64 +5938,66 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
+
+;;;;;ThrowDirection is for deciding Y velocities
+;;;;;Objects_UpDrop is per object, whether it was up thrown or dropped
 ThrownYVels:
 	;     n/a  DOWN  UP
-	.byte $00, $00, -$60
+	.byte $00, -$04, -$60
 	
-SetKickedYVel:
-	;zero shells y vel, what we removed from prg0
-	LDA #$00
-	STA <Objects_YVel,X
-	;load throw direction into Y
+SetKickedVel_30:
+	LDA #$00						;zero shells y vel, what we removed from prg0
+	STA <Objects_YVel,X		
+			
+;shell drop trick checks		
 	LDY ThrowDirection
-	;if ThrowDirection=$00 RTS, otherwise continue because ThrowDirection=$08 or $04
-	BEQ _post_skyv
-	;zero ThrowDirection
-	STA ThrowDirection
-
-	;do x velocity arithmetic
-	CLC
-	LDA <Player_XVel	; Use CLC/SEC and BPL to do an arithmetic right shift
-	BPL FirstDivide	; BPL branch on N=0
-	SEC
-FirstDivide:
-	ROR A				; mod N,Z,C
-	;after this A= marios speed / 2
-	;store A into shells x vel
-	STA <Objects_XVel,X
+	BNE UpDownThrowVel				;if ThrowDirection=$00(regular kick) continue
 	
-	; Transfer Y(ThrowDirection) to A, A is now $04 or $08
-	TYA
-	;logical shift rights, $04/4=1, $08/4=2
-	LSR A
-	LSR A
-	;transfer A to Y, either 1 or 2
-	TAY
-	;A= ThrownYVels,1 (00), or ThrownYVels,2 (-60)
-	LDA ThrownYVels,Y
-	;set that to shells y vel
+	LDA Objects_UpDrop,X			;if this object slot was dropped, use drop trick velocity
+	CMP #$04
+	BEQ DropTrickVel
+UpDownThrowVel:
+	CPY #$00						;Y still holds ThrowDirection
+	BEQ KickedShellReturn			;if ThrowDirection=$00 RTS, up(08) drop(04) continue
+	STA ThrowDirection				;zero ThrowDirection
+			
+;set kicked X vel		
+	CLC								;do x velocity arithmetic
+	LDA <Player_XVel				;Use CLC/SEC and BPL to do an arithmetic right shift
+	BPL FirstDivide					;BPL branch on N=0
+	SEC		
+FirstDivide:		
+	ROR A							;mod N,Z,C
+									;after this A= marios speed / 2
+	STA <Objects_XVel,X				;store A into shells x vel
+		
+;set kicked Y vel		
+	TYA								;transfer Y(ThrowDirection) to A, A is now $04 or $08													
+	LSR A							;;;;
+	LSR A							;logical shift rights, $04/4=1, $08/4=2
+	TAY								;transfer A to Y, either 1 or 2
+	LDA ThrownYVels,Y				;A= ThrownYVels,1 (00), or ThrownYVels,2 (-60)
+	STA <Objects_YVel,X				;set that to shells y vel
+	LDA #OBJSTATE_SHELLED			;set state to shelled
+	STA Objects_State,X	
+KickedShellReturn:			
+	RTS
+DropTrickVel:
+	LDA #$28						;drop trick velocity
 	STA <Objects_YVel,X
-	;set state to shelled
-	LDA #OBJSTATE_SHELLED
-	STA Objects_State,X
+	RTS
 
-_post_skyv:
-	RTS
-	
 SetThrowDirection:
-_check_upthrow:
-	;check if holding up
-	LDA <Pad_Holding
-	AND #PAD_UP
-	BEQ _check_set_down
-	;store PAD_UP=$08 to ThrowDirection
-	STA ThrowDirection
-	RTS
-_check_set_down:
-	;;; ThrowDirection is either zero or down after this, which is what we want
-	;check if holding down
-	LDA <Pad_Holding
+	LDA #$00						;clear objects drop flag on rethrow
+	STA Objects_UpDrop,X			;in case shell was dropped and then recaught before hitting the ground clear		
+	
+	LDA <Pad_Holding				;check if holding up
+	AND #PAD_UP		
+	BNE ThrowReturn					;if not holding up check down
+	
+	LDA <Pad_Holding				;check if holding down
 	AND #PAD_DOWN
-	;store PAD_DOWN=$04 or neither held=$00 to ThrowDirection
-	STA ThrowDirection
+ThrowReturn:
+	STA ThrowDirection				;store up=$08, down=$04, or neither=$00 to ThrowDirection
+	STA Objects_UpDrop,X			;store it in the per object slot array, used for other zero/nonzero checks
 	RTS

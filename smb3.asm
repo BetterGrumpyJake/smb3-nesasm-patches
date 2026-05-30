@@ -2467,7 +2467,7 @@ Tile_Mem:	.ds 6480	; $6000-$794F Space used to store the 16x16 "tiles" that make
 	Level_Jct_VS:		.ds 1	; Level junction vertical scroll value
 
 	;			.ds 2	; $7990-7991 unused
-	ThrowDirection:		.ds 1	; $7990 boolean flag whether or not Player_Kick should kick upward
+	ThrowDirection:		.ds 1	; $7990 flag for up, down, or neither for shells
 						.ds 1	; $7991 unused
 
 	Map_Unused7992:			; Value used in some dead code in PRG011; cleared elsewhere (NOT SURE if maybe it sometimes meant Bonus_DiePos?)
@@ -2479,7 +2479,8 @@ Tile_Mem:	.ds 6480	; $6000-$794F Space used to store the 16x16 "tiles" that make
 
 	Player_NoSlopeStick:	.ds 1	; If set, Player does not stick to slopes (noticeable running downhill)
 
-				.ds 105	; $7997-$79FF unused
+	Objects_UpDrop:		.ds 8	;$7997-$799E, flag for drop tricks per object slot
+						.ds 97	; $799F-$79FF unused
 	; Auto scroll effect variables -- everything to do with screens that aren't scrolling in the normal way
 	; NOTE: Post-airship cinematic scene with Toad and King ONLY uses $7A01-$7A11 MMC3 SRAM (from Level_AScrlSelect to Level_AScrlHVelCarry)
 

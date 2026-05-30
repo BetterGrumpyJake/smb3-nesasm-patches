@@ -566,25 +566,25 @@ PRG000_C3E7:
 ; FIXME: Anybody want to claim this?
 ; Looks like maybe a leftover debug routine for some kind of "float around" mode maybe!!
 ; $C3EA 
-	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player X velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_XVel
-
-	LDA <Pad_Holding
-	LSR A
-	LSR A
-	AND #((PAD_UP | PAD_DOWN) >> 2)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player Y velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_YVel
-
-	RTS		 ; Return
+;	LDA <Pad_Holding
+;	AND #(PAD_LEFT | PAD_RIGHT)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player X velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_XVel
+;
+;	LDA <Pad_Holding
+;	LSR A
+;	LSR A
+;	AND #((PAD_UP | PAD_DOWN) >> 2)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player Y velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_YVel
+;
+;	RTS		 ; Return
 
 	; Offsets into Sprite_RAM used by objects
 SprRamOffsets:
@@ -2181,7 +2181,10 @@ PRG000_CB10:
  
 	LDA <Objects_DetStat,X 
 	AND #$04 
-	BEQ PRG000_CB45	 ; If object hit floor, jump to PRG000_CB45 
+	BEQ PRG000_CB45	 ; If object DOES NOT hit floor, jump to PRG000_CB45
+	
+	LDA #$00			;if shell touches ground, clear the flag
+	STA Objects_UpDrop,X
 
 	LDA <Objects_YVel,X 
 	BMI PRG000_CB45	 ; If object is moving upward, jump to PRG000_CB45 
@@ -2986,7 +2989,7 @@ PRG000_CEE8:
 	; Set object's Y velocity to zero
 	;LDA #$00
 	;STA <Objects_YVel,X
-	JSR SetKickedYVel
+	JSR SetKickedVel_30
 
 	JMP PRG000_CF98	 ; Jump to PRG000_CF98
 
@@ -4414,6 +4417,7 @@ PRG000_D4C8:
 	STA Objects_Var12,X
 	STA Objects_Var13,X
 	STA Objects_Var14,X
+	STA Objects_UpDrop,X		;clear the was it up thrown/dropped flag
 
 PRG000_D506:
 	RTS		 ; Return

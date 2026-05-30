@@ -2832,11 +2832,16 @@ Player_KickObject:
 	LDA Level_PipeMove	 
 	BNE PRG000_CE2F	 ; If Player is moving through pipes, jump to PRG000_CE2F (PRG000_CEEF)
 
+	LDA ThrowDirection		;skip kick sound on shell drop
+	AND #PAD_DOWN
+	BNE SkipKickSound
+	
 	; Play kick sound
 	LDA Sound_QPlayer
 	ORA #SND_PLAYERKICK
 	STA Sound_QPlayer
-
+	
+SkipKickSound:
 	; Have Player do kick frame
 	LDA #$0c
 	STA Player_Kick

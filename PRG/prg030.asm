@@ -6018,3 +6018,10 @@ SkipBumpBlocks:
 	LDA #$10						;velocity shell falls back down, what was removed in prg0
 	STA <Objects_YVel,X
 	RTS
+	
+AirborneShellKill_30:
+	LDA Objects_UpDrop,X			;check if that object slot was up/down kicked
+	BEQ AirborneShellNoKill			;RTS
+	JMP DoUpDownKill_00				;jump to the code that kills enemies from a kicked shell
+AirborneShellNoKill:
+	RTS

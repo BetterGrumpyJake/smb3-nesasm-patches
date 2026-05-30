@@ -2178,6 +2178,7 @@ PRG000_CB10:
 
 	JSR Object_ShellDoWakeUp	 ; Handle waking up (MAY not return here, if object "wakes up"!) 
 	JSR Object_Move	 		; Perform standard object movements
+	JSR AirborneShellKill_30		;handle up and down kicked shells kill enemies
  
 	LDA <Objects_DetStat,X 
 	AND #$04 
@@ -2588,7 +2589,7 @@ PRG000_CCF4:
 
 PRG000_CCF7: 
 	JSR Object_HandleBumpUnderneath	 ; Handle the kicked shelled object getting hit from underneath
- 
+DoUpDownKill_00:
 	TXA 
 	ADD <Counter_1 
 	LSR A 

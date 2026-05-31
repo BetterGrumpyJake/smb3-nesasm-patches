@@ -1128,7 +1128,8 @@ PRG030_881D:
 	STA Map_EntTran_Cnt	 ; Map_EntTran_Cnt = $30
 
 	LDA #SND_MAPENTERLEVEL
-	STA Sound_QMap	 ; Play "enter level" sound effect!
+	;STA Sound_QMap	 ; Play "enter level" sound effect!
+	JSR CheckPlayLevelEntrySound
 
 	; Loop until V-Blank is not occurring
 PRG030_883E:
@@ -1633,7 +1634,10 @@ PRG030_8AE0:
 	CMP #18
 	BNE PRG030_8AE7	 ; If Level_Tileset <> 18 (2P Vs), jump to PRG030_8AE7
 
-	JMP Do_2PVsChallenge	 ; Jump Do_2PVsChallenge
+	;JMP Do_2PVsChallenge	 ; Jump Do_2PVsChallenge
+	NOP
+	NOP
+	NOP
 
 PRG030_8AE7:
 	; Normal gameplay...
@@ -2318,7 +2322,8 @@ PRG030_8E5D:
 
 	LDA Level_PauseFlag
 	EOR #$01	 
-	STA Level_PauseFlag	 ; Toggle pause flag
+	;STA Level_PauseFlag	 ; Toggle pause flag
+	JSR InitializePauseMenu
  
 	BNE PRG030_8E76	 ; If game is now paused, jump to PRG030_8E76
 
@@ -2332,14 +2337,20 @@ PRG030_8E79:
 	BEQ PRG030_8EAD	 	; If not paused, jump to PRG030_8EAD
 
 	; When game is paused...
+	;; Do the new pause menu state machine:
+	;; > continue	(unpause)
+	;;   restart	(restart level)
+	;;   quit	(return to map)
+	JSR RunPauseMenu13
+	JMP Level_MainLoop
 
 	; Wow, what the heck did they remove here??
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
 	NOP
 	NOP
 	NOP
@@ -3093,410 +3104,537 @@ PRG030_927E:
 	LDA GameOver_State
 
 	CMP #$06
-	BEQ PRG030_929C	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_929C
+	;BEQ PRG030_929C	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_929C
+	BEQ PRG030_927E	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_927E
 
 	CMP #$09
 	BNE PRG030_927E	 ; If GameOver_State <> 9 (Player did not choose to END), jump to PRG030_927E (loop around)
 
-	; Player chose to END...
+;	; Player chose to END...
+;
+;	LDA Total_Players
+;	CMP #$01
+;	BEQ PRG030_92B6	 ; If Total_Players = 1, jump to PRG030_92B6
+;
+;	; More than 2 Players
+;
+;PRG030_929C:
+;	
+;	; Stop music
+;	LDA #MUS1_STOPMUSIC
+;	STA Sound_QMusic1
+;
+;	; Switch bank A000 to page 26
+;	LDA #26
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	JSR Palette_FadeOut	; Fade out
+;
+;	LDA GameOver_State
+;	CMP #$09
+;	BEQ PRG030_92B6	 ; If GameOver_State = 9 (Player chose to END), jump to PRG030_92B6
+;
+;	JMP PRG030_9149	 ; Jump to PRG030_9149
+;
+;PRG030_92B6:
+;
+;	LDA #$00
+;	STA World_EnterState	 ; World_EnterState = 0 (just arriving)
+;
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	LDA Map_GameOver_CursorY
+;	AND #$08
+;	BNE PRG030_932A	 ; If Player chose to END, jump to PRG030_932A
+;
+;	; Player's live reset to 4
+;	LDA #$04
+;	STA Player_Lives,X
+;
+;	; Set up position variables
+;	LDA <Horz_Scroll
+;	STA Map_Prev_XOff,X
+;	LDA <Horz_Scroll_Hi
+;	STA Map_Prev_XHi,X
+;	LDA <World_Map_Y,X
+;	STA Map_Entered_Y,X
+;	LDA <World_Map_XHi,X
+;	STA Map_Entered_XHi,X
+;	LDA <World_Map_X,X
+;	STA Map_Entered_X,X
+;	LDA <Map_UnusedPlayerVal2,X
+;	STA Map_Previous_UnusedPVal2,X
+;
+;	; Reset map variables
+;	LDA #$00
+;	STA Map_Player_SkidBack,X
+;	STA World_EnterState
+;	STA Map_GameOver_CursorY
+;	STA BigQBlock_GotIt	; Didn't get any Big ? Blocks
+;
+;	LDY #(Inventory_Coins - Inventory_Cards)	; Y = offset to Mario's coins
+;
+;	CPX #$00
+;	BEQ PRG030_92FE	 ; If Player is Mario, jump to PRG030_92FE
+;
+;	LDY #(Inventory_Coins2 - Inventory_Cards)	; Y = offset to Luigi's coins
 
-	LDA Total_Players
-	CMP #$01
-	BEQ PRG030_92B6	 ; If Total_Players = 1, jump to PRG030_92B6
+;PRG030_92FE:
+;	LDA #(Inventory_Coins - Inventory_Cards)
+;	STA <Temp_Var1		 ; Temp_Var1 = total bytes to clear
 
-	; More than 2 Players
+;	LDA #$00	 ; A = 0
+;PRG030_9304:
+;	STA Inventory_Cards,Y	 ; Clear cards/coins
+;
+;	DEY		 ; Y--
+;	DEC <Temp_Var1	 ; Temp_Var1--
+;	BPL PRG030_9304	 ; While Temp_Var1 >= 0, loop
+;
+;	LDY #$3f	 ; Y = $3F (End of Mario's Map Completions)
+;
+;	CPX #$00
+;	BEQ PRG030_9314	 ; If Player is Mario, jump to PRG030_9314
+;
+;	LDY #$7f	 ; Y = $7F (End of Luigi's Map Completions)
+;
+;PRG030_9314:
+;	LDA #$3f
+;	STA <Temp_Var1	 ; Temp_Var1 = $3F
+; 
+;PRG030_9318:
+;	TYA
+;	EOR #$40
+;	TAX
+;
+;	; Clear this Player's map completions
+;	LDA Map_Completions,X
+;	AND Map_Completions,Y
+;	STA Map_Completions,Y
+;
+;	DEY		 ; Y--
+;	DEC <Temp_Var1	 ; Temp_Var1--
+;	BPL PRG030_9318	 ; While Temp_Var1 >= 0, loop!
+;
+;PRG030_932A:
+;	LDY Total_Players	 ; Y = Total_Players
+;	DEY		 ; Y = 0 if 1P, or 1 if 2P
+;
+;PRG030_932E:
+;	LDA Player_Lives,Y
+;	BPL PRG030_933E	 ; If this Player isn't dead, jump to PRG030_933E
+;
+;	DEY		 ; Y--
+;	BPL PRG030_932E	 ; While Y >= 0, loop
+;
+;	; All Players are dead and have given up
+;
+;	; Stop music
+;	LDA #MUS1_STOPMUSIC
+;	STA Sound_QMusic1
+;
+;	; Reset game
+;	JMP IntReset_Part2
+;
+;PRG030_933E:
+;
+;	; A Player gave up, but there's one left
+;
+;	JSR GameOver_PlayerQuitCleanup	 ; Performs some cleanup work for the Player who left
+;
+;	; Map_Operation = 0
+;	LDY #$00
+;	STY Map_Operation
+;
+;	LDX Player_Current	 ; X = Player_Current
+;	JMP PRG030_879B	 ; Jump to PRG030_879B
+;
+;
+;Do_2PVsChallenge:
+;
+;	; 2P Vs Challenge!
+;
+;	; Load page 14 @ C000
+;	LDA #14
+;	STA PAGE_C000
+;	JSR PRGROM_Change_Both2
+;
+;	JSR Scroll_Dirty_Update	 ; Render the 2P Vs terrain
+;
+;	; Update_Select = $C0
+;	LDA #$c0
+;	STA Update_Select
+;
+;	; Raster_Effect = $80
+;	LDA #$80
+;	STA Raster_Effect
+;
+;	; Load graphics for 2P Vs
+;	LDY #$04
+;	STY PatTable_BankSel+2
+;	INY
+;	STY PatTable_BankSel+3
+;	INY
+;	STY PatTable_BankSel+4
+;	INY
+;	STY PatTable_BankSel+5
+;
+;	; Play battle (2P Vs) music
+;	LDA #MUS2B_BATTLE
+;	STA Level_MusicQueue
+;
+;	; Set page @ A000 to 27
+;	LDA #27
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	JSR Setup_PalData	 ; On page 27 -- PalData now holds palette data for world map tiles/objects
+;
+;	; Resume Update_Select activity
+;	LDA #$00
+;	STA UpdSel_Disable
+;
+;	; Set page @ A000 to 26
+;	LDA #26
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;	JSR Palette_FadeIn	 ; On page 26 -- Fade in the world map
 
-PRG030_929C:
+;	; Set page @ A000 to 9
+;	LDA #$09
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;PRG030_939A:
+;	JSR GraphicsBuf_Prep_And_WaitVSync	 ; V Sync
+;
+;	LDA SndCur_Map
+;	AND #SND_MAPENTERLEVEL
+;	BNE PRG030_93B1	 ; If the level entrance sound is still playing, jump to PRG030_93B1
+;
+;	LDA Level_MusicQueue
+;	BEQ PRG030_93B1	 ; If no BGM is queued, jump to PRG030_93B1
+;
+;	; Play the queued music
+;	STA Sound_QMusic2
+;
+;	; Clear music queue
+;	LDA #$00
+;	STA Level_MusicQueue
+;
+;PRG030_93B1:
+;	JSR Sprite_RAM_Clear	 ; Clear Sprite RAM 
+;	JSR Vs_2PVsPauseHandler	 ; Handle pausing
+;
+;	LDA Level_ExitToMap
+;	BEQ PRG030_939A	 ; If not exiting to map, loop 2P Vs!
+;
+;	; Set page @ A000 to 26
+;	LDA #26
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;	JSR Palette_FadeOut	 		; Fade out
+;
+;	; Stop 2P Vs music
+;	LDA #MUS1_STOPMUSIC
+;	STA Sound_QMusic1
+;
+;	LDA #%00011000
+;	STA <PPU_CTL2_Copy	; Show BG+Sprites
+;
+;	JSR GraphicsBuf_Prep_And_WaitVSync	; Vertical sync
+;
+;	; Disable display
+;	LDA #$00
+;	STA PPU_CTL1
+;	STA PPU_CTL2
+;
+;	LDX Map_PlayerLost2PVs
+;	DEX
+;	CPX Player_Current
+;	BNE PRG030_93E7	 ; If the Player who lost the match was not the Player whose turn it was, jump to PRG030_93E7
+;
+;	JMP PRG030_946C	 ; Jump to PRG030_946C
+;
+;PRG030_93E7:
+;	LDA #(Inventory_Score - Inventory_Items)	; Offset to Mario's score
+;
+;	LDX Player_Current
+;	BEQ PRG030_93F1	 ; If current Player is Mario, jump to PRG030_93F1
+;
+;	ADD #(Inventory_Score2 - Inventory_Score)	; Offset to Luigi's score
+;
+;PRG030_93F1:
+;	TAY		 ; Y = offset to Player's score
+;
+;	LDX #$00	 ; X = 0
+;PRG030_93F4:
+;	LDA Inventory_Items,Y
+;	STA Player_Score,X
+;
+;	INY		 ; Y++ (next "inventory" score byte)
+;	INX		 ; X++ (next "active" score byte)
+;
+;	CPX #$03
+;	BNE PRG030_93F4	; While X <> 3, loop!
+;
+;	LDX Map_PlayerLost2PVs
+;	DEX
+;	TXA
+;	EOR #$01
+;	TAY		 ; Y = the OTHER Player's index
+;
+;	; Swap all Player map position variables because the challenger lost!
+;	LDA Map_Previous_Y,Y
+;	STA <Temp_Var1
+;	LDA Map_Previous_XHi,Y
+;	STA <Temp_Var2
+;	LDA Map_Previous_X,Y
+;	STA <Temp_Var3
+;	LDA Map_Prev_XOff2,Y
+;	STA <Temp_Var4
+;	LDA Map_Prev_XHi2,Y
+;	STA <Temp_Var5
+;	LDA Map_Prev_XOff,Y
+;	STA <Temp_Var6
+;	LDA Map_Prev_XHi,Y
+;	STA <Temp_Var7
+;	LDA Map_Previous_Y,X
+;	STA Map_Previous_Y,Y
+;	LDA Map_Previous_XHi,X
+;	STA Map_Previous_XHi,Y
+;	LDA Map_Previous_X,X
+;	STA Map_Previous_X,Y
+;	LDA Map_Prev_XOff2,X
+;	STA Map_Prev_XOff2,Y
+;	LDA Map_Prev_XHi2,X
+;	STA Map_Prev_XHi2,Y
+;	LDA <Temp_Var1
+;	STA Map_Previous_Y,X
+;	LDA <Temp_Var2
+;	STA Map_Previous_XHi,X
+;	LDA <Temp_Var3
+;	STA Map_Previous_X,X
+;	LDA <Temp_Var4
+;	STA Map_Prev_XOff2,X
+;	LDA <Temp_Var5
+;	STA Map_Prev_XHi2,X
+;	LDA <Temp_Var6
+;	STA Map_Prev_XOff,X
+;	LDA <Temp_Var7
+;	STA Map_Prev_XHi,X
+;
+;PRG030_946C:
+;
+;	; Flag as "death" so challenger flies backward
+;	LDX Map_PlayerLost2PVs
+;	STX Map_ReturnStatus
+;
+;	; Set new current Player
+;	DEX		 ; X--
+;	STX Player_Current
+;
+;	JMP PRG030_8FB2	 ; Jump to PRG030_8FB2
+;
+;GameOver_WhiteMapObjs:
+;	.byte MAPOBJ_NSPADE, MAPOBJ_WHITETOADHOUSE, MAPOBJ_UNK0C
+;
+;
+;GameOver_PlayerQuitCleanup:
+;	LDY Total_Players	; Y = Total_Players
+;	CPY #$01
+;	BEQ PRG030_948F	 	; If only a 1P game, jump to PRG030_948F
+;
+;	; This is a 2P game
+;
+;	DEY		 ; Y-- (Y = 1)
+;PRG030_9484:
+;	LDA Player_Lives,Y
+;	BPL PRG030_948E	 ; If this is the living Player, jump to PRG030_948E (RTS)
+;
+;	DEY		 ; Y--
+;	BPL PRG030_9484	 ; While Y >= 0, loop!
+;
+;	BMI PRG030_948F	 ; Jump to PRG030_948F
+;
+;PRG030_948E:
+;	RTS		 ; Return
+;
+;PRG030_948F:
+;	; BUG!! Apparently the game is SUPPOSED to delete all 
+;	; bonus objects after a game over, but code starts with
+;	; the wrong index (see immediately below) and that causes
+;	; this to not work correctly!  Strange, huh?
+;
+;	; As my brother put it:
+;	; "It may have been because of the 2P mode. You can't punish
+;	; the other player because one of you sucks bad."
+;
+;	LDX #-$04	; <-- BUG!  BAD INDEX!!  (Should be X = 2??)
+;PRG030_9491:
+;	LDY #(MAPOBJ_TOTAL-1)	 ; Y = (MAPOBJ_TOTAL-1) (all Map Objects)
+;
+;PRG030_9493:
+;	LDA Map_Objects_IDs,Y
+;	BEQ PRG030_94A2	 ; If this Map Object is empty, jump to PRG030_94A2
+;
+;	CMP GameOver_WhiteMapObjs,X
+;	BNE PRG030_94A2	 ; If this is NOT one of the "white" objects (White Toad House, Coin Ship, and the ??), jump to PRG030_94A2
+;
+;	; Delete the bonus objects!  You don't deserve them!
+;
+;	LDA #MAPOBJ_EMPTY
+;	STA Map_Objects_IDs,Y
+;
+;PRG030_94A2:
+;	DEY		 ; Y--
+;	BPL PRG030_9493	 ; While Y >= 0, loop
+;
+;	DEX		 ; X--
+;	BPL PRG030_9491	 ; While X >= 0, loop	<-- BUG! This will fail on the first pass!
+;
+;	LDA #$00
+;	STA Map_NSpade_NextScore	 ; Highest byte in the N-Spade score = 0
+;	STA Map_Anchored ; Airship is no longer anchored
+;
+;	; N-Spade appears every 80,000 points, but the leading zero is fake, so 8000
+;
+;	; Middle byte of the N-Spade score
+;	LDA #HIGH(8000)
+;	STA Map_NSpade_NextScore+1
+;
+;	; Lowest byte of the N-Spade score
+;	LDA #LOW(8000)
+;	STA Map_NSpade_NextScore+2
+;
+;	RTS		 ; Return
+InitializePauseMenu:
+	STA Level_PauseFlag	; Toggle pause flag
+	STA PauseMenuSel	; Set our menu selection (0 for unpaused, 1 for pausing)
+	RTS
 	
-	; Stop music
-	LDA #MUS1_STOPMUSIC
-	STA Sound_QMusic1
+RunPauseMenu13:
+	LDA PAGE_A000
+	PHA
 
+	; Set page @ A000 to 13
+;	LDA #$09
+	LDA #13
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	
+	JSR RunPauseMenu
+	
+	PLA
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	RTS
+	
+DoSoundEngineSave13:
+	LDA PAGE_A000
+	PHA
+	LDA #13
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	JSR DoSoundEngineSave
+	PLA
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	RTS
+
+DoSoundEngineRestore13:
+	LDA PAGE_A000
+	PHA
+	LDA #13
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	JSR DoSoundEngineRestore
+	PLA
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	RTS
+	
+RestartLevelPRG030:		; This is jumped to from Level_MainLoop->RunPauseMenu->DoMenuInput->PauseMenuRestartLevel
+	PLA			; Restore the A000 page saved by RunPauseMenu13 before getting here
+	TAY
+	PLA
+	PLA			; Remove the Level_MainLoop return address
+	TYA
+	STA PAGE_A000
+	JSR PRGROM_Change_A000
+	
+	INC LevelRestarting			; Flag that we're restarting the level
+
+	LDA SoundEngineBackedUp
+	BNE _no_sound_engine_save
+	JSR DoSoundEngineSave13			; We don't want to save if we already saved at the death song
+_no_sound_engine_save:
 	; Switch bank A000 to page 26
 	LDA #26
 	STA PAGE_A000
 	JSR PRGROM_Change_A000
+	JSR Palette_FadeOut			; Fade out
+	JSR GraphicsBuf_Prep_And_WaitVSync
 
-	JSR Palette_FadeOut	; Fade out
+	JSR Clear_500_300_RAM
 
-	LDA GameOver_State
-	CMP #$09
-	BEQ PRG030_92B6	 ; If GameOver_State = 9 (Player chose to END), jump to PRG030_92B6
+	JSR Sprite_RAM_Clear
+	JSR Scroll_PPU_Reset
 
-	JMP PRG030_9149	 ; Jump to PRG030_9149
+	LDA #$10
+	STA Map_Operation
 
-PRG030_92B6:
+	LDA Map_Prev_XOff
+	STA <Horz_Scroll
+	LDA Map_Prev_XHi
+	STA <Horz_Scroll_Hi
+	LDA Map_Entered_Y
+	STA <World_Map_Y
+	LDA Map_Entered_XHi
+	STA <World_Map_XHi
+	LDA Map_Entered_X
+	STA <World_Map_X
+	LDA Map_Previous_UnusedPVal2
+	STA <Map_UnusedPlayerVal2
 
-	LDA #$00
-	STA World_EnterState	 ; World_EnterState = 0 (just arriving)
-
-	LDX Player_Current	 ; X = Player_Current
-
-	LDA Map_GameOver_CursorY
-	AND #$08
-	BNE PRG030_932A	 ; If Player chose to END, jump to PRG030_932A
-
-	; Player's live reset to 4
-	LDA #$04
-	STA Player_Lives,X
-
-	; Set up position variables
-	LDA <Horz_Scroll
-	STA Map_Prev_XOff,X
-	LDA <Horz_Scroll_Hi
-	STA Map_Prev_XHi,X
-	LDA <World_Map_Y,X
-	STA Map_Entered_Y,X
-	LDA <World_Map_XHi,X
-	STA Map_Entered_XHi,X
-	LDA <World_Map_X,X
-	STA Map_Entered_X,X
-	LDA <Map_UnusedPlayerVal2,X
-	STA Map_Previous_UnusedPVal2,X
-
-	; Reset map variables
-	LDA #$00
-	STA Map_Player_SkidBack,X
-	STA World_EnterState
-	STA Map_GameOver_CursorY
-	STA BigQBlock_GotIt	; Didn't get any Big ? Blocks
-
-	LDY #(Inventory_Coins - Inventory_Cards)	; Y = offset to Mario's coins
-
-	CPX #$00
-	BEQ PRG030_92FE	 ; If Player is Mario, jump to PRG030_92FE
-
-	LDY #(Inventory_Coins2 - Inventory_Cards)	; Y = offset to Luigi's coins
-
-PRG030_92FE:
-	LDA #(Inventory_Coins - Inventory_Cards)
-	STA <Temp_Var1		 ; Temp_Var1 = total bytes to clear
-
-	LDA #$00	 ; A = 0
-PRG030_9304:
-	STA Inventory_Cards,Y	 ; Clear cards/coins
-
-	DEY		 ; Y--
-	DEC <Temp_Var1	 ; Temp_Var1--
-	BPL PRG030_9304	 ; While Temp_Var1 >= 0, loop
-
-	LDY #$3f	 ; Y = $3F (End of Mario's Map Completions)
-
-	CPX #$00
-	BEQ PRG030_9314	 ; If Player is Mario, jump to PRG030_9314
-
-	LDY #$7f	 ; Y = $7F (End of Luigi's Map Completions)
-
-PRG030_9314:
-	LDA #$3f
-	STA <Temp_Var1	 ; Temp_Var1 = $3F
- 
-PRG030_9318:
-	TYA
-	EOR #$40
+	JMP PRG030_8732
+	
+CheckPlayLevelEntrySound:
 	TAX
-
-	; Clear this Player's map completions
-	LDA Map_Completions,X
-	AND Map_Completions,Y
-	STA Map_Completions,Y
-
-	DEY		 ; Y--
-	DEC <Temp_Var1	 ; Temp_Var1--
-	BPL PRG030_9318	 ; While Temp_Var1 >= 0, loop!
-
-PRG030_932A:
-	LDY Total_Players	 ; Y = Total_Players
-	DEY		 ; Y = 0 if 1P, or 1 if 2P
-
-PRG030_932E:
-	LDA Player_Lives,Y
-	BPL PRG030_933E	 ; If this Player isn't dead, jump to PRG030_933E
-
-	DEY		 ; Y--
-	BPL PRG030_932E	 ; While Y >= 0, loop
-
-	; All Players are dead and have given up
-
-	; Stop music
-	LDA #MUS1_STOPMUSIC
-	STA Sound_QMusic1
-
-	; Reset game
-	JMP IntReset_Part2
-
-PRG030_933E:
-
-	; A Player gave up, but there's one left
-
-	JSR GameOver_PlayerQuitCleanup	 ; Performs some cleanup work for the Player who left
-
-	; Map_Operation = 0
-	LDY #$00
-	STY Map_Operation
-
-	LDX Player_Current	 ; X = Player_Current
-	JMP PRG030_879B	 ; Jump to PRG030_879B
-
-
-Do_2PVsChallenge:
-
-	; 2P Vs Challenge!
-
-	; Load page 14 @ C000
-	LDA #14
-	STA PAGE_C000
-	JSR PRGROM_Change_Both2
-
-	JSR Scroll_Dirty_Update	 ; Render the 2P Vs terrain
-
-	; Update_Select = $C0
-	LDA #$c0
-	STA Update_Select
-
-	; Raster_Effect = $80
-	LDA #$80
-	STA Raster_Effect
-
-	; Load graphics for 2P Vs
-	LDY #$04
-	STY PatTable_BankSel+2
-	INY
-	STY PatTable_BankSel+3
-	INY
-	STY PatTable_BankSel+4
-	INY
-	STY PatTable_BankSel+5
-
-	; Play battle (2P Vs) music
-	LDA #MUS2B_BATTLE
-	STA Level_MusicQueue
-
-	; Set page @ A000 to 27
-	LDA #27
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-	JSR Setup_PalData	 ; On page 27 -- PalData now holds palette data for world map tiles/objects
-
-	; Resume Update_Select activity
-	LDA #$00
-	STA UpdSel_Disable
-
-	; Set page @ A000 to 26
-	LDA #26
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR Palette_FadeIn	 ; On page 26 -- Fade in the world map
-
-	; Set page @ A000 to 9
-	LDA #$09
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-PRG030_939A:
-	JSR GraphicsBuf_Prep_And_WaitVSync	 ; V Sync
-
-	LDA SndCur_Map
-	AND #SND_MAPENTERLEVEL
-	BNE PRG030_93B1	 ; If the level entrance sound is still playing, jump to PRG030_93B1
-
-	LDA Level_MusicQueue
-	BEQ PRG030_93B1	 ; If no BGM is queued, jump to PRG030_93B1
-
-	; Play the queued music
-	STA Sound_QMusic2
-
-	; Clear music queue
-	LDA #$00
-	STA Level_MusicQueue
-
-PRG030_93B1:
-	JSR Sprite_RAM_Clear	 ; Clear Sprite RAM 
-	JSR Vs_2PVsPauseHandler	 ; Handle pausing
-
-	LDA Level_ExitToMap
-	BEQ PRG030_939A	 ; If not exiting to map, loop 2P Vs!
-
-	; Set page @ A000 to 26
-	LDA #26
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR Palette_FadeOut	 		; Fade out
-
-	; Stop 2P Vs music
-	LDA #MUS1_STOPMUSIC
-	STA Sound_QMusic1
-
-	LDA #%00011000
-	STA <PPU_CTL2_Copy	; Show BG+Sprites
-
-	JSR GraphicsBuf_Prep_And_WaitVSync	; Vertical sync
-
-	; Disable display
-	LDA #$00
-	STA PPU_CTL1
-	STA PPU_CTL2
-
-	LDX Map_PlayerLost2PVs
-	DEX
-	CPX Player_Current
-	BNE PRG030_93E7	 ; If the Player who lost the match was not the Player whose turn it was, jump to PRG030_93E7
-
-	JMP PRG030_946C	 ; Jump to PRG030_946C
-
-PRG030_93E7:
-	LDA #(Inventory_Score - Inventory_Items)	; Offset to Mario's score
-
-	LDX Player_Current
-	BEQ PRG030_93F1	 ; If current Player is Mario, jump to PRG030_93F1
-
-	ADD #(Inventory_Score2 - Inventory_Score)	; Offset to Luigi's score
-
-PRG030_93F1:
-	TAY		 ; Y = offset to Player's score
-
-	LDX #$00	 ; X = 0
-PRG030_93F4:
-	LDA Inventory_Items,Y
-	STA Player_Score,X
-
-	INY		 ; Y++ (next "inventory" score byte)
-	INX		 ; X++ (next "active" score byte)
-
-	CPX #$03
-	BNE PRG030_93F4	; While X <> 3, loop!
-
-	LDX Map_PlayerLost2PVs
-	DEX
+	LDA LevelRestarting
+	BEQ _not_restarting
+	RTS				; We still have more to do before we're done restarting the level
+_not_restarting:
 	TXA
-	EOR #$01
-	TAY		 ; Y = the OTHER Player's index
+	STA Sound_QMap	 ; Play "enter level" sound effect!
+	RTS
 
-	; Swap all Player map position variables because the challenger lost!
-	LDA Map_Previous_Y,Y
-	STA <Temp_Var1
-	LDA Map_Previous_XHi,Y
-	STA <Temp_Var2
-	LDA Map_Previous_X,Y
-	STA <Temp_Var3
-	LDA Map_Prev_XOff2,Y
-	STA <Temp_Var4
-	LDA Map_Prev_XHi2,Y
-	STA <Temp_Var5
-	LDA Map_Prev_XOff,Y
-	STA <Temp_Var6
-	LDA Map_Prev_XHi,Y
-	STA <Temp_Var7
-	LDA Map_Previous_Y,X
-	STA Map_Previous_Y,Y
-	LDA Map_Previous_XHi,X
-	STA Map_Previous_XHi,Y
-	LDA Map_Previous_X,X
-	STA Map_Previous_X,Y
-	LDA Map_Prev_XOff2,X
-	STA Map_Prev_XOff2,Y
-	LDA Map_Prev_XHi2,X
-	STA Map_Prev_XHi2,Y
-	LDA <Temp_Var1
-	STA Map_Previous_Y,X
-	LDA <Temp_Var2
-	STA Map_Previous_XHi,X
-	LDA <Temp_Var3
-	STA Map_Previous_X,X
-	LDA <Temp_Var4
-	STA Map_Prev_XOff2,X
-	LDA <Temp_Var5
-	STA Map_Prev_XHi2,X
-	LDA <Temp_Var6
-	STA Map_Prev_XOff,X
-	LDA <Temp_Var7
-	STA Map_Prev_XHi,X
+CheckQueueLevelsMusic:
+	TAX
+	LDA LevelRestarting
+	BEQ _not_restarting2
+	JSR DoSoundEngineRestore13
+	DEC LevelRestarting		; Restarting the level done
+	RTS
+_not_restarting2:
+	TXA
+	STA Level_MusicQueue
+	STA Level_MusicQueueRestore
+	RTS
 
-PRG030_946C:
-
-	; Flag as "death" so challenger flies backward
-	LDX Map_PlayerLost2PVs
-	STX Map_ReturnStatus
-
-	; Set new current Player
-	DEX		 ; X--
-	STX Player_Current
-
-	JMP PRG030_8FB2	 ; Jump to PRG030_8FB2
-
-GameOver_WhiteMapObjs:
-	.byte MAPOBJ_NSPADE, MAPOBJ_WHITETOADHOUSE, MAPOBJ_UNK0C
-
-
-GameOver_PlayerQuitCleanup:
-	LDY Total_Players	; Y = Total_Players
-	CPY #$01
-	BEQ PRG030_948F	 	; If only a 1P game, jump to PRG030_948F
-
-	; This is a 2P game
-
-	DEY		 ; Y-- (Y = 1)
-PRG030_9484:
-	LDA Player_Lives,Y
-	BPL PRG030_948E	 ; If this is the living Player, jump to PRG030_948E (RTS)
-
-	DEY		 ; Y--
-	BPL PRG030_9484	 ; While Y >= 0, loop!
-
-	BMI PRG030_948F	 ; Jump to PRG030_948F
-
-PRG030_948E:
-	RTS		 ; Return
-
-PRG030_948F:
-	; BUG!! Apparently the game is SUPPOSED to delete all 
-	; bonus objects after a game over, but code starts with
-	; the wrong index (see immediately below) and that causes
-	; this to not work correctly!  Strange, huh?
-
-	; As my brother put it:
-	; "It may have been because of the 2P mode. You can't punish
-	; the other player because one of you sucks bad."
-
-	LDX #-$04	; <-- BUG!  BAD INDEX!!  (Should be X = 2??)
-PRG030_9491:
-	LDY #(MAPOBJ_TOTAL-1)	 ; Y = (MAPOBJ_TOTAL-1) (all Map Objects)
-
-PRG030_9493:
-	LDA Map_Objects_IDs,Y
-	BEQ PRG030_94A2	 ; If this Map Object is empty, jump to PRG030_94A2
-
-	CMP GameOver_WhiteMapObjs,X
-	BNE PRG030_94A2	 ; If this is NOT one of the "white" objects (White Toad House, Coin Ship, and the ??), jump to PRG030_94A2
-
-	; Delete the bonus objects!  You don't deserve them!
-
-	LDA #MAPOBJ_EMPTY
-	STA Map_Objects_IDs,Y
-
-PRG030_94A2:
-	DEY		 ; Y--
-	BPL PRG030_9493	 ; While Y >= 0, loop
-
-	DEX		 ; X--
-	BPL PRG030_9491	 ; While X >= 0, loop	<-- BUG! This will fail on the first pass!
-
-	LDA #$00
-	STA Map_NSpade_NextScore	 ; Highest byte in the N-Spade score = 0
-	STA Map_Anchored ; Airship is no longer anchored
-
-	; N-Spade appears every 80,000 points, but the leading zero is fake, so 8000
-
-	; Middle byte of the N-Spade score
-	LDA #HIGH(8000)
-	STA Map_NSpade_NextScore+1
-
-	; Lowest byte of the N-Spade score
-	LDA #LOW(8000)
-	STA Map_NSpade_NextScore+2
-
-	RTS		 ; Return
+AllowDeathSongToContinueMusic:
+	JSR DoSoundEngineSave13
+	LDA #1
+	STA SoundEngineBackedUp
+	; Queue death song
+	LDA Sound_QMusic1
+	ORA #MUS1_PLAYERDEATH
+	STA Sound_QMusic1
+	RTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; Removed 2-player vs and game over
+	.ds 0x155
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4405,11 +4543,15 @@ PRG030_98C8:
 	BEQ PRG030_98DE		; If playing the Invincibility music, don't queue this song right now
 
 	; Queue this music to play
-	STA Level_MusicQueue
+	;STA Level_MusicQueue
 
 PRG030_98DE:
 	; Set this as the music to "restore" to when P-Tab / Invincibility ends
-	STA Level_MusicQueueRestore
+	;STA Level_MusicQueueRestore
+	NOP
+	NOP
+	NOP
+	JSR CheckQueueLevelsMusic
 
 	; Level_LayPtr_AddrL/H += 9 (i.e. move pointer to after the header)
 	LDA <Level_LayPtr_AddrL

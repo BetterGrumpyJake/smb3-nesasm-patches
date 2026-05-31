@@ -3737,3 +3737,24 @@ PRG026_B51F:
 	RTS		 ; Return
 
 ; Rest of ROM bank was empty...
+;;; Tons of space for stuff
+
+Clear_500_300_RAM:
+	LDY #5
+	STY <Temp_Var2		; Save Y in <Temp_Var2
+	LDY #$00		; Y = 0
+	STY <Temp_Var1		; Clear <Temp_Var1
+	TYA			; A = 0
+
+	; Y is the initial input as the high byte of the address
+	; low first then high, so [Temp_Var2][Temp_Var1]
+_clear53loop:
+	STA [Temp_Var1],Y	; Otherwise, clear this byte
+	DEY			; Y--
+	BNE _clear53loop	; While Y <> 0, loop around again (goes $00, $FF, $FE, ... back to $00) again
+	DEC <Temp_Var2
+	DEC <Temp_Var2		; Temp_Var2 -= 2
+	LDX <Temp_Var2		; X = current high byte of address in this case
+	CPX #$01		; If we've reached the $01xx bank, we cleared 5 and 3, so we're done
+	BNE _clear53loop	 ; ... skip the next line (don't clear the stack space!)
+	RTS			; Return

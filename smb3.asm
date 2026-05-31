@@ -954,7 +954,8 @@ SPR_VFLIP	= %10000000
 	Level_SkipStatusBarUpd:	.ds 1	; When set, skips updating the status bar for one frame (priority graphics buffer changes I think)
 	Raster_State:		.ds 1	; This variable's meaning depends on the Raster_Effect in use; typically 0 is first pass, then more for further scanlines
 
-				.ds 7	; $0379-$037F unused
+	PauseMenuSel:		.ds 1	; $0379 Custom pause menu
+						.ds 6	; $037A-$037F unused
 
 	Scroll_ToVRAMHi:	.ds 1	; High byte for when pushing a column of tile data to VRAM (Set to $20, Name Table 0, after scroll update)
 
@@ -2595,11 +2596,13 @@ CFIRE_LASER		= $15	; Laser fire
 
 	SObjBlooperKid_OutOfWater:.ds 8	; $7A68-$7A6F Blooper kid only; if set, Blooper Kid is trying to go out of water
 
-				.ds 2	; $7A70-$7A71 unused
+	LevelRestarting:	.ds 2	; $7A70-$7A71 unused
 
 	Object_SplashAlt:	.ds 1	; Used to alternate the "splash slots" 1 and 2 as objects hit the water
 
-				.ds 109	; $7A73-$7ADF unused
+	SoundEngineBackupArray:	.ds 30
+	SoundEngineBackedUp:	.ds 1
+							.ds 78	; $7A73-$7ADF unused
 
 	Music_Start:		.ds 1	; Music start index (beginning of this song)
 	Music_End:		.ds 1	; Music end index (inclusive last index to play before loop)

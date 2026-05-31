@@ -5765,9 +5765,15 @@ PRG000_DA7A:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Player_Die:
 	; Queue death song
-	LDA Sound_QMusic1
-	ORA #MUS1_PLAYERDEATH
-	STA Sound_QMusic1
+;	LDA Sound_QMusic1
+;	ORA #MUS1_PLAYERDEATH
+;	STA Sound_QMusic1
+	JSR AllowDeathSongToContinueMusic
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 	; Clear a bunch of stuff at time of death
 	LDA #$00

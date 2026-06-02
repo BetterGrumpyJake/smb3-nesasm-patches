@@ -2585,6 +2585,11 @@ ObjInit_Vine:
 	; Stores the high byte of the VRAM address
 Vine_NTHigh:	.byte $20, $28
 
+EatableTable:		;what can a vine "eat"
+	.byte TILEA_MUNCHER
+	.byte TILE4_JELECTRO
+EatableTable_Size = * - EatableTable
+
 ObjNorm_Vine:
 
 	; Vine moves at Y Vel = -$10
@@ -2612,9 +2617,17 @@ ObjNorm_Vine:
 
 	CMP Tile_AttrTable,Y
 	BLT PRG001_AC86	 ; If vine is not within the solid tiles, jump to PRG001_AC86
-
+	
+	LDY #00
+VineEatLoop:
+	CMP EatableTable,Y
+	BEQ PRG001_AC86
+	
+	INY
+	CPY #EatableTable_Size
+	BNE VineEatLoop
+	
 PRG001_AC80:
-
 	; Set vine to dead/empty
 	LDA #OBJSTATE_DEADEMPTY
 	STA Objects_State,X
@@ -6320,4 +6333,3 @@ PRG001_BF9B:
 	RTS		 ; Return
 
 ; Rest of ROM bank was empty
-

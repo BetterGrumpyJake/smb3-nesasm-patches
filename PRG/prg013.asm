@@ -466,6 +466,7 @@ PauseMenuReturnToMap:
 
 	LDA #$01
 	STA <Level_ExitToMap
+	STA Map_PlayerLost2PVs	;skips decrement life in PRG030_910C
 	STA Map_ReturnStatus	 ; Map_ReturnStatus = 1 (Player died, level is not clear)
 
 	JMP PRG030_8F42

@@ -1796,7 +1796,7 @@ PRG008_A8C8:
 	STY <Player_YVel  ; Set Player's Y Velocity
 
 PRG008_A8CA:
-	LDY #$10	 ; Y = $10 (rightward X velocity)
+	LDY #$08	 ; Y = $10 (rightward X velocity)
 
 	LDA <Pad_Holding
 	AND #(PAD_LEFT | PAD_RIGHT)
@@ -1805,7 +1805,7 @@ PRG008_A8CA:
 	AND #PAD_LEFT
 	BEQ PRG008_A8D8	 ; If Player is NOT pressing LEFT, jump to PRG008_A8D8
 
-	LDY #-$10	 ; Y = -$10 (leftward X velocity)
+	LDY #-$08	 ; Y = -$10 (leftward X velocity)
 
 PRG008_A8D8:
 	STY <Player_XVel ; Set Player's X Velocity

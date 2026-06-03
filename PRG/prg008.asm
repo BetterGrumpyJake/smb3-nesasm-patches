@@ -4861,7 +4861,7 @@ LATR_GNote:	.byte $00
 LATR_HNote:	.byte $10
 LATR_Notes:	.byte $40, $40, $40, $40
 LATR_Woodblocks:.byte $50, $50, $50, $50
-LATR_QBlocks:	.byte $20, $20, $20, $20, $20, $20, $20, $30, $20, $20, $20, $20, $20, $60, $20, $20, $20
+LATR_QBlocks:	.byte $20, $20, $20, $20, $20, $20, $20, $30, $20, $20, $20, $20, $20, $60, $20, $80, $20
 LATR_InvisCoin:	.byte $20, $20, $10
 LATR_InvisNote:	.byte $40
 LATR_PWrksJct:	.byte $70	; UNUSED breakable pipeworks junction tile!

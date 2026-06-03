@@ -1024,6 +1024,7 @@ Bounce_TileReplacements:
 	.byte CHNGTILE_TOBOUNCEWOOD
 	.byte CHNGTILE_TOBRICKCOIN
 	.byte CHNGTILE_PIPEJCT
+	.byte CHNGTILE_DELETETOBG
 
 	; Power-up X or Y velocity upon emerging from the bounce block
 Bouncer_PUpVel:	.byte $00, -$40, -$40, -$30, -$20, -$10, $00, $10, $20, $30, $40

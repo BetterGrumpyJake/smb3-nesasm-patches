@@ -1204,7 +1204,7 @@ Player_RootJumpVel:	.byte PLAYER_JUMP
 Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
-	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
+;	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
 	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
@@ -1720,6 +1720,9 @@ PRG008_A86C:
 
 	LDA Player_IsClimbing
 	BNE PRG008_A898	 ; If climbing flag is set, jump to PRG008_A898
+	
+	LDA <Player_YVel		;don't allow climbing while jumping, until you start falling
+	BMI PRG008_A890
 
 	LDA <Pad_Holding
 	AND #(PAD_UP | PAD_DOWN)
@@ -1738,6 +1741,15 @@ PRG008_A890:
 	JMP PRG008_A8F9	 ; Jump to PRG008_A8F9
 
 PRG008_A898:
+	LDA <Pad_Input		;check if a is pressed otherwise keep climbing
+	AND #PAD_A
+	BEQ VineJumpSkip
+
+	LDA #$00			;clear Player_InAir(allowing jumping) and let A890 clear Player_IsClimbing
+    STA <Player_InAir
+    BEQ PRG008_A890
+
+VineJumpSkip:
 	LDA #$01
 	STA Player_IsClimbing	 ; Player_IsClimbing = 1 (Player is climbing)
 

@@ -2913,9 +2913,9 @@ PRG000_CE79:
 
 	; This object is being held by Player...
 
-	LDA Level_ObjectID,X
-	CMP #OBJ_ICEBLOCK
-	BEQ PRG000_CEB4	 ; If this is an ice block, jump to PRG000_CEB4
+	;LDA Level_ObjectID,X
+	;CMP #OBJ_ICEBLOCK
+	;BEQ PRG000_CEB4	 ; If this is an ice block, jump to PRG000_CEB4
 
 	LDY #1	 ; Y = 1
 

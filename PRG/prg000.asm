@@ -2932,26 +2932,28 @@ PRG000_CE94:
 	LDA <Objects_DetStat,X
 	AND #$03	
 	BEQ PRG000_CEB4	 ; If object has not hit a wall, jump to PRG000_CEB4
+	
+	JSR WallPopOut
 
 	; KICK OBJECT INTO WALL LOGIC
 
 	; Flat 100 points
-	LDA #$05
-	JSR Score_PopUp
-
-	; Object state is Killed
-	LDA #OBJSTATE_KILLED
-	STA Objects_State,X
-
-	; Set object Y velocity to -$40 (fly up a bit)
-	LDA #-$40
-	STA <Objects_YVel,X
-
-	; Remove that minimum X velocity
-	LDA #$00
-	STA <Objects_XVel,X
-
-	JMP PRG000_CF98	 ; Jump to PRG000_CF98
+;	LDA #$05
+;	JSR Score_PopUp
+;
+;	; Object state is Killed
+;	LDA #OBJSTATE_KILLED
+;	STA Objects_State,X
+;
+;	; Set object Y velocity to -$40 (fly up a bit)
+;	LDA #-$40
+;	STA <Objects_YVel,X
+;
+;	; Remove that minimum X velocity
+;	LDA #$00
+;	STA <Objects_XVel,X
+;
+;	JMP PRG000_CF98	 ; Jump to PRG000_CF98
 
 PRG000_CEB4:
 

@@ -1205,7 +1205,7 @@ Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
 	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
-	.byte $08, $04
+;	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
 Player_SomersaultFlipBits:
@@ -4557,6 +4557,10 @@ PRG008_B536:
 	BNE PRG008_B53B	 ; If Y <> 0, jump to PRG008_B53B
 
 	STA <Player_XVel ; Otherwise, halt Player horizontally
+	
+	JMP Player_DetectSolids		;marios X just corrected/nudged out of wall, but the data from detection
+								;at PRG008_B4CA is stale now, rerun to get new values after the nudge
+								;to correctly use with the floor check
 
 PRG008_B53B:
 	LDA <Player_YVel

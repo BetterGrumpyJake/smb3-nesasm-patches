@@ -5938,4 +5938,34 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
-
+WallPopOut:
+;remove wall kill logic and pop objects out of walls instead
+;%00000001  (= $01)  hit right wall
+;%00000010  (= $02)  hit left wall
+;shift bits one to the right, carry set=right wall, carry clear=left wall
+;after  lsr:  %00000000    carry = 1    (hit right wall)
+;after  lsr:  %00000001    carry = 0    (hit left wall)
+    LSR A						;do logical shift, carry=which side of the wall
+	LDA #10						;using 10 for regular shells
+	LDY Objects_IsGiant,X		;check if it's a giant shell
+	BEQ WallPopAmount
+	LDA #16						;if it is giant, use 16 instead
+WallPopAmount:
+	STA Temp_Var1				;store 10 or 20 in temp var 1
+	
+	LDA <Objects_X,X			;load current x position
+    BCC ObjectPopRight			;if the lsr set carry clear it's a left wall, pop right
+	
+	SUB Temp_Var1				;otherwise right side wall, subtract 10/16 pixels, pop left
+	STA <Objects_X,X
+	LDA <Objects_XHi,X
+	SBC #$00
+	STA <Objects_XHi,X
+	RTS							;pop it!
+ObjectPopRight:
+	ADD Temp_Var1				;left side wall, add 10/16 pixels, pop right
+	STA <Objects_X,X
+	LDA <Objects_XHi,X
+	ADC #$00
+	STA <Objects_XHi,X
+	RTS							;pop it!

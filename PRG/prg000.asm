@@ -2239,8 +2239,17 @@ PRG000_CB4F:
 	LDA <Objects_DetStat,X 
 	AND #$03 
 	BEQ PRG000_CB58	 ; If object has NOT hit wall, jump to PRG000_CB58 
- 
-	JSR Object_AboutFace	 ; Turn around... 
+
+	JSR Object_AboutFace	 		; Turn around... 
+	
+	CLC								;do x velocity arithmetic
+	LDA <Objects_XVel,X				;Use CLC/SEC and BPL to do an arithmetic right shift
+	BPL WallBounceDivide			;BPL branch on N=0
+	SEC		
+WallBounceDivide:		
+	ROR A							;mod N,Z,C
+									;after this A= object x vel / 2
+	STA <Objects_XVel,X
 
 PRG000_CB58:
 	JSR Object_HandleBumpUnderneath	 ; Handle object getting hit from underside 
@@ -6527,16 +6536,16 @@ Object_AnySprOffscreen:
 ; FIXME: Anybody want to claim this?
 ; Appears it would return a free object slot
 ; $DD5B 
-	LDY #$04	; Y = 4
-PRG000_DD5D:
-	LDA Objects_State,Y
-	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
-
-	DEY		 ; Y--
-	BPL PRG000_DD5D	 ; While Y >= 0, loop
-
-PRG000_DD65:
-	RTS		 ; Return
+;	LDY #$04	; Y = 4
+;PRG000_DD5D:
+;	LDA Objects_State,Y
+;	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
+;
+;	DEY		 ; Y--
+;	BPL PRG000_DD5D	 ; While Y >= 0, loop
+;
+;PRG000_DD65:
+;	RTS		 ; Return
 
 
 ; FIXME: Anybody want to claim this?

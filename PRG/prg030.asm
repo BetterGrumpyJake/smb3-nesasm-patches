@@ -2482,11 +2482,21 @@ PRG030_8F31:
 	LDA <Level_ExitToMap
 	BEQ PRG030_8F42	 ; If Level_ExitToMap flag is not set, jump to PRG030_8F42
 
-	LDX Player_Current	 ; X = Player_Current
+	LDX Player_Current	 ; X = Player_Current (Player 1 or player 2)
 
 	; Transfer Player's current power up to the World Map counterpart
-	LDA <Player_Suit
+	LDA #00
 	STA World_Map_Power,X
+; Player_Suit -- Player's active powerup (see also: Player_QueueSuit)
+;PLAYERSUIT_SMALL	= 0
+;PLAYERSUIT_BIG		= 1
+;PLAYERSUIT_FIRE		= 2
+;PLAYERSUIT_RACCOON	= 3
+;PLAYERSUIT_FROG		= 4
+;PLAYERSUIT_TANOOKI	= 5
+;PLAYERSUIT_HAMMER	= 6
+;PLAYERSUIT_SUPERSUITBEGIN = PLAYERSUIT_FROG	; Marker for when "Super Suits" begin
+;PLAYERSUIT_LAST		= PLAYERSUIT_HAMMER	; Marker for "last" suit (Debug cycler needs it)
 
 	; Level_GetWandState = 0
 	LDA #$00

@@ -1205,7 +1205,7 @@ Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
 ;	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
-	.byte $08, $04
+;	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
 Player_SomersaultFlipBits:
@@ -1710,10 +1710,16 @@ PRG008_A86C:
 	; VINE CLIMBING LOGIC
 
 	LDA Player_InWater
-	ORA Player_IsHolding
 	ORA Player_Kuribo
-	BNE PRG008_A890	 ; If Player is in water, holding something, or in Kuribo's shoe, jump to PRG008_A890
+	BNE PRG008_A890				; If Player is in water or in Kuribo's shoe, jump to PRG008_A890
+	
+	LDA Player_IsClimbing		;if already climbing skip the holding check
+	BNE HoldingVineSkip			;if not already climbing gate if you're holding something
+	
+	LDA Player_IsHolding
+	BNE PRG008_A890	 			; If Player is holding something jump to PRG008_A890
 
+HoldingVineSkip:
 	LDA <Temp_Var1
 	CMP #TILE1_VINE
 	BNE PRG008_A890	 ; If tile is not the vine, jump to PRG008_A890
@@ -1831,6 +1837,7 @@ PRG008_A8EC:
 	JSR Player_ApplyXVelocity
 	JSR Player_ApplyYVelocity
 
+	JSR Player_FlipDirection	;flip marios direction when pressing left/right
 	JSR Player_DoClimbAnim	 ; Animate climbing
 	JSR Player_Draw29	 ; Draw Player
 	RTS		 ; Return
@@ -2983,58 +2990,61 @@ PRG008_AE03:
 
 PRG008_AE11:
 	LDA Player_TailAttack
-	BNE PRG008_AE26	 ; If Player is performing tail attack, jump to PRG008_AE26
+	BNE PRG008_AE58	 ; If Player is performing tail attack, jump to PRG008_AE26
 
-	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT)
-	BEQ PRG008_AE26	 ; If Player is NOT pressing left or right, jump to PRG008_AE26
+;	LDA <Pad_Holding
+;	AND #(PAD_LEFT | PAD_RIGHT)
+;	BEQ PRG008_AE26	 ; If Player is NOT pressing left or right, jump to PRG008_AE26
+;
+;	; Player is pressing left/right
+;
+;	LDY #$00	; No flip
+;
+;	AND #%00000010
+;	BNE PRG008_AE24	 ; If Player is pressing left, jump to PRG008_AE24
+;
+;	LDY #SPR_HFLIP	; Horizontal flip
+;
+;PRG008_AE24:
+;	STY <Player_FlipBits	; Set appropriate flip
 
-	; Player is pressing left/right
+								;move the flipping of mario to a seperate subroutine
+	JSR Player_FlipDirection	;flip marios direction when pressing left/right
 
-	LDY #$00	; No flip
-
-	AND #%00000010
-	BNE PRG008_AE24	 ; If Player is pressing left, jump to PRG008_AE24
-
-	LDY #SPR_HFLIP	; Horizontal flip
-
-PRG008_AE24:
-	STY <Player_FlipBits	; Set appropriate flip
-
-PRG008_AE26:
-	LDA Debug_Flag
-	CMP #$80
-	BNE PRG008_AE58	 ; If we're not in debug mode, jump to PRG008_AE58
-
-	; DEBUG SUIT/POWER-UP SWITCH AND KURIBO TOGGLE
-
-	LDA <Pad_Input
-	AND #PAD_SELECT
-	BEQ PRG008_AE58	 ; If Player is NOT pressing select, jump to PRG008_AE58
-
-	LDA <Pad_Holding
-	AND #(PAD_A | PAD_B)
-	BNE PRG008_AE50	 ; If Player is holding A or B, jump to PRG008_AE50
-
-
-	; In short, cycle through power-up 0-6 (all power ups)
-	LDA <Player_Suit
-	ADD #$01
-	STA Player_QueueSuit
-	CMP #(PLAYERSUIT_LAST+1)	; +1 because it's by Player_QueueSuit
-	BLS PRG008_AE47			; If not the last suit, jump to PRG008_AE47
-	LDA #$00
-PRG008_AE47:
-	STA Player_QueueSuit
-	INC Player_QueueSuit
-	JMP PRG008_AE58	 ; Jump to PRG008_AE58
-
-PRG008_AE50:
-
-	; Kuribo's shoe toggle!
-	LDA Player_Kuribo
-	EOR #$01
-	STA Player_Kuribo
+;PRG008_AE26:
+;	LDA Debug_Flag
+;	CMP #$80
+;	BNE PRG008_AE58	 ; If we're not in debug mode, jump to PRG008_AE58
+;
+;	; DEBUG SUIT/POWER-UP SWITCH AND KURIBO TOGGLE
+;
+;	LDA <Pad_Input
+;	AND #PAD_SELECT
+;	BEQ PRG008_AE58	 ; If Player is NOT pressing select, jump to PRG008_AE58
+;
+;	LDA <Pad_Holding
+;	AND #(PAD_A | PAD_B)
+;	BNE PRG008_AE50	 ; If Player is holding A or B, jump to PRG008_AE50
+;
+;
+;	; In short, cycle through power-up 0-6 (all power ups)
+;	LDA <Player_Suit
+;	ADD #$01
+;	STA Player_QueueSuit
+;	CMP #(PLAYERSUIT_LAST+1)	; +1 because it's by Player_QueueSuit
+;	BLS PRG008_AE47			; If not the last suit, jump to PRG008_AE47
+;	LDA #$00
+;PRG008_AE47:
+;	STA Player_QueueSuit
+;	INC Player_QueueSuit
+;	JMP PRG008_AE58	 ; Jump to PRG008_AE58
+;
+;PRG008_AE50:
+;
+;	; Kuribo's shoe toggle!
+;	LDA Player_Kuribo
+;	EOR #$01
+;	STA Player_Kuribo
 
 PRG008_AE58:
 	LDA <Player_Suit
@@ -6968,5 +6978,21 @@ PRG008_BFF9:
 	RTS		 ; Return
 
 ; Rest of ROM bank was empty
+Player_FlipDirection:
+	LDA <Pad_Holding
+	AND #(PAD_LEFT | PAD_RIGHT)
+	BEQ SetFlipReturn	 ; If Player is NOT pressing left or right, jump to PRG008_AE26
 
+	; Player is pressing left/right
 
+	LDY #$00	; No flip
+
+	AND #%00000010
+	BNE SetFlip	 ; If Player is pressing left, RTS
+
+	LDY #SPR_HFLIP	; Horizontal flip
+
+SetFlip:
+	STY <Player_FlipBits	; Set appropriate flip
+SetFlipReturn:
+	RTS

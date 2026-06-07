@@ -980,8 +980,9 @@ ObjInit_BounceDU:
 	LDA Player_BounceObj
 	BNE PRG001_A4C6	 ; If this is actually an object that bounced, jump to PRG001_A4C6
 
-	LDA #$20	 
-	STA <Player_YVel ; PRG001_A4C6 = $20 (bounce down)
+	;LDA #$20	
+	LDA #$08			;marios downward vel after hitting block
+	STA <Player_YVel ; PRG001_A4C6 = $08 (bounce down)
 
 PRG001_A4BF:
 	STX <Player_InAir ; Mark Player as mid-air

@@ -1710,16 +1710,10 @@ PRG008_A86C:
 	; VINE CLIMBING LOGIC
 
 	LDA Player_InWater
-	ORA Player_Kuribo
-	BNE PRG008_A890				; If Player is in water or in Kuribo's shoe, jump to PRG008_A890
+	;ORA Player_Kuribo
+	;ORA Player_IsHolding
+	BNE PRG008_A890	 ; If Player is in water, holding something, or in Kuribo's shoe, jump to PRG008_A890
 	
-	LDA Player_IsClimbing		;if already climbing skip the holding check
-	BNE HoldingVineSkip			;if not already climbing gate if you're holding something
-	
-	LDA Player_IsHolding
-	BNE PRG008_A890	 			; If Player is holding something jump to PRG008_A890
-
-HoldingVineSkip:
 	LDA <Temp_Var1
 	CMP #TILE1_VINE
 	BNE PRG008_A890	 ; If tile is not the vine, jump to PRG008_A890
@@ -1838,8 +1832,12 @@ PRG008_A8EC:
 	JSR Player_ApplyYVelocity
 
 	JSR Player_FlipDirection	;flip marios direction when pressing left/right
+	LDA Player_Kuribo
+	BNE VineReturn
+	
 	JSR Player_DoClimbAnim	 ; Animate climbing
 	JSR Player_Draw29	 ; Draw Player
+VineReturn:
 	RTS		 ; Return
 
 PRG008_A8F9:

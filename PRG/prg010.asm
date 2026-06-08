@@ -63,7 +63,7 @@ Video_DoWXMario00:
 	.byte $05, $BA, $BC, $E9, $FC, $F0	; MARIO
 
 	vaddr $29B3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	; ----
 
@@ -153,7 +153,7 @@ Video_DoWXMario80:
 	.byte $05, $BA, $BC, $E9, $FC, $F0 ; MARIO
 
 	vaddr $29A3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	vaddr $2BD0
 	.byte VU_REPEAT | 2, $00
@@ -408,7 +408,7 @@ Video_DoWXLuigi00:
 	.byte $05, $EC, $DA, $FC, $EB, $FC	; LUIGI
 
 	vaddr $29B3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	vaddr $2BD2
 	.byte VU_REPEAT | 4, $00
@@ -495,7 +495,7 @@ Video_DoWXLuigi80:
 	.byte $05, $EC, $DA, $FC, $EB, $FC	; LUIGI
 
 	vaddr $29A3
-	.byte $01, $FB
+	.byte $01, $FE			;remove X before player lives in the intro box
 
 	vaddr $2BD0
 	.byte VU_REPEAT | 2, $00
@@ -663,7 +663,7 @@ Map_ConfigWorldIntro:
 	STA Graphics_Buffer+3	; Store the tile into the buffer
 
 	; High byte
-	LDA #$29	 	
+	LDA #$29
 	STA Graphics_Buffer+4	
 
 	; Low byte: Calculate the proper offset address based on the horizontal scroll
@@ -679,9 +679,9 @@ Map_ConfigWorldIntro:
 	STA Graphics_Buffer+6
 
 	; Takes the lives from the status bar!
-	LDA StatusBar_LivesH
+	LDA #$FE		;blank player lives
 	STA Graphics_Buffer+7
-	LDA StatusBar_LivesL
+	LDA #$FE		;blank player lives other digit
 	STA Graphics_Buffer+8
 
 	LDA #$00	

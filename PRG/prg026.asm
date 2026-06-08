@@ -2813,42 +2813,47 @@ PRG026_B00A:
 ; the current lives held by the player
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StatusBar_Fill_Lives:
-	LDX Player_Current	; X = Player_Current
-	LDY #$00	 	; Y = 0
-	LDA Player_Lives,X	; Get current player's lives count -> A
-	CMP #$ff	 	
-	BNE PRG026_B04D	 	; If lives <> $FF, jump to PRG026_B04D
-
-	; Lives are $FF (last death at zero lives)
-	LDA #$0E	 ; A = $E (this will appear as a blank tile)
-	JMP PRG026_B061	 ; Jump to PRG026_B061
-
-PRG026_B04D:
-	CMP #100
-	BLS PRG026_B056	 ; If Player's lives are under 100, jump to PRG026_B056
-
-	LDA #99	
-	STA Player_Lives,X	 ; Otherwise, force Player's lives to cap at 99
-PRG026_B056:
-
-	; Loop while A > 10, basically a rudimentary modulus for the
-	; LSD; 'Y' will count the loops, and thus be the MSD
-	CMP #10	 
-	BMI PRG026_B061	 ; When A is under 10, jump to PRG026_B061
-	SUB #10		 ; A -= 10 (find the LSD)
-	INY		 ; Y++ (form the MSD)
-	JMP PRG026_B056	 ; Loop again...
-
-PRG026_B061:
-	ADD #$f0	 	; Offset the LSD to the appropriate tile
+	LDA #$E8
 	STA StatusBar_LivesL	; Store into StatusBar_LivesL
-	TYA		 	; Most significant digit -> A
-	BNE PRG026_B06C		; Anything but zero, jump to PRG026_B06C
-	LDA #$0E	 	; Otherwise, use blank tile instead of leading zero
-PRG026_B06C:
-	ADD #$f0	 	; Offset to appropriate tile
+	LDA #$E7
 	STA StatusBar_LivesH	; Store into StatusBar_LivesH
 	RTS		 ; Return
+;	LDX Player_Current	; X = Player_Current
+;	LDY #$00	 	; Y = 0
+;	LDA Player_Lives,X	; Get current player's lives count -> A
+;	CMP #$ff	 	
+;	BNE PRG026_B04D	 	; If lives <> $FF, jump to PRG026_B04D
+;
+;	; Lives are $FF (last death at zero lives)
+;	LDA #$0E	 ; A = $E (this will appear as a blank tile)
+;	JMP PRG026_B061	 ; Jump to PRG026_B061
+;
+;PRG026_B04D:
+;	CMP #100
+;	BLS PRG026_B056	 ; If Player's lives are under 100, jump to PRG026_B056
+;
+;	LDA #99	
+;	STA Player_Lives,X	 ; Otherwise, force Player's lives to cap at 99
+;PRG026_B056:
+;
+;	; Loop while A > 10, basically a rudimentary modulus for the
+;	; LSD; 'Y' will count the loops, and thus be the MSD
+;	CMP #10	 
+;	BMI PRG026_B061	 ; When A is under 10, jump to PRG026_B061
+;	SUB #10		 ; A -= 10 (find the LSD)
+;	INY		 ; Y++ (form the MSD)
+;	JMP PRG026_B056	 ; Loop again...
+;
+;PRG026_B061:
+;	ADD #$f0	 	; Offset the LSD to the appropriate tile
+;	STA StatusBar_LivesL	; Store into StatusBar_LivesL
+;	TYA		 	; Most significant digit -> A
+;	BNE PRG026_B06C		; Anything but zero, jump to PRG026_B06C
+;	LDA #$0E	 	; Otherwise, use blank tile instead of leading zero
+;PRG026_B06C:
+;	ADD #$f0	 	; Offset to appropriate tile
+;	STA StatusBar_LivesH	; Store into StatusBar_LivesH
+;	RTS		 ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; StatusBar_Fill_Coins

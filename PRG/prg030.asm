@@ -2832,8 +2832,31 @@ PRG030_90C4:
 PRG030_910C:
 
 	; Player returns to map dead
+	
+;Map_Operation
+;	There's the complete list, from state machine in PRG010
+;	code for states can be in prg11
 
-	LDY #$02	 ; Y = 2 (Will be the Map_Operation value)
+;	MO_WorldXIntro	; 0 - "World X" Intro (the box, erasing it, and the stars)
+;	MO_SwitchToMO_D	; 1 - Just switches to Map_Operation = $D
+;	MO_SkidToPrev	; 2 - "Skid" backwards from death (short distance, same map screen)
+;	MO_SkidToPrevAfar	; 3 - "Skid" backwards from death, from far away (different map screen); this skids from the far end...
+;	MO_SkidAfarPrep	; 4 - Prepare to finish skid from afar
+;	MO_SkidAfarFinish	; 5 - Finish the far away skidding
+;	MO_Wait14Ticks	; 6 - Loads 14 ticks and wait for it
+;	MO_DoLevelClear	; 7 - Do level completion effect
+;	MO_DoFortressFX	; 8 - If any Poof-then-Fortress effect (e.g. busting a lock) to do, do it!
+;	MO_CheckForBonus	; 9 - Check for any map bonuses to appear (White Toad House, Coin Ship)
+;	MO_Wait14Ticks	; A - Loads 14 ticks and wait for it
+;	MO_HammerBroMarch	; B - Map Hammer brother march around (mostly handled elsewhere instead of this state routine)
+;	MO_Wait8Proceed	; C - After 8 ticks, resume normal operations (if 1P game or didn't end turn), or else go to state $0F
+;	MO_NormalMoveEnter; D - "Normal" map operations; move on map (paths, canoe, bridges etc.), enter levels (including 2P vs and hand trap random)
+;	MO_HandTrap	; E - Hand trap gotcha!
+
+	; NOTE: There is a Map_Operation $F (edge scroll) and Map_Operation $10 (enter level)
+	; that are not in this jump table, but handled explicitly...
+	
+	LDY #$0D	 ; Y = D (Will be the Map_Operation value)
 
 	; Map_ReturnStatus = 0
 	LDA #$00
@@ -2844,9 +2867,17 @@ PRG030_910C:
 
 	LDX Player_Current	 ; X = Player_Current
 
+	;by setting map_operation to D instead of 2 means this will not be cleared when returning to the map
+	;the code in the state machine for 2 clears it at PRG011_A891
+	;since we skip it we need to not set it here for map panning to work at Map_DoPlayer_Edge_Scroll: in prg10
 	; Skid backward
-	LDA #$01
-	STA Map_Player_SkidBack,X
+	;LDA #$01
+	;STA Map_Player_SkidBack,X
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 	LDA Map_PlayerLost2PVs
 	BNE PRG030_9128	 ; If Map_PlayerLost2PVs is set, jump to PRG030_9128
@@ -2860,7 +2891,7 @@ PRG030_9128:
 	LDA #MUS1_STOPMUSIC
 	STA Sound_QMusic1
 
-	STY Map_Operation	 ; Map_Operation = 2
+	STY Map_Operation	 ; Map_Operation = D
 	JMP PRG030_84D7	 	; Jump to PRG030_84D7
 
 PRG030_9133:

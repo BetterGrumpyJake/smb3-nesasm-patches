@@ -751,8 +751,9 @@ PRG029_D0AE:
 	CMP #$c0	 
 	BGE PRG029_D0BC	 ; If Player_SpriteY >= $C0, he's below the status bar, so jump to PRG029_D0BC
 
-	CMP #$b0
-	BGE PRG029_D0C9	 ; If Player_SpriteY >= $B0, he's halway below the status bar, so jump to PRG029_D0C9
+	;CMP #$b0
+	CMP #$A0
+	BGE PRG029_D0C9	 ; If Player_SpriteY >= $A0, he's halway below the status bar, so jump to PRG029_D0C9
 	BLT PRG029_D0D3	 ; Otherwise, Player is totally visible, jump to PRG029_D0D3
 
 PRG029_D0BC:
@@ -2089,13 +2090,14 @@ PRG029_D6E5:
 	BNE PRG029_D6EF	; If Event_Countdown > 0 (time until drop to map), jump to PRG029_D6EF
 
 	; Reload Event_Countdown
-	LDA #64
+	;LDA #64
+	LDA #20
 	STA Event_Countdown	; Event_Countdown = 64
 
 PRG029_D6EF:
 	CMP #$01
 	BNE PRG029_D6F5	 ; If Event_Countdown <> 1, jump to PRG029_D6F5 (RTS)
-	BEQ PRG029_D6FB	 ; If Event_Countdown = 1, jump to PRG029_D6FB
+	BEQ PRG029_D6FB	 ; If Event_Countdown = 1, jump to PRG029_D6FB (where we return to map)
 
 PRG029_D6F5:
 	RTS		 ; Return

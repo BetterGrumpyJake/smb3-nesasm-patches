@@ -857,8 +857,9 @@ PRG008_A3FA:
 	JSR Player_Die	 ; Begin death sequence
 
 	; This jumps the initial part of the death sequence
-	LDA #$c0
-	STA Event_Countdown ; Event_Countdown = $C0
+	;LDA #$c0
+	LDA #$10
+	STA Event_Countdown ; Event_Countdown = $10
 	LDA #$02
 	STA <Player_IsDying	; Player_IsDying = 2 (already dropped off screen)
 
@@ -894,7 +895,8 @@ PRG008_A44D:
 	LDA #$01	 
 	STA Player_QueueSuit	 ; Queue change to small (superfluous, Player_Die sets it to 1)
 
-	LDA #$50	 ; Event_Countdown to be set to $50
+	LDA #$00
+	;LDA #$50	 ; Event_Countdown to be set to $00
 
 	STA Event_Countdown
 	JMP PRG008_A472	 	; Jump to PRG008_A472

@@ -60,10 +60,10 @@ Video_DoWXMario00:
 	.byte $05, $D8, $F0, $E9, $EC, $EE	; WORLD
 
 	vaddr $29AA
-	.byte $05, $BA, $BC, $E9, $FC, $F0	; MARIO
+	.byte $05, $FE, $DB, $E8, $FB, $6B	; NEB!
 
 	vaddr $29B3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	; ----
 
@@ -150,10 +150,10 @@ Video_DoWXMario80:
 	.byte $01, $EE			; D
 
 	vaddr $29BA
-	.byte $05, $BA, $BC, $E9, $FC, $F0 ; MARIO
+	.byte $05, $FE, $DB, $E8, $FB, $6B	; NEB!
 
 	vaddr $29A3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	vaddr $2BD0
 	.byte VU_REPEAT | 2, $00
@@ -405,10 +405,10 @@ Video_DoWXLuigi00:
 	.byte $05, $D8, $F0, $E9, $EC, $EE	; WORLD
 
 	vaddr $29AA
-	.byte $05, $EC, $DA, $FC, $EB, $FC	; LUIGI
+	.byte $05, $D9, $BC, $FD, $E8, $6B	; JAKE!
 
 	vaddr $29B3
-	.byte $01, $FB
+	.byte $01, $FE		;remove X before player lives in the intro box
 
 	vaddr $2BD2
 	.byte VU_REPEAT | 4, $00
@@ -492,10 +492,10 @@ Video_DoWXLuigi80:
 	.byte $01, $EE			; D
 
 	vaddr $29BA
-	.byte $05, $EC, $DA, $FC, $EB, $FC	; LUIGI
+	.byte $05, $D9, $BC, $FD, $E8, $6B	; JAKE!
 
 	vaddr $29A3
-	.byte $01, $FB
+	.byte $01, $FE			;remove X before player lives in the intro box
 
 	vaddr $2BD0
 	.byte VU_REPEAT | 2, $00
@@ -663,7 +663,7 @@ Map_ConfigWorldIntro:
 	STA Graphics_Buffer+3	; Store the tile into the buffer
 
 	; High byte
-	LDA #$29	 	
+	LDA #$29
 	STA Graphics_Buffer+4	
 
 	; Low byte: Calculate the proper offset address based on the horizontal scroll

@@ -1,14 +1,7 @@
-# smb3
-Disassembly of Super Mario Bros 3
+WIP this information could very well be wrong or misleading
 
-Specifically for use with NESASM (https://github.com/camsaul/nesasm), this will reassemble into a byte-for-byte perfect clone of Super Mario Bros. 3 US (PRG1)
+This seems to use chr20-23 for the intro box
+Each CHR file is 1KB = 64 tiles. The PPU background address space is $0000–$0FFF (4KB = 256 tiles).
 
-NOTE: Included are support files for my "NoDice" level editor (game.xml and "icons" subdirectory) and "MusConv" (musconv.xml) utilities. They are not part of the actual source code required to build the ROM, but are necessary if you intend to use these tools.
-
--------------
-
-To assemble, simply run:
-
-nesasm smb3.asm
-
-Intended for use for research into the inner workings of SMB3 and highly technical ROM hacks (such as Super Mario Bros. 3Mix)
+Tile $00–$7F (0–127) - PPU $0000–$07FF - chr020 + chr021
+Tile $80–$FF (128–255) -PPU $0800–$0FFF - chr022 + chr023

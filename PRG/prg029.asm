@@ -2106,10 +2106,15 @@ Player_Die_FellOff:
 	BNE PRG029_D702	 ; If Event_Countdown <> 0, jump to PRG029_D702 (RTS)
 
 PRG029_D6FB:
-	INC <Level_ExitToMap	; Level_ExitToMap = 1
-
-	LDA #$01
-	STA Map_ReturnStatus	 ; Map_ReturnStatus = 1 (Player died, level is not clear)
+;	INC <Level_ExitToMap	; Level_ExitToMap = 1
+;
+;	LDA #$01
+;	STA Map_ReturnStatus	 ; Map_ReturnStatus = 1 (Player died, level is not clear)
+	JMP DeathRestartLevel
+	NOP
+	NOP
+	NOP
+	NOP
 
 PRG029_D702:
 	RTS		 ; Return

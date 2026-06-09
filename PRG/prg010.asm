@@ -971,7 +971,8 @@ WorldIntro_BoxTimer_NoSym:
 	BNE PRG010_C513	 	; If Map_Intro_Tick <> 0, jump to PRG010_C513
 
 	; This initializes it, since if the world intro box is new, this is zero
-	LDA #$80
+	;LDA #$80
+	LDA #$08
 	STA Map_Intro_Tick	; Map_Intro_Tick = $80
 
 PRG010_C513:

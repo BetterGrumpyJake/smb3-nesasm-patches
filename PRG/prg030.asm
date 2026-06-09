@@ -2485,8 +2485,11 @@ PRG030_8F31:
 	LDX Player_Current	 ; X = Player_Current
 
 	; Transfer Player's current power up to the World Map counterpart
-	LDA <Player_Suit
+	LDA #00
 	STA World_Map_Power,X
+	STA Player_Score
+	STA Player_Score+1
+    STA Player_Score+2
 
 	; Level_GetWandState = 0
 	LDA #$00
@@ -2541,6 +2544,8 @@ PRG030_8F80:
 	; StatusBar_UpdFl = 0 (we just updated it)
 	LDA #$00
 	STA StatusBar_UpdFl
+	
+	JSR ScoreDeathCheck		;check if score is to high
 
 PRG030_8F85:
 
@@ -5939,3 +5944,34 @@ PRG030_9FAF:
 
 ; NOTE: The remaining ROM space was all blank ($FF)
 
+;Player_Score:		.ds 3	; $0715 (H)-$0717 (L) treated as 3-byte integer, with least significant zero on display not part of this value 	
+;				Stored	
+;Displayed	   Player_Score   +0    +1    +2
+;        0	        0  		 $00   $00   $00
+;       10	        1  		 $00   $00   $01
+;      100	       10  		 $00   $00   $0A
+;    1,000	      100  		 $00   $00   $64
+;    2,000	      200  		 $00   $00   $C8
+;    2,550	      255  		 $00   $00   $FF
+;    2,560	      256  		 $00   $01   $00
+;   10,000	    1,000  		 $00   $03   $E8
+;   50,000	    5,000  		 $00   $13   $88
+;  100,000	   10,000  		 $00   $27   $10
+;  655,350	   65,535  		 $00   $FF   $FF
+;  655,360	   65,536  		 $01   $00   $00
+;1,000,000	  100,000  		 $01   $86   $A0
+;9,999,990	  999,999  		 $0F   $42   $3F
+ScoreDeathCheck:	
+	LDA Player_Score		;check first byte in Player_Score
+	BNE ScoreKill
+	LDA Player_Score+1		;check second byte in Player_Score
+	BNE ScoreKill
+	LDA Player_Score+2		;check third byte in Player_Score
+	CMP #$C8				;check for 2000
+	BLT SkipScoreKill
+
+ScoreKill:
+	JSR Player_Die
+
+SkipScoreKill:
+	RTS

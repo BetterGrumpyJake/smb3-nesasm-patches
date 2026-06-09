@@ -3638,9 +3638,9 @@ AllowDeathSongToContinueMusic:
 	LDA #1
 	STA SoundEngineBackedUp
 	; Queue death song
-	LDA Sound_QMusic1
-	ORA #MUS1_PLAYERDEATH
-	STA Sound_QMusic1
+	LDA Sound_QLevel1
+	ORA #SND_LEVELSHOE
+	STA Sound_QLevel1
 	RTS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; Removed 2-player vs and game over

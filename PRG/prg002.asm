@@ -940,12 +940,19 @@ ObjInit_BusterBeatle:
 
 	RTS		 ; Return
 
+BusterTilePickupTable:
+	.byte TILEA_ICEBRICK		;$32
+	.byte TILEA_BRICK			;$67
+	.byte TILE1_PIPETB1_L		;AD Pipe top/bottom 1 left (alt level)
+	.byte TILE1_PIPETB1_R		;AE Pipe top/bottom 1 right
+	
+BusterTilePickupTableSize = * - BusterTilePickupTable
 
 ObjNorm_BusterBeatle:
 	JSR Object_Move	 ; Do standard object movements
 	JSR Object_HandleBumpUnderneath	 ; Get killed if hit underneath by block
 	JSR Object_HitFloorAlign	 ; If Buster hits floor, align him
-
+	
 	LDA <Objects_DetStat,X
 	AND #$03
 	BEQ PRG002_A535	 ; If not hit wall, jump to PRG002_A535
@@ -964,25 +971,29 @@ ObjNorm_BusterBeatle:
 	JSR Object_AnySprOffscreen
 	BNE PRG002_A532	 ; If any of Buster's sprite are off-screen, jump to PRG002_A532
 
-	LDY #$01	; Y = 1 (Buster's got brick!)
+	;LDY #$01	; Y = 1 (Buster's got brick!)
 
-	LDA Object_TileWall2
+	LDA Object_TileWall2			;A = tile buster ran into
+	LDY #BusterTilePickupTableSize	;Y = size of BusterPickupTable
 
-	CMP #TILEA_ICEBRICK
-	BEQ PRG002_A508	 ; If Buster's touching an ice brick, jump to PRG002_A508
+BusterTileLoop:
+	CMP BusterTilePickupTable-1,Y	;compare A (wall tile) to our pickup table
+									;(pickup table address) -1 + Y(2) = BusterPickupTable(1)
+									;(pickup table address) -1 + Y(1) = BusterPickupTable(0)
+									;etc
+									;downstream logic needs Y!=0 to draw,throw
 
-	; ?? This might be lost functionality?
-	; Tile $F4 is Jelectro in most sets... Buster will pick up and toss this
-	; tile like an Ice Brick, but it's ... never an Ice Brick.  
-	; Maybe he'd toss Jelectros at you??
-	CMP #$f4
-	BNE PRG002_A532
+	BEQ PRG002_A508					;if what buster ran into matches something in our table go to A508
+	
+	DEY								;decrement Y, Y=0 set z flag, Y!=0 do not set z
 
-	INY		 ; Y = 2
+	BNE BusterTileLoop				;if z flag not set loop with new Y value
+	BEQ PRG002_A532					;if z flag set then Y=0 and we found nothing to pickup
+									;aboutface because it already detected a wall
 
 PRG002_A508:
 	STY <Objects_Var5,X	 ; Update Var5
-
+	
 	; Change tile event (to background) by ice brick
 	LDA #CHNGTILE_DELETETOBG
 	STA Level_ChgTileEvent
@@ -1001,21 +1012,21 @@ PRG002_A508:
 	LDA ObjTile_DetXLo
 	AND #$f0
 	STA Level_BlockChgXLo
-
+	
 	; Set Buster's timer 2 to $0F
 	LDA #$0f
 	STA Objects_Timer2,X
 
-	BNE PRG002_A535	 ; Jump (technically always) to PRG002_A535
+	BNE PRG002_A535	 ; Jump (technically always) to PRG002_A535. Always branch A!=0
 
 PRG002_A532:
 	JSR Object_AboutFace	 ; Buster turns around
 
 PRG002_A535:
-	LDA Objects_Timer,X
+	LDA Objects_Timer,X		;timer for throw countdown, when buster actually throws
 	BNE PRG002_A542	 ; If timer not expired, jump to PRG002_A542
 
-	LDA Objects_Timer2,X 
+	LDA Objects_Timer2,X 	;timer for lift animation
 	BEQ PRG002_A542	 ; If timer 2 expired, jump to PRG002_A542
 
 	; Timer 2 not expired...
@@ -1081,7 +1092,8 @@ PRG002_A57B:
 
 	CMP #$11
 	BNE PRG002_A5A1	 ; If timer <> $11, jump to PRG002_A5A1 (RTS)
-	JMP PRG002_A5A2	 ; Otherwise, jump to PRG002_A5A2
+	;JMP PRG002_A5A2	 ; Otherwise, jump to PRG002_A5A2
+	BEQ PRG002_A5A2	 ; Otherwise, jump to PRG002_A5A2
 
 PRG002_A587:
 	LDA <Counter_1
@@ -1241,7 +1253,7 @@ PRG002_A663:
 	STA <Temp_Var4	; Custom color cycling on the ice brick he's holding
 
 	PLA		 ; Restore Var5
-	TAY		 ; -> 'Y'
+	;TAY		 ; -> 'Y'
 
 	LDX #$BE	 ; X = $BE (Ice Brick tile)
 
@@ -6328,8 +6340,7 @@ PRG002_BFD3:
 	RTS		 ; Return
 
 	; ?? Someone wanna claim this?
-PRG002_BFD4:
-	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
-	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
-	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
-
+;PRG002_BFD4:
+;	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
+;	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
+;	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00

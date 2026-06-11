@@ -948,10 +948,19 @@ BusterTilePickupTable:
 	
 BusterTilePickupTableSize = * - BusterTilePickupTable
 
+BusterObjectPickupTable:
+	.byte OBJ_GREENTROOPA	;$6C green koopa troopa
+	.byte OBJ_REDTROOPA		;$6D red koopa troopa
+	
+BusterObjectPickupTableSize = * - BusterObjectPickupTable
+
 ObjNorm_BusterBeatle:
 	JSR Object_Move	 ; Do standard object movements
 	JSR Object_HandleBumpUnderneath	 ; Get killed if hit underneath by block
 	JSR Object_HitFloorAlign	 ; If Buster hits floor, align him
+	
+	JSR ObjectToObject_HitTest			;do object to object hit test
+	BCS BusterCheckObjects				;carry set=collision, see if it's something in our table
 	
 	LDA <Objects_DetStat,X
 	AND #$03
@@ -973,27 +982,46 @@ ObjNorm_BusterBeatle:
 
 	;LDY #$01	; Y = 1 (Buster's got brick!)
 
-	LDA Object_TileWall2			;A = tile buster ran into
-	LDY #BusterTilePickupTableSize	;Y = size of BusterPickupTable
+	LDA Object_TileWall2				;A = tile buster ran into
+	LDY #BusterTilePickupTableSize		;Y = size of BusterPickupTable
 
 BusterTileLoop:
-	CMP BusterTilePickupTable-1,Y	;compare A (wall tile) to our pickup table
-									;(pickup table address) -1 + Y(2) = BusterPickupTable(1)
-									;(pickup table address) -1 + Y(1) = BusterPickupTable(0)
-									;etc
-									;downstream logic needs Y!=0 to draw,throw
+	CMP BusterTilePickupTable-1,Y		;compare A (wall tile) to our pickup table
+										;(pickup table address) -1 + Y(2) = BusterTilePickupTable(1)
+										;(pickup table address) -1 + Y(1) = BusterTilePickupTable(0)
+										;etc
+										;downstream logic needs Y!=0 to draw,throw
 
-	BEQ PRG002_A508					;if what buster ran into matches something in our table go to A508
+	BEQ PRG002_A508						;if what buster ran into matches something in our table go to A508
 	
-	DEY								;decrement Y, Y=0 set z flag, Y!=0 do not set z
+	DEY									;decrement Y, Y=0 set z flag, Y!=0 do not set z
 
-	BNE BusterTileLoop				;if z flag not set loop with new Y value
-	BEQ PRG002_A532					;if z flag set then Y=0 and we found nothing to pickup
-									;aboutface because it already detected a wall
+	BNE BusterTileLoop					;if z flag not set loop with new Y value
+	BEQ PRG002_A532						;if z flag set then Y=0 and we found nothing to pickup
+										;aboutface because it already detected a wall
+									
+BusterCheckObjects:
+	;after objecttoobject_hittest
+	;Y=collided with objects ID slot
+	;A=collided with object id
+	;X=Buster
+	STY <Temp_Var9						;Temp_Var9=collided with objects slot
 
-PRG002_A508:
-	STY <Objects_Var5,X	 ; Update Var5
+	LDY <Objects_Var5,X
+	BNE PRG002_A535							
 	
+	LDY #BusterObjectPickupTableSize	;set Y to buster object table size
+BusterObjectLoop:
+	CMP BusterObjectPickupTable-1,Y		;compare collided with object id to our pickup table
+										;same as for tiles
+	BEQ BusterObjectPickup
+	
+	DEY
+	
+	BNE BusterObjectLoop
+	BEQ PRG002_A535	
+
+PRG002_A508:	
 	; Change tile event (to background) by ice brick
 	LDA #CHNGTILE_DELETETOBG
 	STA Level_ChgTileEvent
@@ -1013,6 +1041,14 @@ PRG002_A508:
 	AND #$f0
 	STA Level_BlockChgXLo
 	
+	LDY #$01							;store 1 to busters Objects_Var5
+	BNE BusterSetVar
+	
+BusterObjectPickup:
+	LDY #$02							;store 2 to busters Objects_Var5
+		
+BusterSetVar:
+	STY <Objects_Var5,X	 ; store Y to Var5
 	; Set Buster's timer 2 to $0F
 	LDA #$0f
 	STA Objects_Timer2,X

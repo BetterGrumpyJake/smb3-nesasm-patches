@@ -998,7 +998,7 @@ Buster_CheckHeldState:
 	BEQ PRG002_A535						;branch if it is
 	
 	LDA #$00							;otherwise clear the flags because it's dead/kicked probably
-	STA <Objects_Var5,X
+	STA <Objects_Var5,X					;clear holding flag
 	RTS
 	
 ObjNorm_BusterBeatle:
@@ -1010,16 +1010,20 @@ ObjNorm_BusterBeatle:
 	BMI Buster_CheckHeldState			;if bit 7 set(object), make sure that object is still in a good state
 	BNE PRG002_A535						;if holding anything, basically just an ice brick check, don't pick up anything new
 	
+	LDA Buster_HeldFlag,X				;if our held flag is set (being held by another buster)
+	BNE PRG002_A535						;skip pickup logic
+	
+	LDA <Objects_DetStat,X
+	AND #$04							;floor check
+	BEQ Buster_SkipCollision	 		;If Buster has not hit floor, jump to Buster_TurnAround
+
 	JSR ObjectToObject_HitTest			;object collision check
 	BCS Buster_StoreObject				;carry set=collision, see if it's something in our table
 	
+Buster_SkipCollision:
 	LDA <Objects_DetStat,X
 	AND #$03							;wall check
 	BEQ PRG002_A535	 					;If not hit wall, jump to PRG002_A535
-
-	LDA <Objects_DetStat,X
-	AND #$04							;floor check
-	BEQ Buster_TurnAround	 			;If Buster has not hit floor, jump to Buster_TurnAround
 
 	LDA <Objects_SpriteX,X				;hit a wall, but buster at screen edge. turn him around
 	SUB #$04							;A=busters x pixel (0-255) - 4
@@ -1082,6 +1086,9 @@ Buster_ObjectPickup:					;found object to pick up
 
 	LDA Objects_State,Y					;collided with object state
 	CMP #OBJSTATE_KICKED				;check if kicked
+	
+	;BEQ PRG002_A535					;for kicked shells kill buster, uncomment this, comment out next 4 lines
+	
 	BNE Buster_SkipShelling				;if not kicked, go to Buster_SkipShelling
 	
 	LDA #OBJSTATE_SHELLED				;otherwise set to shelled
@@ -1089,6 +1096,8 @@ Buster_ObjectPickup:					;found object to pick up
 Buster_SkipShelling:
 	LDA #$80							;store 80 to busters Objects_Var5
 										;bit 7 set for objects
+	STA Buster_HeldFlag,Y				;store 80 to this per object array, to be used as an is held flag
+										;this is really just for buster on buster interaction
 
 Buster_SetVar:
 	STA <Objects_Var5,X	 				;store A to Var5, whatever was set by tilepickup or objectpickup
@@ -1258,6 +1267,8 @@ Buster_ThrowObject:
 	LDA #OBJSTATE_NORMAL				;if out of range, load normal state
 BusterThrowSetState:
 	STA Objects_State,X					;actually set the state of the thrown object
+	;LDA #$ff							;uncomment these so that when buster kicks a shell it
+	;STA Objects_Timer3,X				;sets the koopa wake up timer, if you need
 
 	JSR Buster_SetObjectPos
 
@@ -1276,8 +1287,9 @@ PRG002_A5F2:
 	STA <Objects_YVel,X
 
 Buster_ClearVar:
-	LDX <SlotIndexBackup				;X = object slot index
 	LDA #$00							;buster threw, do some clearing
+	STA Buster_HeldFlag,X				;clear other objects being held flag
+	LDX <SlotIndexBackup				;X = object slot index
 	STA <Objects_Var5,X					;clear busters var5 deciding whether it's holding or not
 	STA Objects_Frame,X					;zero busters frame, to drop his arms visually
 	RTS		 							;Return

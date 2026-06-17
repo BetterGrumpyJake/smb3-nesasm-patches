@@ -3155,9 +3155,9 @@ PRG000_CFA8:
 
 
 	; Unused space... deleted code?
-	NOP
-	NOP
-	NOP
+	;NOP
+	;NOP
+	;NOP
 	NOP
 	NOP
 	NOP
@@ -4374,7 +4374,7 @@ Level_PrepareNewObject:
 	STA Objects_FlipBits,X
 	STA Objects_Frame,X	
 	STA Objects_ColorCycle,X
-	STA <Objects_DetStat,X	
+	STA <Objects_DetStat,X
 
 	CPX #$06
 	BGE PRG000_D4C8	 ; If using slot index >= 6, jump to PRG000_D4C8 (skip variables available only to slots 0 to 5)
@@ -4410,6 +4410,7 @@ PRG000_D4C8:
 	STA Objects_Var12,X
 	STA Objects_Var13,X
 	STA Objects_Var14,X
+	STA Buster_HeldFlag,X
 
 PRG000_D506:
 	RTS		 ; Return

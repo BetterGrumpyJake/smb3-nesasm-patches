@@ -2599,7 +2599,9 @@ CFIRE_LASER		= $15	; Laser fire
 
 	Object_SplashAlt:	.ds 1	; Used to alternate the "splash slots" 1 and 2 as objects hit the water
 
-				.ds 109	; $7A73-$7ADF unused
+	Buster_HeldFlag:	.ds 5	;$7A73-$7A77 flag used for when buster beatle picks up another buster
+	
+				.ds 104	; $7A78-$7ADF unused
 
 	Music_Start:		.ds 1	; Music start index (beginning of this song)
 	Music_End:		.ds 1	; Music end index (inclusive last index to play before loop)

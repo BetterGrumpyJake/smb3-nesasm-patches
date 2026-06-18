@@ -954,18 +954,17 @@ BusterObjectTable:						;what objects can buster pickup
 BusterObjectTableSize = * - BusterObjectTable
 
 ObjInit_BusterBeatle:
-	LDY <Scroll_LastDir	; Get last scroll direction
+	LDY <Scroll_LastDir					;Get last scroll direction
 
-	; Set flip bits to face Player
-	LDA FacePlayer_FlipBitsStart,Y
+	LDA FacePlayer_FlipBitsStart,Y		;Set flip bits to face Player
 	STA Objects_FlipBits,X
 
-	; Set appropriate X velocity for Buster Beatle
-	LDA Buster_XVel,Y
+	LDA Buster_XVel,Y					;Set appropriate X velocity for Buster Beatle
 	STA <Objects_XVel,X
 
-	RTS		 ; Return
+	RTS
 
+;Buster Tile Deletion
 Buster_TilePickup:						;found tile to pick up
 	LDA #CHNGTILE_DELETETOBG			;Change tile event (to background) by ice brick
 	STA Level_ChgTileEvent
@@ -986,7 +985,8 @@ Buster_TilePickup:						;found tile to pick up
 	
 	LDA #$01							;store 1 to busters Objects_Var5 to specify ice brick
 	BNE Buster_SetVar					;bit 7 clear for ice brick, branch to Buster_SetVar(always)
-	
+
+;Buster what is being held check
 Buster_CheckHeldState:
 	LDY Objects_Var3,X					;Y=busters held object slot id
 	LDA Objects_State,Y					;A=held objects state
@@ -1005,7 +1005,8 @@ ObjNorm_BusterBeatle:
 	JSR Object_Move	 					;Do standard object movements
 	JSR Object_HandleBumpUnderneath	 	;Get killed if hit underneath by block
 	JSR Object_HitFloorAlign	 		;If Buster hits floor, align him
-	
+
+;Buster holding, floor, object collision checks	
 	LDA <Objects_Var5,X					;buster holding something check
 	BMI Buster_CheckHeldState			;if bit 7 set(object), make sure that object is still in a good state
 	BNE PRG002_A535						;if holding anything don't do pickup logic
@@ -1018,6 +1019,7 @@ ObjNorm_BusterBeatle:
 	BCS Buster_StoreObject				;carry set=collision, see if it's something in our table
 	
 Buster_SkipCollision:
+;Buster Wall checks
 	LDA <Objects_DetStat,X
 	AND #$03							;wall check
 	BEQ PRG002_A535	 					;If not hit wall, jump to PRG002_A535
@@ -1065,7 +1067,7 @@ Buster_StoreObject:
 	TYA
 	STA Objects_Var3,X					;store collided with objects slot to busters Var3
 	PLA
-
+	BNE Buster_ObjectPickup
 	LDY #BusterObjectTableSize			;set Y to buster object table size
 	
 Buster_ObjectLoop:
@@ -1078,6 +1080,7 @@ Buster_ObjectLoop:
 	BNE Buster_ObjectLoop
 	BEQ PRG002_A535
 
+;Buster Object Pickup
 Buster_ObjectPickup:					;found object to pick up
 	LDY Objects_Var3,X					;Y=object slot we are picking up
 
@@ -1096,6 +1099,7 @@ Buster_SkipShelling:
 	STA Buster_HeldFlag,Y				;store 80 to this per object array, to be used as an is held flag
 										;this is really just for buster on buster interaction
 
+;Buster holding something
 Buster_SetVar:
 	STA <Objects_Var5,X	 				;store A to Var5, whatever was set by tilepickup or objectpickup
 
@@ -1107,6 +1111,7 @@ Buster_SetVar:
 Buster_TurnAround:
 	JSR Object_AboutFace	 			;Buster turns around
 
+;Buster Normal stuff
 PRG002_A535:
 	LDA Objects_Timer,X
 	BNE PRG002_A542	 					;If timer not expired, jump to PRG002_A542
@@ -1119,73 +1124,67 @@ PRG002_A535:
 
 PRG002_A542:
 	LSR A		 
-	STA <Objects_Var4,X	 ; Var4 = timer2 / 2
+	STA <Objects_Var4,X					; Var4 = timer2 / 2
 
-	JSR Object_DeleteOffScreen	 ; Delete object if it falls off-screen
+	JSR Object_DeleteOffScreen	 		;Delete object if it falls off-screen
 
-	JSR Buster_DrawHoldingIceBrick	 ; Draw Buster with his ice brick if he has it
+	JSR Buster_DrawHoldingIceBrick	 	;Draw Buster with his ice brick if he has it
 
-	LDA <Objects_Var5,X
+	LDA <Objects_Var5,X					;If Buster is holding, or his timer is not expired, jump to PRG002_A568
 	ORA Objects_Timer,X
-	BNE PRG002_A568	 	; If Buster is holding a brick or his timer is not expired, jump to PRG002_A568
+	BNE PRG002_A568
 
-	LDY #$10	 ; Y = $10 (Run right)
+	LDY #$10	 						;Y = $10 (Run right)
 
 	LDA Objects_FlipBits,X
 	ASL A
-	BMI PRG002_A55C	 ; If horizontally flipped, jump to PRG002_A55C
+	BMI PRG002_A55C	 					;If horizontally flipped, jump to PRG002_A55C
 
-	LDY #-$10	 ; Y = -$10 (Run left)
+	LDY #-$10	 						;Y = -$10 (Run left)
 
 PRG002_A55C:
-	STY <Objects_XVel,X	 ; Set Buster's X Velocity
+	STY <Objects_XVel,X	 				;Set Buster's X Velocity
 
-	; Buster's little frame toggle
-	LDA <Counter_1
+	LDA <Counter_1						;Buster's little frame toggle
 	LSR A	
 	LSR A	
 	AND #$01
 	STA Objects_Frame,X
 
-	RTS		 ; Return
+	RTS
 
 PRG002_A568:
+; Buster with brick or timer not expired
 
-	; Buster with brick or timer not expired
-
-	; Halt Buster's horizontal movement
-	LDA #$00
+	LDA #$00							;Halt Buster's horizontal movement
 	STA <Objects_XVel,X
 
 	LDA Objects_Timer2,X
-	BEQ PRG002_A57B	 ; If Timer 2 expired, jump to PRG002_A57B
+	BEQ PRG002_A57B	 					;If Timer 2 expired, jump to PRG002_A57B
 
-	; Timer 2 not expired...
-
+; Timer 2 not expired...
 	AND #%00011000
-	BNE PRG002_A5A1	 ; Timing jump to PRG002_A5A1 (RTS)
+	BNE PRG002_A5A1	 					;Timing jump to PRG002_A5A1 (RTS)
  
-	; Buster's frame = 2 
-	LDA #$02
+	LDA #$02							;set Buster's frame = 2 
 	STA Objects_Frame,X
 
-	RTS		 ; Return
+	RTS
 
 PRG002_A57B:
 	LDA Objects_Timer,X
-	BEQ PRG002_A587	 ; If timer expired, jump to PRG002_A587
+	BEQ PRG002_A587	 					;If timer expired, jump to PRG002_A587
 
 	CMP #$11
 	BEQ Buster_Throw					;if timer=$11, jump to Buster_Throw
 	RTS									;otherwise RTS
 
 PRG002_A587:
-	LDA <Counter_1	;global counter
+	LDA <Counter_1						;global counter
 	AND #$07
-	BNE PRG002_A5A1	 ; 1:8 ticks continue, otherwise jump to PRG002_A5A1 (RTS)
+	BNE PRG002_A5A1	 					;1:8 ticks continue, otherwise jump to PRG002_A5A1 (RTS)
 
-	; Set Buster's flip to face towards Player
-	JSR Object_CalcCoarseXDiff
+	JSR Object_CalcCoarseXDiff			;Set Buster's flip to face towards Player
 	STA Objects_FlipBits,X
 
 	JSR Object_CalcCoarseYDiff
@@ -1204,15 +1203,15 @@ PRG002_A587:
 										;$0B - 44px above - 2.75 tiles
 										;$0C - 48px above - 3.00 tiles (original)
 
-	BGE PRG002_A5A1	 ; If Player is too far away, jump to PRG002_A5A1 (RTS)
+	BGE PRG002_A5A1	 					;If Player is too far away, (RTS)
 
-	; "Stay close for $1B and I'll getcha..."
-	LDA #$1b
+	LDA #$1b							;"Stay close for $1B and I'll getcha..."
 	STA Objects_Timer,X
 
 PRG002_A5A1:
-	RTS		 ; Return
+	RTS
 
+;Buster Throw
 Buster_Throw:
 	LDY <SlotIndexBackup				;Y = Buster's slot index
 
@@ -1272,15 +1271,15 @@ BusterThrowSetState:
 	LDA Objects_FlipBits,Y
 
 ;set throw velocity
-	LDY #$30	 						; Y = $30
+	LDY #$30	 						;Y = $30
 	ASL A
-	BMI PRG002_A5F2	 					; If Buster's turned around, jump to PRG002_A5F2
-	LDY #-$30	 						; Otherwise, Y = -$30
+	BMI PRG002_A5F2	 					;If Buster's turned around, jump to PRG002_A5F2
+	LDY #-$30	 						;Otherwise, Y = -$30
 
 PRG002_A5F2:
-	STY <Objects_XVel,X					; Set X velocity dependent on the above
+	STY <Objects_XVel,X					;Set X velocity dependent on the above
 
-	LDA #-$30							; Set Y velocity
+	LDA #-$30							;Set Y velocity
 	STA <Objects_YVel,X
 
 Buster_ClearVar:
@@ -1295,6 +1294,7 @@ Buster_RTS:
 	LDX <SlotIndexBackup				;X = object slot index
 	RTS		 							;Return
 
+;Buster Draw
 Buster_DrawHoldingIceBrick:
 	JSR Object_ShakeAndCalcSprite
 
@@ -1307,7 +1307,7 @@ Buster_DrawHoldingIceBrick:
 	TAX		 							;X = Var4 (lift offset index)
 
 
-	LDA <Temp_Var1						; Offset sprite Y by the index given in Var4
+	LDA <Temp_Var1						;Offset sprite Y by the index given in Var4
 	ADD Buster_BlockLiftYOff,X
 	STA <Temp_Var1	
 
@@ -1327,40 +1327,40 @@ PRG002_A641:
 	; Var5 = 1 (Ice Brick)
 	;PHA								;Save Var5 not sure why they did this
 	LDA <Objects_SpriteY,X
-	LDY <Objects_Var4,X	 				; Y = Var4
+	LDY <Objects_Var4,X	 				;Y = Var4
 	BIT <Temp_Var3
-	BMI PRG002_A657	 					; If vertically flipped, jump to PRG002_A657
+	BMI PRG002_A657	 					;If vertically flipped, jump to PRG002_A657
 
-										; Adds an offset in case Buster's holding a block... but since it's
-										; applied all the time, it just looks odd otherwise...
+										;Adds an offset in case Buster's holding a block... but since it's
+										;applied all the time, it just looks odd otherwise...
 	ADD Buster_BlockLiftYOff,Y
 
 PRG002_A657:
-	STA <Temp_Var1		 				; Update Sprite Y
+	STA <Temp_Var1		 				;Update Sprite Y
 
 	LDA Buster_BlockLiftXOff,Y
 	BIT <Temp_Var3
-	BVS PRG002_A663	 					; If Buster is horizontally flipped, jump to PRG002_A663
+	BVS PRG002_A663	 					;If Buster is horizontally flipped, jump to PRG002_A663
 
-	JSR Negate	 						; Negate the X offset if he's flipped around
+	JSR Negate	 						;Negate the X offset if he's flipped around
 
 PRG002_A663:
-	ADD <Temp_Var2						; Apply X offset
-	STA <Temp_Var2						; Update Sprte X
+	ADD <Temp_Var2						;Apply X offset
+	STA <Temp_Var2						;Update Sprte X
 
 	LDA Level_NoStopCnt
-	AND #$03							; Palette select 0-3
-	STA <Temp_Var4						; Custom color cycling on the ice brick he's holding
+	AND #$03							;Palette select 0-3
+	STA <Temp_Var4						;Custom color cycling on the ice brick he's holding
 	;PLA								;Restore Var5 not sure why they did this
 	;TAY								;unnecessary, clobbered by the next TAY
 	LDX #$BE	 						; X = $BE (Ice Brick tile)
 	LDA <Temp_Var7
 	ADD #$08	
-	TAY									; Y = Sprite_RAM + 8
+	TAY									;Y = Sprite_RAM + 8
 
 	JSR Object_Draw16x16Sprite
 
-	LDA Sprite_RAM+$02,Y				; Draw Ice Brick
+	LDA Sprite_RAM+$02,Y				;Draw Ice Brick
 	AND #~SPR_HFLIP
 	STA Sprite_RAM+$02,Y
 	ORA #SPR_HFLIP
@@ -1388,16 +1388,13 @@ Buster_DrawHoldingObject:
 	BEQ Buster_RTS						;restore x=busters slot and RTS
 	
 Buster_SetObjectPos:
-	; Set X
-	LDA Objects_X,Y
+	LDA Objects_X,Y						; Set X
 	STA <Objects_X,X
 
-	; Set X Hi
-	LDA Objects_XHi,Y
+	LDA Objects_XHi,Y					; Set X Hi
 	STA <Objects_XHi,X
 
-	; Set Y/Hi
-	LDA Objects_Y,Y
+	LDA Objects_Y,Y						; Set Y/Hi
 	SUB #16
 	STA <Objects_Y,X
 	LDA Objects_YHi,Y

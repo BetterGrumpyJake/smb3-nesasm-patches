@@ -1008,14 +1008,11 @@ ObjNorm_BusterBeatle:
 	
 	LDA <Objects_Var5,X					;buster holding something check
 	BMI Buster_CheckHeldState			;if bit 7 set(object), make sure that object is still in a good state
-	BNE PRG002_A535						;if holding anything, basically just an ice brick check, don't pick up anything new
-	
-	LDA Buster_HeldFlag,X				;if our held flag is set (being held by another buster)
-	BNE PRG002_A535						;skip pickup logic
+	BNE PRG002_A535						;if holding anything don't do pickup logic
 	
 	LDA <Objects_DetStat,X
 	AND #$04							;floor check
-	BEQ Buster_SkipCollision	 		;If Buster has not hit floor, jump to Buster_TurnAround
+	BEQ Buster_SkipCollision	 		;If Buster has not hit floor, skip collision check
 
 	JSR ObjectToObject_HitTest			;object collision check
 	BCS Buster_StoreObject				;carry set=collision, see if it's something in our table
@@ -1068,7 +1065,7 @@ Buster_StoreObject:
 	TYA
 	STA Objects_Var3,X					;store collided with objects slot to busters Var3
 	PLA
-	
+
 	LDY #BusterObjectTableSize			;set Y to buster object table size
 	
 Buster_ObjectLoop:

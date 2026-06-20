@@ -1067,7 +1067,7 @@ Buster_StoreObject:
 	TYA
 	STA Objects_Var3,X					;store collided with objects slot to busters Var3
 	PLA
-	BNE Buster_ObjectPickup
+
 	LDY #BusterObjectTableSize			;set Y to buster object table size
 	
 Buster_ObjectLoop:

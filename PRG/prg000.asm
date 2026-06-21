@@ -1665,7 +1665,7 @@ PRG000_C85C:
 
 ; FIXME: Anybody want to claim this?
 ; $C893
-	.byte $FC, $04, $01, $02
+;	.byte $FC, $04, $01, $02
 
 
 	; When Object hits water, splash!
@@ -3369,6 +3369,8 @@ Object_Gravity:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; $D097
 Object_Move:
+	JSR Buster_ThrowCheck_30			;if buster threw object, hijack his velocities until it hits ground
+	
 	LDA <Objects_XVel,X	; Get Object's X velocity
 	PHA		 	; Save it
 
@@ -4375,6 +4377,7 @@ Level_PrepareNewObject:
 	STA Objects_Frame,X	
 	STA Objects_ColorCycle,X
 	STA <Objects_DetStat,X
+	STA Buster_ThrowFlag,X				;clear the flag that says whether something got thrown by buster
 
 	CPX #$06
 	BGE PRG000_D4C8	 ; If using slot index >= 6, jump to PRG000_D4C8 (skip variables available only to slots 0 to 5)
@@ -4410,7 +4413,6 @@ PRG000_D4C8:
 	STA Objects_Var12,X
 	STA Objects_Var13,X
 	STA Objects_Var14,X
-	STA Buster_HeldFlag,X
 
 PRG000_D506:
 	RTS		 ; Return
@@ -5423,7 +5425,7 @@ PRG000_D929:
 
 ; FIXME: Anybody want to claim this?
 ; $D92B
-	.byte $F0, $00, $10, $20
+;	.byte $F0, $00, $10, $20
 
 
 	; Calculates the upper-left and returns the lower-right offsets

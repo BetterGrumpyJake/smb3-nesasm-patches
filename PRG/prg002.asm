@@ -1016,7 +1016,28 @@ ObjNorm_BusterBeatle:
 	BEQ Buster_SkipCollision	 		;If Buster has not hit floor, skip collision check
 
 	JSR ObjectToObject_HitTest			;object collision check
-	BCS Buster_StoreObject				;carry set=collision, see if it's something in our table
+	BCC Buster_SkipCollision			;carry clear=no collision, skip object check
+	
+;Buster Object Check
+Buster_StoreObject:
+	;Y=collided with objects ID slot
+	;A=collided with object id
+	;X=Buster	
+	PHA									;do all this because you cant STY to var3 because its not zp
+	TYA
+	STA Objects_Var3,X					;store collided with objects slot to busters Var3
+	PLA
+
+	LDY #BusterObjectTableSize			;set Y to buster object table size
+	
+Buster_ObjectLoop:
+	CMP BusterObjectTable-1,Y			;compare collided with object id to our pickup table
+										;same as for tiles
+	BEQ Buster_ObjectPickup				;pick it up if we found a match
+
+	DEY
+
+	BNE Buster_ObjectLoop
 	
 Buster_SkipCollision:
 ;Buster Wall checks
@@ -1058,28 +1079,6 @@ Buster_TileLoop:
 	BEQ Buster_TurnAround				;if z flag set then Y=0 and we found nothing to pickup
 										;aboutface because it already detected a wall
 
-;Buster Object Check
-Buster_StoreObject:
-	;Y=collided with objects ID slot
-	;A=collided with object id
-	;X=Buster	
-	PHA									;do all this because you cant STY to var3 because its not zp
-	TYA
-	STA Objects_Var3,X					;store collided with objects slot to busters Var3
-	PLA
-
-	LDY #BusterObjectTableSize			;set Y to buster object table size
-	
-Buster_ObjectLoop:
-	CMP BusterObjectTable-1,Y			;compare collided with object id to our pickup table
-										;same as for tiles
-	BEQ Buster_ObjectPickup				;pick it up if we found a match
-
-	DEY
-
-	BNE Buster_ObjectLoop
-	BEQ PRG002_A535
-
 ;Buster Object Pickup
 Buster_ObjectPickup:					;found object to pick up
 	LDY Objects_Var3,X					;Y=object slot we are picking up
@@ -1095,9 +1094,6 @@ Buster_ObjectPickup:					;found object to pick up
 	STA Objects_State,Y
 Buster_SkipShelling:
 	LDA #$80							;store 80 to busters Objects_Var5
-										;bit 7 set for objects
-	STA Buster_HeldFlag,Y				;store 80 to this per object array, to be used as an is held flag
-										;this is really just for buster on buster interaction
 
 ;Buster holding something
 Buster_SetVar:
@@ -1212,12 +1208,21 @@ PRG002_A5A1:
 	RTS
 
 ;Buster Throw
+Buster_ThrowObject:
+	LDX Objects_Var3,Y					;X = held object's slot
+
+	LDA Objects_State,X					;get held object slots state
+	CMP #OBJSTATE_SHELLED
+	
+	BNE Buster_ThrowNormal
+	BEQ Buster_ThrowKicked
+	
 Buster_Throw:
 	LDY <SlotIndexBackup				;Y = Buster's slot index
 
 	LDA <Objects_Var5,X					;if object, no need to check for empty slot
 	BMI Buster_ThrowObject				;bit 7 set(object), go to Buster_ThrowObject
-
+	
 	LDX #$04	 						;X = 4 for the find dead/empty loop, check slots 4, 3, 2, 1, 0
 
 PRG002_A5A4:
@@ -1243,28 +1248,13 @@ PRG002_A5AE:
 	;LDA #$ff							;dead code, ice blocks timer3 only matters in shelled/held state
 	;STA Objects_Timer3,X
 
+Buster_ThrowKicked:
 	LDA #OBJSTATE_KICKED				;set ice block to kicked
-	BNE BusterThrowSetState				;always taken (KICKED=05, !=0)
-
-Buster_ThrowObject:
-	LDX Objects_Var3,Y					;X = held object's slot
-										;Y=buster slot
-
-	LDA Level_ObjectID,X				;get held object slots ID
-	SUB #OBJ_GREENTROOPA				;check if it is within the shell range
-	CMP #$05							;range $6C-$70
-										;OBJ_GREENTROOPA		= $6C	; green koopa troopa
-										;OBJ_REDTROOPA		= $6D	; red koopa troopa
-										;OBJ_PARATROOPAGREENHOP	= $6E	; Hopping green paratroopa
-										;OBJ_FLYINGREDPARATROOPA	= $6F	; Flying up/down red winged turtle
-										;OBJ_BUZZYBEATLE		= $70	; Buzzy beatle
-	LDA #OBJSTATE_KICKED				;if it's within range, load kicked state
-	BCC BusterThrowSetState
-	LDA #OBJSTATE_NORMAL				;if out of range, load normal state
-BusterThrowSetState:
+Buster_ThrowNormal:
 	STA Objects_State,X					;actually set the state of the thrown object
-	;LDA #$ff							;uncomment these so that when buster kicks a shell it
-	;STA Objects_Timer3,X				;sets the koopa wake up timer, if you need
+
+	LDA #$ff							;sets the koopa wake up timer
+	STA Objects_Timer3,X
 
 	JSR Buster_SetObjectPos
 
@@ -1282,10 +1272,13 @@ PRG002_A5F2:
 	LDA #-$30							;Set Y velocity
 	STA <Objects_YVel,X
 
+;Clear busters "is holding something" flag and frame for visuals
+;also stores the x throw vel to the objects slot, until it's cleared when hitting floor
 Buster_ClearVar:
+	TYA									;move the previous throw x velocity to A
+	STA Buster_ThrowFlag,X				;store the thrown x vel to the thrown object
+	LDX <SlotIndexBackup				;X = busters slot	
 	LDA #$00							;buster threw, do some clearing
-	STA Buster_HeldFlag,X				;clear other objects being held flag
-	LDX <SlotIndexBackup				;X = object slot index
 	STA <Objects_Var5,X					;clear busters var5 deciding whether it's holding or not
 	STA Objects_Frame,X					;zero busters frame, to drop his arms visually
 	RTS		 							;Return
@@ -1376,11 +1369,11 @@ Buster_DrawHoldingObject:
 										;release his held object, or kill his held object when killed
 	CMP #OBJSTATE_KILLED				;otherwise continue like nothing is wrong
 	BEQ Buster_ClearVar					;clears vars, restore buster slot to x, RTS
+	
+	;LDA Objects_FlipBits,Y				;flip him accordingly
+	;STA Objects_FlipBits,X				;removing this as a simple fix to the homing bullet bill visuals
 
-	JSR Buster_SetObjectPos				;move held object above busters head, not really "draw"
-
-	LDA Objects_FlipBits,Y				;flip him accordingly
-	STA Objects_FlipBits,X
+	JSR Buster_SetObjectPos				;move held object above busters head
 	
 	LDA #$00							;set held objects velocity to 0 every frame it's being held
 	STA <Objects_XVel,X

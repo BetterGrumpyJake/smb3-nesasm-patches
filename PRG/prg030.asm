@@ -5939,3 +5939,41 @@ PRG030_9FAF:
 
 ; NOTE: The remaining ROM space was all blank ($FF)
 
+Buster_ThrowCheck_30:
+	LDA Objects_State,X					;if object is kicked skip
+	CMP #OBJSTATE_KICKED
+	BEQ Buster_ThrowCheckReturn
+	
+	LDA Buster_ThrowFlag,X				;0=wasn't thrown, else=the throw x vel from buster
+	BEQ Buster_ThrowCheckReturn
+	
+	STA <Objects_XVel,X					;restamp object with the x vel
+	
+	LDA <Objects_DetStat,X				;wall check
+	AND #$03
+	BNE FlipThrowXVel
+	
+	LDA <Objects_DetStat,X				;floor check
+	AND #$04
+	BEQ Buster_ThrowCheckReturn
+
+RemoveThrowFlag:						;clear throw flag and set x vel to 0 for objects that don't set their own vel every frame
+	LDA #$00
+	STA Buster_ThrowFlag,X
+	STA <Objects_XVel,X
+	RTS
+	
+FlipThrowXVel:							;flips/halves x velocity on wall hit
+	CLC
+	LDA Buster_ThrowFlag,X
+	BPL WallBounceDivide
+	SEC
+WallBounceDivide:
+	ROR A
+
+	JSR Negate
+	STA Buster_ThrowFlag,X				;negate Buster_ThrowFlag to use as x vel now
+	STA <Objects_XVel,X
+
+Buster_ThrowCheckReturn:
+	RTS

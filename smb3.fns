@@ -1969,6 +1969,7 @@ PRG011_A99A                      = $A99A
 PRG011_A396                      = $A396
 WWFX_WarpWhistleInit             = $A340
 DMC08                            = $DC00
+Map_NewEnterSpecialTiles         = $DDC0
 Vs_RestoreBlockHitTile           = $B805
 Vs_ObjectPalette                 = $B0C1
 PRG009_AD2B                      = $AD2B

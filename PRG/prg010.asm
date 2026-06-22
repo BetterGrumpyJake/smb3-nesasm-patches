@@ -2771,9 +2771,9 @@ PRG010_CEBF:
 	BEQ PRG010_CEE1	 	; If Player is not pressing 'A', jump to PRG010_CEE1
 
 	LDA <World_Map_Tile
-	LDY #$1a	; Y = $1A (BUG!  Map_EnterSpecialTiles is much smaller than this, should be $0A!  Causes some bytes used for palette data to be considered!)
+	LDY #$13        ; Fix the tables size of the special tiles - this needs to match your table size
 PRG010_CEC9:
-	CMP Map_EnterSpecialTiles,Y
+	CMP Map_NewEnterSpecialTiles,Y
 	BEQ PRG010_CEA7	 	; If this is one of the special enterable tiles, jump to PRG010_CEA7 (enter level!)
 	DEY		 	; Y--
 	BPL PRG010_CEC9	 	; If Y >= 0, jump to PRG010_CEC9
@@ -4049,4 +4049,12 @@ DMC08:
 DMC08_End
 
 ; Rest of ROM bank was empty
-
+Map_NewEnterSpecialTiles:
+    .byte TILE_TOADHOUSE, TILE_SPADEBONUS, TILE_PIPE, TILE_ALTTOADHOUSE
+    .byte TILE_CASTLEBOTTOM, TILE_SPIRAL, TILE_ALTSPIRAL, TILE_PATHANDNUB
+    .byte TILE_DANCINGFLOWER, TILE_HANDTRAP, TILE_BOWSERCASTLELL
+    .byte TILE_MARIOCOMP_G, TILE_LUIGICOMP_G
+    .byte TILE_MARIOCOMP_P, TILE_LUIGICOMP_P
+    .byte TILE_MARIOCOMP_R, TILE_LUIGICOMP_R
+    .byte TILE_MARIOCOMP_O, TILE_LUIGICOMP_O
+    .byte TILE_FORTRUBBLE

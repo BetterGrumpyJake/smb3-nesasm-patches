@@ -1844,6 +1844,7 @@ ObjNorm_ObjB3                    = $A2F3
 PRG004_AA51                      = $AA51
 PRG004_A593                      = $A593
 PRG004_A57C                      = $A57C
+ObjInit_RedKoopa                 = $BE56
 EndLevelCard_AnimateSpinAway     = $BC18
 PRG002_B451                      = $B451
 DoorAppear_YUpr                  = $BEF7

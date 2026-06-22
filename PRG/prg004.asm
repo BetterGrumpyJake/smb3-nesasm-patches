@@ -24,7 +24,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup03_InitJumpTable:
-	.word ObjInit_GroundTroop	; Object $6C - OBJ_GREENTROOPA
+	.word ObjInit_GreenKoopa	; Object $6C - OBJ_GREENTROOPA
 	.word ObjInit_GroundTroop	; Object $6D - OBJ_REDTROOPA
 	.word ObjInit_GroundTroop	; Object $6E - OBJ_PARATROOPAGREENHOP
 	.word ObjInit_GroundTroop	; Object $6F - OBJ_FLYINGREDPARATROOPA
@@ -6205,4 +6205,13 @@ PRG004_BE54:
 	RTS		 ; Return
 
 ; Rest of ROM bank was empty
+ObjInit_GreenKoopa:
+    ; Set Objects_State to Shelled
+    LDA #OBJSTATE_SHELLED
+    STA Objects_State,X
 
+    ; Set timer 3 = $FF (wake up timer)
+    LDA #$ff
+    STA Objects_Timer3,X
+
+    JMP ObjInit_GroundTroop

@@ -1496,18 +1496,27 @@ PRG008_A77E:
 	STA <Player_XVel
 	STA <Pad_Input
 
-	AND #~PAD_A
-	STA <Pad_Input	; ?? it's still zero?
+	;AND #~PAD_A
+	;STA <Pad_Input	; ?? it's still zero?
+	NOP
+	NOP
 
 	; Player_LowClearance = 1 (Player is in a "low clearance" situation!)
 	LDA #$01
 	STA Player_LowClearance
 
 	; This makes the Player "slide" when he's in a space too narrow
-	ADD <Player_X
+	;ADD <Player_X
+	;STA <Player_X	 ; Player_X += 1
+	;BCC PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
+	;INC <Player_XHi	 ; Otherwise, apply carry
+	
+	LDA <Player_X
+	SEC
+	SBC #$01
 	STA <Player_X	 ; Player_X += 1
-	BCC PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
-	INC <Player_XHi	 ; Otherwise, apply carry
+	BCS PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
+	DEC <Player_XHi	 ; Otherwise, apply carry
 
 PRG008_A7AD:
 

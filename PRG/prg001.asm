@@ -2090,7 +2090,10 @@ ObjHit_FireFlower:
 	LDY PUp_StarManFlash
 	BNE PRG001_AA05	 ; If fire flower came from Big (?) block, jump to PRG001_AA05
 
-	JMP PRG001_A897	 ; Otherwise, jump to PRG001_A897
+	;JMP PRG001_A897	 ; Otherwise, jump to PRG001_A897
+	NOP
+	NOP
+	NOP
 
 PRG001_AA05:
 	CMP #$02
@@ -2546,7 +2549,10 @@ ObjHit_SuperLeaf:
 	LDA PUp_StarManFlash
 	BNE PRG001_AC37	 ; If leaf did not come from big (?) block, jump to PRG001_AC37 
 
-	JMP PRG001_A897	 ; Otherwise, jump to PRG001_A897
+	;JMP PRG001_A897	 ; Otherwise, jump to PRG001_A897
+	NOP
+	NOP
+	NOP
 
 PRG001_AC37:
 	CMP #$03

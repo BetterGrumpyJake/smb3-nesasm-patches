@@ -3792,14 +3792,23 @@ ObjNorm_RedTroopa:
 	JSR Object_DeleteOffScreen	 ; Delete object if it falls off-screen
 
 	; Toggle frame 0/1
-	LDA <Objects_Var5,X
-	LSR A
-	LSR A
-	LSR A
-	AND #$01
-	STA Objects_Frame,X
-
-	JSR GroundTroop_Draw	 ; Draw the troopa
+	;LDA <Objects_Var5,X
+	;LSR A
+	;LSR A
+	;LSR A
+	;AND #$01
+	;STA Objects_Frame,X
+	;
+	;JSR GroundTroop_Draw	 ; Draw the troopa
+	
+	; red koopas dont wake up
+	LDA #OBJSTATE_SHELLED
+    STA Objects_State,X
+    LDA #$FF
+    STA Objects_Timer3,X
+    RTS
+    NOP
+    NOP
 
 	LDA <Player_HaltGame
 	BNE PRG004_B2A2	 ; If gameplay is halted, jump to PRG004_B2A2

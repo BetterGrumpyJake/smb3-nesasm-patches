@@ -1093,9 +1093,9 @@ PRG002_A587:
 	STA Objects_FlipBits,X
 
 	JSR Object_CalcCoarseYDiff
-	LDA <Temp_Var15
-	CMP #$0c
-	BGE PRG002_A5A1	 ; If Player is too far away, jump to PRG002_A5A1 (RTS)
+	JSR BusterProxCheck
+	BCS PRG002_A5A1
+	NOP
 
 	; "Stay close for $1B and I'll getcha..."
 	LDA #$1b
@@ -6350,3 +6350,15 @@ BusterShell:
     LDA #OBJ_GREENTROOPA    ; loads green koopa and stores it (could change this to anything?)
     STA Level_ObjectID,X
     RTS
+	
+BusterProxCheck:
+	LDY <SlotIndexBackup
+	LDA Objects_Var5,Y
+	CMP #$02
+	BEQ BusterThrowNow
+	LDA <Temp_Var15
+	CMP #$0c
+	RTS
+BusterThrowNow:
+	CLC
+	RTS

@@ -5284,6 +5284,7 @@ PRG008_B84E:
 	RTS		 ; Return
 
 LATP_Vine:
+	JSR PRG008_B84E
 	LDY #$00	 ; Y = 0 (??)
 
 	; Vine raise sound!

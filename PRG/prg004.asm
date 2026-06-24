@@ -4861,21 +4861,21 @@ PRG004_B75A:
 	INC Objects_IsGiant,X	 ; Flag as a giant enemy
 	RTS		 ; Return
 
-GiantPiranha_TimerReloads:
-	.byte $30, $30, $30, $30
+;GiantPiranha_TimerReloads:
+;	.byte $30, $30, $30, $30
 
 ObjNorm_BigPiranha:
 	JSR Object_DeleteOffScreen	 ; Delete object if it falls off-screen
 
-	LDA <Objects_Var4,X
-	AND #$03
-	BNE PRG004_B78C	 ; If (Var4 & 3) <> 0 (internal state 0 means Piranha is fully retracted), jump to PRG004_B78C
-
-	; Set all sprites as horizontally off-screen (piranha is fully retracted in pipe)
-	LDA #$ff
-	STA Objects_SprHVis,X
-
-	JMP PRG004_B79D	 ; Jump to PRG004_B79D
+	;LDA <Objects_Var4,X
+	;AND #$03
+	;BNE PRG004_B78C	 ; If (Var4 & 3) <> 0 (internal state 0 means Piranha is fully retracted), jump to PRG004_B78C
+	;
+	;; Set all sprites as horizontally off-screen (piranha is fully retracted in pipe)
+	;LDA #$ff
+	;STA Objects_SprHVis,X
+	;
+	;JMP PRG004_B79D	 ; Jump to PRG004_B79D
 
 PRG004_B78C:
 
@@ -4890,101 +4890,101 @@ PRG004_B78C:
 	JSR GiantPiranha_Draw	 ; Draw the giant piranha
 	JSR Player_HitEnemy	 ; Player to piranha collision
 
-PRG004_B79D:
-	LDA <Player_HaltGame
-	BNE PRG004_B7FD	 ; If gameplay is halted, jump to PRG004_B7FD (RTS)
-
-	INC Objects_Var3,X	 ; Var3++
-
-	LDA <Objects_Var4,X
-	AND #$03	; Keep internal state counter 0-3
-
-	JSR DynJump
-
-	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
-	.word GiantPiranha_HideInPipe	; 0: Retracted in pipe
-	.word GiantPiranha_Emerge	; 1: Emerging
-	.word GiantPiranha_Chomp	; 2: Chomp
-	.word GiantPiranha_Retract	; 3: Retract
-
-GiantPiranha_Emerge:
-
-	; Objects_TargetingYVal = $21
-	; Var5 = original Y 
-	; Var7 = original Y Hi
-
-	LDA <Objects_Var5,X		; Original Y
-	SUB Objects_TargetingYVal,X	; subtract TargetingYVal
-	PHA				; Save it
-
-	LDA Objects_Var7,X
-	SBC #$00
-	STA <Temp_Var1			; Temp_Var1 = Original Y Hi, carry applied
-
-	PLA		 ; Restore the Original Y difference
-	CMP <Objects_Y,X
-	LDA <Temp_Var1
-	SBC <Objects_YHi,X
-	BCS PRG004_B7F0	 ; Basically if Giant Piranha is at his Y and Y Hi highest point, jump to PRG004_B7F0
-
-	LDA #-$10	 ; A = -$10
-	BNE PRG004_B7E6	 ; Jump (technically always) to PRG004_B7E6
-
-GiantPiranha_Retract:
-	LDA <Objects_Y,X
-	ADD #$01
-	PHA		 ; Save Y + 1
-
-	LDA <Objects_YHi,X
-	ADC #$00
-	STA <Temp_Var1	 ; Temp_Var1 = carry applied to Y Hi
-
-	PLA		 ; Restore Y + 1
-
-	CMP <Objects_Var5,X
-	LDA <Temp_Var1	
-	SBC Objects_Var7,X
-	BCS PRG004_B7F0	 ; Basically if Giant Piranha is at his Y and Y Hi origin, jump to PRG004_B7F0
-
-	LDA #$10	 ; A = $10
-
-PRG004_B7E6:
-
-	; Giant Piranha is not fully extended/retracted...
-
-	STA <Objects_YVel,X	 ; Set Y velocity as appropriate
-	JMP Object_ApplyYVel_NoLimit	 ; Apply Y velocity and don't come back!!
-
-GiantPiranha_Chomp:
-	LDA Objects_Timer,X
-	BNE PRG004_B80F	 ; If timer not expired, jump to PRG004_B80F
-
-PRG004_B7F0:
-	INC <Objects_Var4,X	 ; Var4++ (next internal state)
-
-	LDA <Objects_Var4,X
-	AND #$03
-	TAY		 ; Y = 0 to 3, based on internal state
-
-	LDA GiantPiranha_TimerReloads,Y	 ; Get timer reload value for this state
-	STA Objects_Timer,X	 ; Reload timer
+;PRG004_B79D:
+;	LDA <Player_HaltGame
+;	BNE PRG004_B7FD	 ; If gameplay is halted, jump to PRG004_B7FD (RTS)
+;
+;	INC Objects_Var3,X	 ; Var3++
+;
+;	LDA <Objects_Var4,X
+;	AND #$03	; Keep internal state counter 0-3
+;
+;	JSR DynJump
+;
+;	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
+;	.word GiantPiranha_HideInPipe	; 0: Retracted in pipe
+;	.word GiantPiranha_Emerge	; 1: Emerging
+;	.word GiantPiranha_Chomp	; 2: Chomp
+;	.word GiantPiranha_Retract	; 3: Retract
+;
+;GiantPiranha_Emerge:
+;
+;	; Objects_TargetingYVal = $21
+;	; Var5 = original Y 
+;	; Var7 = original Y Hi
+;
+;	LDA <Objects_Var5,X		; Original Y
+;	SUB Objects_TargetingYVal,X	; subtract TargetingYVal
+;	PHA				; Save it
+;
+;	LDA Objects_Var7,X
+;	SBC #$00
+;	STA <Temp_Var1			; Temp_Var1 = Original Y Hi, carry applied
+;
+;	PLA		 ; Restore the Original Y difference
+;	CMP <Objects_Y,X
+;	LDA <Temp_Var1
+;	SBC <Objects_YHi,X
+;	BCS PRG004_B7F0	 ; Basically if Giant Piranha is at his Y and Y Hi highest point, jump to PRG004_B7F0
+;
+;	LDA #-$10	 ; A = -$10
+;	BNE PRG004_B7E6	 ; Jump (technically always) to PRG004_B7E6
+;
+;GiantPiranha_Retract:
+;	LDA <Objects_Y,X
+;	ADD #$01
+;	PHA		 ; Save Y + 1
+;
+;	LDA <Objects_YHi,X
+;	ADC #$00
+;	STA <Temp_Var1	 ; Temp_Var1 = carry applied to Y Hi
+;
+;	PLA		 ; Restore Y + 1
+;
+;	CMP <Objects_Var5,X
+;	LDA <Temp_Var1	
+;	SBC Objects_Var7,X
+;	BCS PRG004_B7F0	 ; Basically if Giant Piranha is at his Y and Y Hi origin, jump to PRG004_B7F0
+;
+;	LDA #$10	 ; A = $10
+;
+;PRG004_B7E6:
+;
+;	; Giant Piranha is not fully extended/retracted...
+;
+;	STA <Objects_YVel,X	 ; Set Y velocity as appropriate
+;	JMP Object_ApplyYVel_NoLimit	 ; Apply Y velocity and don't come back!!
+;
+;GiantPiranha_Chomp:
+;	LDA Objects_Timer,X
+;	BNE PRG004_B80F	 ; If timer not expired, jump to PRG004_B80F
+;
+;PRG004_B7F0:
+;	INC <Objects_Var4,X	 ; Var4++ (next internal state)
+;
+;	LDA <Objects_Var4,X
+;	AND #$03
+;	TAY		 ; Y = 0 to 3, based on internal state
+;
+;	LDA GiantPiranha_TimerReloads,Y	 ; Get timer reload value for this state
+;	STA Objects_Timer,X	 ; Reload timer
 
 PRG004_B7FD:
 	RTS		 ; Return
 
-GiantPiranha_HideInPipe:
-	LDA Objects_Timer,X
-	BNE PRG004_B80F	 ; If timer not expired, jump to PRG004_B80F
-
-	JSR Level_ObjCalcXDiffs
-
-	LDA <Temp_Var16
-	ADD #$18
-	CMP #$31
-	BGE PRG004_B7F0	 ; If Player is not too close, jump to PRG004_B7F0
-
-PRG004_B80F:
-	RTS		 ; Return
+;GiantPiranha_HideInPipe:
+;	LDA Objects_Timer,X
+;	BNE PRG004_B80F	 ; If timer not expired, jump to PRG004_B80F
+;
+;	JSR Level_ObjCalcXDiffs
+;
+;	LDA <Temp_Var16
+;	ADD #$18
+;	CMP #$31
+;	BGE PRG004_B7F0	 ; If Player is not too close, jump to PRG004_B7F0
+;
+;PRG004_B80F:
+;	RTS		 ; Return
 
 GiantPiranha_Draw:
 	LDA <Objects_X,X	 

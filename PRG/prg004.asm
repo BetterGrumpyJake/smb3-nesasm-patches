@@ -4855,8 +4855,8 @@ PRG004_B75A:
 	STA Objects_Var7,X
 
 	; Set priority
-	LDA #SPR_BEHINDBG
-	STA Objects_FlipBits,X
+	;LDA #SPR_BEHINDBG
+	;STA Objects_FlipBits,X
 
 	INC Objects_IsGiant,X	 ; Flag as a giant enemy
 	RTS		 ; Return

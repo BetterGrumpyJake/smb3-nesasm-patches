@@ -59,7 +59,8 @@ ObjectGroup03_InitJumpTable:
 	.word ObjInit_ThwompLRSlide	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.word ObjInit_ThwompUDSlide	; Object $8D - OBJ_THWOMPUPDOWN
 	.word ObjInit_ThwompUDSlide	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.word ObjInit_ThwompUDSlide	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.word ObjInit_ThwompUDSlide	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.word ObjInit_ShelledTroop	; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) State 2 jump table
@@ -101,7 +102,8 @@ ObjectGroup03_NormalJumpTable:
 	.word ObjNorm_ThwompLRSlide	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.word ObjNorm_ThwompVertical	; Object $8D - OBJ_THWOMPUPDOWN
 	.word ObjNorm_ThwompVertical	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.word ObjNorm_ThwompVertical	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.word ObjNorm_ThwompVertical	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.word ObjNorm_GroundTroop	; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) Collision routine jump table (if calling Object_HitTestRespond;
@@ -144,7 +146,8 @@ ObjectGroup03_CollideJumpTable:
 	.word $0000					; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.word $0000					; Object $8D - OBJ_THWOMPUPDOWN
 	.word $0000					; Object $8E - OBJ_THWOMPDIAGONALUL
-	.word $0000					; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.word $0000					; Object $8F - OBJ_THWOMPDIAGONALDL
+	.word $0000					; Object $8F - OBJ_SHELLEDTROOPA
 
 	
 	; Object group $03 (i.e. objects starting at ID $6C) attribute bits set 1 (OA1_* flags valid here)
@@ -186,7 +189,8 @@ ObjectGroup03_Attributes:
 	.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH48	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH48	; Object $8D - OBJ_THWOMPUPDOWN
 	.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH48	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH48	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH48	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte OA1_PAL3 | OA1_HEIGHT32 | OA1_WIDTH16	; Object $8F - OBJ_SHELLEDTROOPA
 
 	; Object group $03 (i.e. objects starting at ID $6C) second set attribute bits
 
@@ -227,7 +231,8 @@ ObjectGroup03_Attributes2:
 	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP2	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP2	; Object $8D - OBJ_THWOMPUPDOWN
 	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP2	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP2	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP2	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte OA2_GNDPLAYERMOD | OA2_TDOGRP1	; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) third set attribute bits
@@ -269,7 +274,8 @@ ObjectGroup03_Attributes3:
 	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE ;Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE ;Object $8D - OBJ_THWOMPUPDOWN
 	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE ;Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE ;Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE ;Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte OA3_HALT_NORMALONLY | OA3_DIESHELLED 			; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) Pattern Table Select
@@ -311,7 +317,8 @@ ObjectGroup03_PatTableSel:
 	.byte OPTS_SETPT5 | $12	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte OPTS_SETPT5 | $12	; Object $8D - OBJ_THWOMPUPDOWN
 	.byte OPTS_SETPT5 | $12	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte OPTS_SETPT5 | $12	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte OPTS_SETPT5 | $12	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte OPTS_SETPT6 | $4F	; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) "Kill Action"
@@ -353,7 +360,8 @@ ObjectGroup03_KillAction:
 	.byte KILLACT_NORMALANDKILLED	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte KILLACT_NORMALANDKILLED	; Object $8D - OBJ_THWOMPUPDOWN
 	.byte KILLACT_NORMALANDKILLED	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte KILLACT_NORMALANDKILLED	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte KILLACT_NORMALANDKILLED	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte KILLACT_JUSTDRAWMIRROR	; Object $8F - OBJ_SHELLEDTROOPA
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) pattern index starts
@@ -372,7 +380,8 @@ ObjectGroup03_PatternStarts:
 	.byte OG3_POff(ObjP80), OG3_POff(ObjP81), OG3_POff(ObjP82), OG3_POff(ObjP83)
 	.byte OG3_POff(ObjP84), OG3_POff(ObjP85), OG3_POff(ObjP86), OG3_POff(ObjP87)
 	.byte OG3_POff(ObjP88), OG3_POff(ObjP89), OG3_POff(ObjP8A), OG3_POff(ObjP8B)
-	.byte OG3_POff(ObjP8C), OG3_POff(ObjP8D), OG3_POff(ObjP8E), OG3_POff(ObjP8F)
+	.byte OG3_POff(ObjP8C), OG3_POff(ObjP8D), OG3_POff(ObjP8E);, OG3_POff(ObjP8F)
+	.byte OG3_POff(ObjP6C)
 
 
 	; Object group $03 (i.e. objects starting at ID $6C) pattern sets
@@ -3743,8 +3752,13 @@ GroundTroop_FlipTowardsPlayer:	.byte SPR_HFLIP, $00
 SpikeCheep_XVelTowardsPlayer:	.byte $08, -$08
 
 	; DEAD CODE
-	LDA #$10	 
-	STA <Objects_YVel,X
+	;;LDA #$10
+	;;STA <Objects_YVel,X
+	;;; [ORANGE] We removed the 4 bytes of dead code above to fit this small Init_Shelled
+	;;; The JSR is only 3 bytes, so we have an extra $FF byte here to fill the 4 bytes we removed.
+	.byte $FF
+ObjInit_ShelledTroop:
+	JSR Object_SetShellState		; [ORANGE] This sets A to $FF and so returns zero flag not set
 	BNE ObjInit_GroundTroop
 
 ObjInit_GiantTroop:
@@ -4278,6 +4292,8 @@ GroundTroop_Draw:
 	LDA Level_ObjectID,X
 	CMP #OBJ_BUZZYBEATLE
 	BLT Troopa_Draw	 ; If this is one of the regular troopas or paratroopas, jump to Troopa_Draw
+	CMP #OBJ_SHELLEDTROOPA
+	BEQ Troopa_Draw
 
 	CMP #OBJ_BIGGREENTROOPA
 	BLT PRG004_B4B6	 ; If this is not one of the giant troopas, jump to PRG004_B4B6
@@ -4396,6 +4412,8 @@ PRG004_B520:
 	LDA Level_ObjectID,X
 	CMP #OBJ_PARATROOPAGREENHOP
 	BLT PRG004_B55D	 ; If this is not a paratroopa, jump to PRG004_B55D
+	CMP #OBJ_SHELLEDTROOPA
+	BEQ PRG004_B55D
 
 	LDA Sprite_RAM+$00,Y
 	CMP #$f8

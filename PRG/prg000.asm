@@ -438,7 +438,8 @@ Object_AttrFlags:
 	.byte OAT_BOUNDBOX13 | OAT_FIREIMMUNITY	; Object $8C - OBJ_THWOMPRIGHTSLIDE
 	.byte OAT_BOUNDBOX13 | OAT_FIREIMMUNITY	; Object $8D - OBJ_THWOMPUPDOWN
 	.byte OAT_BOUNDBOX13 | OAT_FIREIMMUNITY	; Object $8E - OBJ_THWOMPDIAGONALUL
-	.byte OAT_BOUNDBOX13 | OAT_FIREIMMUNITY	; Object $8F - OBJ_THWOMPDIAGONALDL
+	;.byte OAT_BOUNDBOX13 | OAT_FIREIMMUNITY	; Object $8F - OBJ_THWOMPDIAGONALDL
+	.byte OAT_BOUNDBOX01 | OAT_BOUNCEOFFOTHERS	; Object $8F - OBJ_SHELLEDTROOPA
 	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_HITNOTKILL	; Object $90 - OBJ_TILTINGPLATFORM
 	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_HITNOTKILL	; Object $91 - OBJ_TWIRLINGPLATCWNS
 	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_HITNOTKILL	; Object $92 - OBJ_TWIRLINGPLATCW
@@ -2647,9 +2648,12 @@ PRG000_CD46:
 
 	; NOTE: I really, really wish Nintendo used a consistent check here!
 	; Other code checks Objects_IsGiant before taking this route...
+	CMP #OBJ_SHELLEDTROOPA
+	BEQ _not_giant
 	CMP #OBJ_BIGGREENTROOPA
 	BGE PRG000_CD80	 ; If the object ID >= OBJ_BIGGREENTROOPA (why not use Objects_IsGiant?!), jump to PRG000_CD80
 
+_not_giant:
 	LDA Level_NoStopCnt
 	LSR A	
 	AND #$03
@@ -3155,10 +3159,10 @@ PRG000_CFA8:
 
 
 	; Unused space... deleted code?
-	NOP
-	NOP
-	NOP
-	NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
 	NOP
 	NOP
 	NOP
@@ -3507,8 +3511,7 @@ PRG000_D11C:
 PRG000_D120:
 
 	; Object is not a Bob-omb and not an Ice Block... 
-
-	LDA Objects_Timer3,X 
+	JSR GetWakeupTimer
 	BNE PRG000_D15A	 ; If timer 3 is not expired, jump to PRG000_D15A (RTS) 
 
 	LDA Objects_State,X 

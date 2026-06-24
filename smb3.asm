@@ -3396,6 +3396,7 @@ OBJ_THWOMPRIGHTSLIDE	= $8C	; Right sliding Thwomp
 OBJ_THWOMPUPDOWN	= $8D	; Up-down sliding Thwomp
 OBJ_THWOMPDIAGONALUL	= $8E	; Diagonal up-left Thwomp
 OBJ_THWOMPDIAGONALDL	= $8F	; Diagonal down-left Thwomp
+OBJ_SHELLEDTROOPA		= $8F
 OBJ_TILTINGPLATFORM	= $90	; Tilting platform
 OBJ_TWIRLINGPLATCWNS	= $91	; Twirling platform, clockwise, non-stop
 OBJ_TWIRLINGPLATCW	= $92	; Twirling platform, clockwise

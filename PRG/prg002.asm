@@ -975,7 +975,7 @@ ObjNorm_BusterBeatle:
 	; Tile $F4 is Jelectro in most sets... Buster will pick up and toss this
 	; tile like an Ice Brick, but it's ... never an Ice Brick.  
 	; Maybe he'd toss Jelectros at you??
-	CMP #$f4
+	CMP #TILEA_BRICK
 	BNE PRG002_A532
 
 	INY		 ; Y = 2
@@ -1120,6 +1120,9 @@ PRG002_A5AE:
 
 	LDY <SlotIndexBackup	 ; Y = Buster's slot index
 
+	; jump to our routine to decide what to throw
+	JSR BusterCheck
+
 	; Var5 and Frame = 0
 	LDA #$00
 	STA Objects_Var5,Y
@@ -1130,8 +1133,8 @@ PRG002_A5AE:
 	STA Objects_State,X
 
 	; It's an Ice Blocj
-	LDA #OBJ_ICEBLOCK
-	STA Level_ObjectID,X
+	;LDA #OBJ_ICEBLOCK
+	;STA Level_ObjectID,X
 
 	; Set Frame = 2
 	LDA #$02
@@ -6328,8 +6331,22 @@ PRG002_BFD3:
 	RTS		 ; Return
 
 	; ?? Someone wanna claim this?
-PRG002_BFD4:
-	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
-	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
-	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
+;PRG002_BFD4:
+;	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
+;	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
+;	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
 
+BusterCheck:
+    LDY <SlotIndexBackup    ; get busters slot index
+    LDA Objects_Var5,Y      ; get the y variable we stored earlier
+    CMP #$02                ; if it equals 2, then:
+    BEQ BusterShell   ; branch to throwing koopa routine
+
+    LDA #OBJ_ICEBLOCK       ; otherwise use ice brick, (could change this to anything?)
+    STA Level_ObjectID,X     ; store ice brick here
+    RTS
+
+BusterShell:
+    LDA #OBJ_GREENTROOPA    ; loads green koopa and stores it (could change this to anything?)
+    STA Level_ObjectID,X
+    RTS

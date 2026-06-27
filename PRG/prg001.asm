@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word Init_Return				;or Init_Return, doesn't matter
+	.word DiscoShell_Init				;or Init_Return, doesn't matter
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word Crazy_Chomp	; Object $00
+	.word DiscoShell	; Object $00
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -110,7 +110,7 @@ ObjectGroup00_NormalJumpTable:
 
 	.org ObjectGroup_CollideJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_CollideJumpTable:
-	.word ObjHit_DoNothing	; Object $00
+	.word DiscoShell_Interaction	; Object $00
 	.word ObjHit_DoNothing	; Object $01
 	.word ObjHit_DoNothing	; Object $02
 	.word ObjHit_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $00
+	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH16					;size probably doesn't matter (16x16 regardless)	; Object $00
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP1	; Object $00
+	.byte OA2_GNDPLAYERMOD | OA2_TDOGRP1	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -250,7 +250,7 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE 	; Object $00
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE | OA3_DIESHELLED 	; Object $00
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
@@ -292,7 +292,7 @@ ObjectGroup00_Attributes3:
 
 	.org ObjectGroup_PatTableSel	; <-- help enforce this table *here*
 ObjectGroup00_PatTableSel:
-	.byte OPTS_SETPT5 | $0A				;same as normal chain chomp (duh)	; Object $00
+	.byte OPTS_SETPT6 | $4F				;same as normal chain chomp (duh)	; Object $00
 	.byte OPTS_SETPT5 | $48	; Object $01
 	.byte OPTS_SETPT5 | $4C	; Object $02
 	.byte OPTS_SETPT5 | $48	; Object $03
@@ -334,7 +334,9 @@ ObjectGroup00_PatTableSel:
 
 	.org ObjectGroup_KillAction	; <-- help enforce this table *here*
 ObjectGroup00_KillAction:
-	.byte KILLACT_STANDARD	; Object $00
+	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
+	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
+	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
 	.byte KILLACT_STANDARD	; Object $01
 	.byte KILLACT_STANDARD	; Object $02
 	.byte KILLACT_STANDARD	; Object $03
@@ -405,8 +407,9 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjPChainChomp:
-	.byte $91, $93, $9D, $9F
+;can probably be shorter, I just copy-pasted those from vanilla koopas
+ObjPDisco:
+	.byte $CB, $C5, $C3, $C5, $FD, $FD, $FD, $FD, $FD, $FD, $D1, $D1, $D3, $D5
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5612,105 +5615,243 @@ SubHorzPos = Level_ObjCalcXDiffs
 SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
-
-CommonSprFlip:
-	.byte SPR_HFLIP, $00
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-CrazyChomp_BounceSpd = $E0
-CrazyChomp_HighBounceSpd = $C0
+;for when it bumps into walls
+DiscoShell_BumpSpeeds:
+	db -$20,$20
 
-CrazyChomp_HighBounceRate = 3
-	
-CrazyChompXSpd:
-	.byte $10,$F0
-	
-;CrazyChomp_BounceSpd = $D0
-;CrazyChomp_HighBounceSpd = $B0
-;
-;CrazyChomp_HighBounceRate = 3
-;	
-;CrazyChompXSpd:
-;	.byte $16,-$16
-	
-Crazy_Chomp:
-    JSR SubOffScreen   					;Handle off-screen situation
-	
-	LDA Player_HaltGame					;
-	BNE Re
-	
-	JSR Player_HitEnemy					;collide with player
-	JSR Object_Move						;move
-	
-	LDA Objects_DetStat,X				;
-	STA $00								;save for future use
-	AND #$04							;if hit ground, bounce
-	BEQ NoGroundHit					;
-	
-    JSR SubHorzPos						;face player on ground hit
-	LDA CommonSprFlip,Y					;
-	STA Objects_FlipBits,X				;
-	
-	LDA CrazyChompXSpd,y				;
-	STA Sprite_X_Speed,X				;
-	
-	LDA Sprite_Misc_Table1,x			;jump high when bounce counter is at set value
-	CMP #CrazyChomp_HighBounceRate		;
-	BNE Default						;
-	
-	LDA #$00							;reset bounce counter
-	STA Sprite_Misc_Table1,x			;
-	
-	LDA #CrazyChomp_HighBounceSpd		;
-	BNE StoreSpd						;
-	
-Default:
-	INC Sprite_Misc_Table1,x			;increase bounce counter
+DiscoShell_ID = $05							;inserted sprite number (necessary for slamming into each other)
 
-	LDA #CrazyChomp_BounceSpd			;normal speed
-	
-StoreSpd:
-	STA Sprite_Y_Speed,x				;
-	
-NoGroundHit:
-	LDA $00								;
-	AND #$03							;
-	BEQ NoWallHit						;hit wall, invert spd
-	
-	;JSR PRG001_A9B1					;can use this routine if in bank 1 (and Object_InteractWithWorld wasn't removed)
-	
-	JSR Object_AboutFace
-    ;JSR Object_FlipFace				;now that i think of it AboutFace already flips sprite, no?
-	
-NoWallHit:
-	LDA $00								;if hit ceiling, reset speed
-	AND #$08							;
-	BEQ NoCeilingHit					;
-	
-	LDA #$00							;
-	STA Sprite_Y_Speed,x				;
-	
-NoCeilingHit:
+DiscoShell:
 
-	LDA #$10							;animate every 16 frames
-	JSR CommonAnimate					;
+;cheat the system, draw a normal shell (drawing routine for thrown/kicked sprites)
+
+	LDA Level_ObjectID,x
+	PHA
+	LDA #OBJ_REDTROOPA
+	STA Level_ObjectID,x
+
+;JSR PRG000_CCF7
+;PLA
+;STA Level_ObjectID,x
+;JMP Continue
+
+JustGFX:
+	JSR PRG000_CD46						;dunno if more efficient than copy-pasting animation and calling 
+	PLA
+	STA Level_ObjectID,x
+	;RTS
+
+	LDA Player_HaltGame
+	BEQ DiscoShell_Continue
+
+;turns out no init needed
+DiscoShell_Init:
+	RTS
+
+;I have X doubts about this working
+
+DiscoShell_Continue:
+	;LDA Objects_State,x
+	;CMP #OBJSTATE_NORMAL				;in case it disappears offscree  (because we mess with status later on)
+	;BCC Re							;(not the case anymore... maybe)
+
+	;INC Objects_Var5,X
+
+;need some sorta timing
+
+	JSR SubHorzPos
+	TYA
+	STA Objects_Var4,x
+
+	LDA Sprite_X_Speed,x
+	LDY Objects_Var4,x
+	BNE MoveLeft
+
+	CMP #$20
+	BPL NoMore
+
+	INC Sprite_X_Speed,x
+	INC Sprite_X_Speed,x
+	JMP NoMore
+
+MoveLeft:
+	CMP #$E0
+	BMI NoMore
+
+	DEC Sprite_X_Speed,x
+	DEC Sprite_X_Speed,x
+
+;i'll leave like this for now...
+
+NoMore:
+;cycle through colors
+
+	LDA Counter_1
+	LSR A
+	BCS NoPal
+
+	LDA Objects_SprAttr,x				;change from pal 1 to pal 3 and back
+	AND #$03
+	CLC
+	ADC #$01
+	CMP #$04
+	BNE NoOverFlow
+
+	LDA #$01							;no palette 0
+
+NoOverFlow:
+	STA $00
+
+	LDA Objects_SprAttr,x
+	AND #$FC
+	ORA $00
+	STA Objects_SprAttr,x
+
+	;LDA Objects_SprAttr,x
+	;AND #$FC
+	;STA $00
+
+	;LDA Objects_SprAttr,x
+	;AND #$03
+	;CLC
+	;ADC #$01
+	;CMP #$04
+	;BNE NoOverFlow
+
+	;LDA #$01
+
+;NoOverFlow:
+	;ORA $00
+	;STA Objects_SprAttr,x				;whichever is more effective, too lazy to check
+
+NoPal:
+
+;COPY-PASTE FROM bank 0!
+    TXA
+    CLC
+    ADC Counter_1
+    LSR A
+    BCC NoSprToSprCollision  ; Semi-randomly jump to PRG000_CD46
+
+    JSR ObjectToObject_HitTest
+    BCC NoSprToSprCollision  ; If object has not hit another object, jump to PRG000_CD46
+
+    ; Play object-to-object collision sound
+    LDA Sound_QPlayer
+    ORA #SND_PLAYERKICK
+    STA Sound_QPlayer
+
+    ; Knock object in same general direction as the kicked shell object
+    LDA Objects_XVel,X
+    ASL A
+    LDA #$10     ; A = $10
+    BCC AB
+    LDA #-$10    ; A = -$10
+AB:							;wouldve use + but it breaks sublabels
+    STA Objects_XVel,Y
+
+	LDA Level_ObjectID,Y
+	CMP #DiscoShell_ID				;if another sprite we killed was a disco shell (which is never in a kicked state)
+	BEQ KillEachOther				;do kill each other
+
+    LDA Objects_State,Y
+    CMP #OBJSTATE_KICKED
+    BNE Ignorance  ; If the impacted object's state is not Kicked, jump to PRG000_CD36
+
+    ; Another kicked object on the way... (slam and kill eachother)
+KillEachOther:
+    LDA Objects_KillTally,Y
+    JSR Score_Get100PlusPts  ; Get the total score this OTHER kicked shell object earned
+    JSR ObjectKill_SetShellKillVars  ; Kill our kicked object and set ShellKill variables
+
+    ; Set X Velocity of our kicked object in the direction of the impacted object
+    LDA Objects_XVel,Y
+    ASL A
+    LDA #$10
+    BCS AA
+    LDA #-$10
+AA:
+    STA Objects_XVel,X
+
+Ignorance:
+    TYA
+    TAX      ; X = the other object we just hit
+    JSR ObjectKill_SetShellKillVars  ; Kill the impacted object and set ShellKill variables
+
+    LDX SlotIndexBackup         ; X = object slot index (our kicked object)
+    LDA Objects_KillTally,X
+    INC Objects_KillTally,X     ; Increase our kicked object's kill tally...
+    JSR Score_Get100PlusPtsY    ; Get points by the kill tally!  (Incidentally, Score_Get100PlusPts would work too)
+
+NoSprToSprCollision:
+	JSR Object_HitTestRespond
+
+	;JSR Object_HandleBumpUnderneath				;turns out this makes player interact with the shell as normal. totally makes sense (NO!)
+												;thankfully not needed, iirc SMW version can't be affected by bumping from underneath
+	JSR Object_Move
+
+	LDA Objects_DetStat,X			;
+	AND #$03						;
+	BEQ NoWall
+	TAY
+	LDA DiscoShell_BumpSpeeds-1,y
+	STA Sprite_X_Speed,x
+
+	LDA Object_TileWall2
+	JSR Object_BumpBlocks				;thanks boom-boom for not using this routine
+
+    LDA Sound_QPlayer
+    ORA #SND_PLAYERBUMP
+    STA Sound_QPlayer
+
+NoWall:
+	LDA Objects_DetStat,X			;
+	AND #$04						;
+	BEQ Re
 	
+	JSR Object_HitGround
+
 Re:
-	JMP Object_ShakeAndDraw				;and draw
-	
-Init_Return:
+;Never wake up!
+;LDA #$FF
+;STA Objects_Timer4,X
 	RTS
-	
-CommonAnimate:
-	STA Temp_Var1
-	LDA Sprite_Misc_Timer1,X
-	BNE Meh
 
-	LDA Objects_Frame,X
-	EOR #$01
-	STA Objects_Frame,X
-	
-	LDA Temp_Var1
-	STA Sprite_Misc_Timer1,X
+DiscoShell_Interaction:
+	;JSR Object_HitTest
+	;BCC NoHit
 
-Meh:
+;more copy-paste job
+    LDA Objects_Y,X     ; Get object's Y
+    SEC
+    SBC #$19       ; Subtract Temp_Var2 (height above object considered "stompable" range)
+    ROL Temp_Var1       ; Stores the carry bit into Temp_Var1 bit 0
+    CMP Player_Y
+
+    PHP      ; Save CPU state (the comparison)
+
+    LSR Temp_Var1      ; Restore the carry bit
+    LDA Objects_YHi,X
+    SBC #$00        ; Apply the carry bit to the Objects_YHi as needed for the height subtraction
+
+    PLP      ; Restore CPU state (the comparison)
+
+    SBC Player_YHi     ; Get the difference against the Player_YHi
+    BMI Hurt     ; If negative (Player_YHi > Objects_YHi, Player is lower), jump to PRG000_D20F (Object_HoldKickOrHurtPlayer)
+
+
+    LDA #-$40
+    STA Player_YVel
+
+    ; Play squish sound
+    LDA Sound_QPlayer
+    ORA #SND_PLAYERSWIM
+    STA Sound_QPlayer
+	
+	;no score, no stop, nothing. bounce as much as you want.
+
 	RTS
+
+Hurt:
+	JMP Player_GetHurt

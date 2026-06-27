@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word Bully_Init				;or Init_Return, doesn't matter
+	.word ObjInit_DoNothing				;or Init_Return, doesn't matter
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word Bully	; Object $00
+	.word CloudGenerator	; Object $00
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -110,7 +110,7 @@ ObjectGroup00_NormalJumpTable:
 
 	.org ObjectGroup_CollideJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_CollideJumpTable:
-	.word Bully_Interaction	; Object $00
+	.word ObjHit_DoNothing	; Object $00
 	.word ObjHit_DoNothing	; Object $01
 	.word ObjHit_DoNothing	; Object $02
 	.word ObjHit_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $00
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $00
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP1 | OA2_GNDPLAYERMOD	; Object $00
+	.byte OA2_TDOGRP2	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -250,7 +250,7 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE 	; Object $00
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE 	; Object $00
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
@@ -292,7 +292,7 @@ ObjectGroup00_Attributes3:
 
 	.org ObjectGroup_PatTableSel	; <-- help enforce this table *here*
 ObjectGroup00_PatTableSel:
-	.byte OPTS_SETPT5 | 14				;can fit tiles for bully	; Object $00
+	.byte OPTS_SETPT5 | $0B				;can fit tiles for bully	; Object $00
 	.byte OPTS_SETPT5 | $48	; Object $01
 	.byte OPTS_SETPT5 | $4C	; Object $02
 	.byte OPTS_SETPT5 | $48	; Object $03
@@ -405,8 +405,8 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjPBully:
-	.byte $B9, $BB, $BD, $BF
+ObjCloudGen:
+	db $9F,$9F
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5613,112 +5613,176 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Sprite flip. honestly should've been in a fixed bank (and other common sprite tables TBH)
-CommonSprFlip:
-	.byte SPR_HFLIP, $00
 
-;common accleration (duh)
-CommonAcceleration:
-	db $01, -$01
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Objects_Var10 - cloud present
+;Objects_Var11 - cloud timer
 
-BumpSpd:
-	db $30,-$30						;player's bump speed
-	
-BullyBumpSpd:
-	.byte -$1A,$1A						;bully's bump speed
+CloudGen_CloudDuration = $9F
+CloudGen_WhenToBlink = $40			;when start blinking
 
-BullyXSpeed:
-	.byte $20,-$20						;bully's max spd.
+CloudGenerator:
+	LDA Player_HaltGame
+	BNE Re
 
-Bully:
-	JSR SubOffScreen				;offscreen situation
-	
-	LDA Player_HaltGame				;don't do whatever
-    	BNE Re						;
-	
-	JSR Object_Move					;interact with objects
-	
-	LDA Objects_DetStat,X				;
-	AND #$04					;
-	BEQ NoFloorHit					;
-	
-	JSR Object_HitGround				;stay on ground
-	
-;only chase when grounded
+	LDA Objects_Var10,x
+	BNE CloudOn
 
-	JSR SubHorzPos					;face player
-	
-	LDA CommonSprFlip,Y				;
-	STA Objects_FlipBits,X				;
-	
-	LDA Sprite_X_Speed,X				;set speed
-	CMP BullyXSpeed,Y				;cap speed
-	BEQ NoFloorHit					;
-	CLC						;add acceleration to speed
-	ADC CommonAcceleration,Y			;
-	STA Sprite_X_Speed,X				;store speed
+	LDA Objects_Var12,x
+	BEQ CanGen
 
-NoFloorHit:
-	LDA Objects_DetStat,X				;if hit wall, invert speed and shiz
-	AND #$03					;
-	BEQ NoWall					;
-	
-	LDA Sprite_X_Speed,X				;
-	;EOR #$FF
-	;TAY
-	;INY
-	;TYA
-	JSR Negate					;yeah, this is a thing
-	STA Sprite_X_Speed,X				;
+	LDA Player_InAir
+	BNE Re
 
-	JSR Bully_PlayBumpSnd				;play bump sound when hit wall
-	
-NoWall:
-	LDA #$07					;animate every 7? frames
-	JSR CommonAnimate				;
-	
-Meh:
-	JSR Object_HitTestRespond			;check collision with player
-	
-Re:
-	JMP Object_ShakeAndDraw				;and draw ofc
+	LDA #$00
+	STA Objects_Var12,x
 
-Bully_Interaction:
-	JSR SubHorzPos						;from what side bump has occured
-
-	LDA BumpSpd,y						;set bump speed
-	STA Player_XVel						;for player
-
-	LDA #$1A						;set longer time for frame to change
-	STA Sprite_Misc_Timer2,x				;
-	STA Sprite_Misc_Timer1,x				;and don't interact with player again for set time
-
-	LDA #$01						;set frame
-	STA Objects_Frame,X					;
-
-	LDA BullyBumpSpd,y					;set bump speed
-	STA Sprite_X_Speed,X					;for bully
-
-Bully_PlayBumpSnd:
-	LDA Sound_QPlayer					;play bump speed
-	ORA #SND_PLAYERBUMP					;
-	STA Sound_QPlayer					;
-	
-Bully_Init:
 	RTS
-	
-CommonAnimate:
-	STA Temp_Var1
-	LDA Sprite_Misc_Timer1,x
-	BNE Meh2
 
-	LDA Objects_Frame,X
-	EOR #$01
-	STA Objects_Frame,X
-	
-	LDA Temp_Var1
-	STA Sprite_Misc_Timer1,x
+CanGen:
+;cloud isn't on screen, allow one to spawn.
+	LDA Pad_Input
+	AND #PAD_UP
+	BEQ Re
+	STA Objects_Var10,x					;spawned cloud
 
-Meh2:
+;set under the player
+
+	LDA Player_Y
+	CLC
+	ADC #$20
+	STA Objects_Y,x
+
+	LDA Player_YHi
+	ADC #$00
+	STA Objects_YHi,x
+
+	LDA Player_X
+	STA Objects_X,x
+
+	LDA Player_XHi
+	STA Objects_XHi,x
+
+	LDA #CloudGen_CloudDuration
+	STA Objects_Timer2,x					;used for anything???
+	STA Objects_Var12,x
+
+;spawn poof of smoke
+
+    JSR Object_DetermineVertVis ; Set flags based on which sprites of this object are vertically visible
+    JSR Object_DetermineHorzVis
+;JSR DontShowButExist
+
+Smoke:
+	LDA #SND_LEVELPOOF
+	STA Sound_QLevel1
+;JSR SpecialObj_FindEmptyAbort
+	LDY #$07
+	JSR SpecialObj_FindEmptyAbortY
+
+	LDA #SOBJ_POOF
+	STA SpecialObj_ID,Y
+
+	LDA #$1f
+	STA SpecialObj_Data,Y
+
+    LDA Objects_X,X
+    STA SpecialObj_XLo,Y
+    LDA Objects_Y,X
+    STA SpecialObj_YLo,Y
+    LDA Objects_YHi,X
+    STA SpecialObj_YHi,Y
+
+Re:
+	RTS
+
+CloudOn:
+;LDA Objects_State,X
+;PHA
+	JSR SubOffScreen
+
+	LDA Objects_State,X
+	BNE Alive
+
+;stay alive but remove the cloud
+
+	STA Objects_Var10,x
+	STA Objects_Timer2,x
+
+;PLA 
+;STA Objects_State,X
+	LDA #OBJSTATE_NORMAL
+	STA Objects_State,X
+	RTS
+;do I need to worry about Level_ObjectsSpawned,Y?
+
+Alive:
+;PLA
+
+
+;solid for the player (copy-pasted from exploding platforms I made, can turn into subroutine if you want...)
+
+    JSR Object_HitTest   ; Test if Player is touching object
+    BCC NotOnPlat     ; If not, jump to PRG002_BAEE (RTS)
+
+    ; Test if Player is standing on top of platform
+
+    LDA Player_SpriteY
+    CLC
+    ADC #20
+    CMP Objects_SpriteY,X
+    BCS NotOnPlat  ; If Player's bottom is beneath object's top, jump to PRG002_BABE
+
+    LDA Player_YVel
+    BMI NotOnPlat  ; If Player is moving upward, jump to PRG002_BABD
+
+    LDA Objects_Y,X
+    SEC
+    SBC #28
+    STA Player_Y
+	
+    LDA Objects_YHi,X
+    SBC #$00
+    STA Player_YHi
+
+    ; Flag Player as NOT mid-air
+    LDY #$00
+    STY Player_InAir
+
+    ;LDA Object_VelCarry
+    ;BPL Carry
+	;LDA #$00
+    ;DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
+
+;Carry:
+    ; Add to Player_X, with carry
+;    CLC
+;    ADC Player_X
+;    STA Player_X
+;    TYA
+;    ADC Player_XHi
+;    STA Player_XHi
+
+NotOnPlat:
+	LDA Objects_Timer2,x
+	BEQ NoCloud
+	CMP #CloudGen_CloudDuration-$1F				;don't show when puff of smoke is displaying
+	BCS DontShowButExist
+	CMP #CloudGen_WhenToBlink
+	BCS NoBlink
+
+	LDA Counter_1
+	AND #$03
+	BNE DontShowButExist
+
+Show:
+NoBlink:
+	JMP Object_ShakeAndDrawMirrored
+
+NoCloud:
+	STA Objects_Var10,x
+	JMP Smoke
+
+DontShowButExist:
+	JSR Object_ShakeAndCalcSprite				;fixes clipping issue (the sprite is there but invisible)
+	LDX SlotIndexBackup
 	RTS

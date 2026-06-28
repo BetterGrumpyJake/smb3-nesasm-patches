@@ -5944,7 +5944,8 @@ PRG030_9FAF:
 ThrownYVels:
 	;     n/a  DOWN  UP
 	.byte $00, -$04, -$60
-	
+
+;shell stuff only
 SetKickedVel_30:
 	LDA #$00						;zero shells y vel, what we removed from prg0
 	STA <Objects_YVel,X		
@@ -5959,15 +5960,21 @@ SetKickedVel_30:
 UpDownThrowVel:
 	CPY #$00						;Y still holds ThrowDirection
 	BEQ KickedShellReturn			;if ThrowDirection=$00 RTS, up(08) drop(04) continue
+	
 	STA ThrowDirection				;zero ThrowDirection
-			
-;set kicked X vel		
-	CLC								;do x velocity arithmetic
+
+	LDA #OBJSTATE_SHELLED			;set state to shelled
+	STA Objects_State,X
+	LDA #$ff						;reset wake up timer on shells
+	STA Objects_Timer3,X
+
+;any kicked object
+SkipShellStuff_30:		
+;set kicked X vel
 	LDA <Player_XVel				;Use CLC/SEC and BPL to do an arithmetic right shift
-	BPL FirstDivide					;BPL branch on N=0
-	SEC		
-FirstDivide:		
-	ROR A							;mod N,Z,C
+	CMP #$80						;A >= $80 -> carry set (number was negative)
+									;A < $80 -> carry clear (number was positive)
+    ROR A
 									;after this A= marios speed / 2
 	STA <Objects_XVel,X				;store A into shells x vel
 		
@@ -5976,13 +5983,9 @@ FirstDivide:
 	LSR A							;;;;
 	LSR A							;logical shift rights, $04/4=1, $08/4=2
 	TAY								;transfer A to Y, either 1 or 2
-	LDA ThrownYVels,Y				;A= ThrownYVels,1 (00), or ThrownYVels,2 (-60)
+	LDA ThrownYVels,Y				;A= ThrownYVels,1 (-$04), or ThrownYVels,2 (-$60)
 	STA <Objects_YVel,X				;set that to shells y vel
-	LDA #OBJSTATE_SHELLED			;set state to shelled
-	STA Objects_State,X
-	LDA #$ff						;reset wake up timer on shells
-	STA Objects_Timer3,X
-KickedShellReturn:
+KickedShellReturn:			
 	RTS
 DropTrickVel:
 	LDA #$28						;drop trick velocity

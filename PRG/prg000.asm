@@ -2894,7 +2894,14 @@ PRG000_CE54:
 	; State remains "normal"
 	LDA #OBJSTATE_NORMAL
 	STA Objects_State,X
+	
+	;allows any holdable object to be up thrown/dropped
+	LDY ThrowDirection			;throw direction check
+	BEQ Object_RegThrow			;if up/down thrown do velocites, otherwise do regular throw
+	JSR SkipShellStuff_30
+	BNE PRG000_CE76				;technically always
 
+Object_RegThrow:
 	; Set Y vel to -$20 (bounce up)
 	LDA #-$20
 	STA <Objects_YVel,X

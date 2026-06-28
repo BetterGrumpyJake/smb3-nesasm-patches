@@ -2816,11 +2816,30 @@ ObjState_Held:
 PRG000_CE28:
 	JSR Object_ShellDoWakeUp ; Wake up while Player is holding object... 
 	BIT <Pad_Holding 
-	BVC Player_KickObject	 ; If Player is NOT holding B button, jump to Player_KickObject  
+	BVC WallPopCheck	 ; If Player is NOT holding B button, jump to Player_KickObject  
 
 PRG000_CE2F:
 	JMP PRG000_CEEF	 ; Jump to PRG000_CEEF
 
+WallPopCheck:
+	;wall check/pop out
+	LDY #1	 ; Y = 1
+
+	LDA <Player_FlipBits
+	BNE HeldObj_WallDetect	 ; If Player is not turned around, jump to PRG000_CE94
+
+	LDY #-1	 ; Y = -1
+
+HeldObj_WallDetect:
+	STY <Objects_XVel,X	 ; Set minimum X velocity on object (to enable wall hit detection)
+
+	JSR Object_WorldDetectN1 ; Detect against world
+
+	LDA <Objects_DetStat,X
+	AND #$03	
+	BEQ Player_KickObject	 ; If object has not hit a wall, jump to PRG000_CEB4
+	
+	JSR WallPopOut
 
 Player_KickObject:
 	LDA Level_PipeMove	 
@@ -2885,33 +2904,33 @@ PRG000_CE79:
 	LDA #$00	
 	STA Objects_KillTally,X
 
-	LDA Objects_State,X
-	CMP #OBJSTATE_HELD
-	BNE PRG000_CEBE	 ; If object's state is not Held, jump to PRG000_CEBE
-
-	; This object is being held by Player...
-
+;	LDA Objects_State,X
+;	CMP #OBJSTATE_HELD
+;	BNE PRG000_CEBE	 ; If object's state is not Held, jump to PRG000_CEBE
+;
+;	; This object is being held by Player...
+;
 ;	LDA Level_ObjectID,X
 ;	CMP #OBJ_ICEBLOCK
 ;	BEQ PRG000_CEB4	 ; If this is an ice block, jump to PRG000_CEB4
-
-	LDY #1	 ; Y = 1
-
-	LDA <Player_FlipBits
-	BNE PRG000_CE94	 ; If Player is not turned around, jump to PRG000_CE94
-
-	LDY #-1	 ; Y = -1
-
-PRG000_CE94:
-	STY <Objects_XVel,X	 ; Set minimum X velocity on object (to enable wall hit detection)
-
-	JSR Object_WorldDetectN1 ; Detect against world
-
-	LDA <Objects_DetStat,X
-	AND #$03	
-	BEQ PRG000_CEB4	 ; If object has not hit a wall, jump to PRG000_CEB4
-	
-	JSR WallPopOut
+;
+;	LDY #1	 ; Y = 1
+;
+;	LDA <Player_FlipBits
+;	BNE PRG000_CE94	 ; If Player is not turned around, jump to PRG000_CE94
+;
+;	LDY #-1	 ; Y = -1
+;
+;PRG000_CE94:
+;	STY <Objects_XVel,X	 ; Set minimum X velocity on object (to enable wall hit detection)
+;
+;	JSR Object_WorldDetectN1 ; Detect against world
+;
+;	LDA <Objects_DetStat,X
+;	AND #$03	
+;	BEQ PRG000_CEB4	 ; If object has not hit a wall, jump to PRG000_CEB4
+;	
+;	JSR WallPopOut
 	; KICK OBJECT INTO WALL LOGIC
 
 	; Flat 100 points

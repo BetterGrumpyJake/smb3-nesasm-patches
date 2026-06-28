@@ -25,8 +25,8 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word DiscoShell_Init				;or Init_Return, doesn't matter
-	.word ObjInit_DoNothing	; Object $01
+	.word DolphinVert_Init				;vertical init
+	.word ObjInit_DoNothing				;horizontal init (no init really)	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
 	.word ObjInit_DoNothing	; Object $04
@@ -67,8 +67,8 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word DiscoShell	; Object $00
-	.word ObjNorm_DoNothing	; Object $01
+	.word DolphinVert	; Object $00
+	.word DolphinHorz	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
 	.word ObjNorm_DoNothing	; Object $04
@@ -110,7 +110,7 @@ ObjectGroup00_NormalJumpTable:
 
 	.org ObjectGroup_CollideJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_CollideJumpTable:
-	.word DiscoShell_Interaction	; Object $00
+	.word ObjHit_DoNothing	; Object $00
 	.word ObjHit_DoNothing	; Object $01
 	.word ObjHit_DoNothing	; Object $02
 	.word ObjHit_DoNothing	; Object $03
@@ -152,8 +152,8 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH16					;size probably doesn't matter (16x16 regardless)	; Object $00
-	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
+	.byte OA1_PAL3 | OA1_HEIGHT32 | OA1_WIDTH16	;vertical	; Object $00
+	.byte OA1_PAL3 | OA1_HEIGHT16 | OA1_WIDTH40	;horizontal	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
 	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH16	; Object $04
@@ -201,8 +201,8 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_GNDPLAYERMOD | OA2_TDOGRP1	; Object $00
-	.byte OA2_TDOGRP1	; Object $01
+	.byte OA2_TDOGRP2 | OA2_GNDPLAYERMOD		;v	; Object $00
+	.byte OA2_TDOGRP5 | OA2_GNDPLAYERMOD		;h	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
 	.byte OA2_TDOGRP2	; Object $04
@@ -250,8 +250,8 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE | OA3_DIESHELLED 	; Object $00
-	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE 	; Object $00
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
 	.byte OA3_HALT_JUSTDRAWTALL 	; Object $04
@@ -292,8 +292,8 @@ ObjectGroup00_Attributes3:
 
 	.org ObjectGroup_PatTableSel	; <-- help enforce this table *here*
 ObjectGroup00_PatTableSel:
-	.byte OPTS_SETPT6 | $4F				;same as normal chain chomp (duh)	; Object $00
-	.byte OPTS_SETPT5 | $48	; Object $01
+	.byte OPTS_SETPT5 | 15				;same as normal chain chomp (duh)	; Object $00
+	.byte OPTS_SETPT5 | 15	; Object $01
 	.byte OPTS_SETPT5 | $4C	; Object $02
 	.byte OPTS_SETPT5 | $48	; Object $03
 	.byte OPTS_SETPT5 | $48	; Object $04
@@ -334,10 +334,8 @@ ObjectGroup00_PatTableSel:
 
 	.org ObjectGroup_KillAction	; <-- help enforce this table *here*
 ObjectGroup00_KillAction:
-	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
-	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
-	.byte KILLACT_JUSTDRAWMIRROR	; Object $00
-	.byte KILLACT_STANDARD	; Object $01
+	.byte KILLACT_STANDARD
+	.byte KILLACT_STANDARD
 	.byte KILLACT_STANDARD	; Object $02
 	.byte KILLACT_STANDARD	; Object $03
 	.byte KILLACT_STANDARD	; Object $04
@@ -408,8 +406,8 @@ ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
 ;can probably be shorter, I just copy-pasted those from vanilla koopas
-ObjPDisco:
-	.byte $CB, $C5, $C3, $C5, $FD, $FD, $FD, $FD, $FD, $FD, $D1, $D1, $D3, $D5
+ObjPVertDolph:
+	db $A1,$A3,$A5,$A7
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -425,7 +423,10 @@ ObjP17:
 ObjP18:	
 ObjP1D:
 ObjP20:	.byte $AD, $AF, $B9, $BB, $B9, $BB
-ObjP01:	.byte $81, $81
+ObjP01:
+ObjPHorzDolph:
+	db $91,$93,$95,$97,$81				;last tile is tail
+	db $B1,$B3,$B5,$B7,$83
 ObjP02:	.byte $8F, $8F, $99, $9B, $9D, $9F
 ObjP04:	.byte $B1, $B3, $B5, $B7, $B9, $BB, $BD, $BF
 ObjP05:	.byte $A5, $A7, $A1, $A3, $A1, $A3
@@ -5615,243 +5616,268 @@ SubHorzPos = Level_ObjCalcXDiffs
 SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
+
+CommonSprFlip:
+	.byte SPR_HFLIP, $00
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;for when it bumps into walls
-DiscoShell_BumpSpeeds:
-	db -$20,$20
+DolphinHorz_XAccel:
+	db -$01,$01
 
-DiscoShell_ID = $05							;inserted sprite number (necessary for slamming into each other)
+DolphinHorz_MaxXSpd:
+	db -$08,$08
 
-DiscoShell:
+DolphinVert_Init:
+	INC Objects_Var12,x
+	RTS
 
-;cheat the system, draw a normal shell (drawing routine for thrown/kicked sprites)
+DolphinVert:
+	;this one is simply 16x32 that flips.
+	JSR Object_Draw16x32Sprite
+	JMP Dolphin_Shared
 
-	LDA Level_ObjectID,x
-	PHA
-	LDA #OBJ_REDTROOPA
-	STA Level_ObjectID,x
+DolphinHorz:
+	JSR DolphinHorzGFX
 
-;JSR PRG000_CCF7
-;PLA
-;STA Level_ObjectID,x
-;JMP Continue
-
-JustGFX:
-	JSR PRG000_CD46						;dunno if more efficient than copy-pasting animation and calling 
-	PLA
-	STA Level_ObjectID,x
-	;RTS
+Dolphin_Shared:
+	JSR SubOffScreen
 
 	LDA Player_HaltGame
-	BEQ DiscoShell_Continue
-
-;turns out no init needed
-DiscoShell_Init:
+	BEQ Continue
 	RTS
 
-;I have X doubts about this working
+Continue:
+	LDA Objects_Var12,x
+	BEQ HorzAnim
 
-DiscoShell_Continue:
-	;LDA Objects_State,x
-	;CMP #OBJSTATE_NORMAL				;in case it disappears offscree  (because we mess with status later on)
-	;BCC Re							;(not the case anymore... maybe)
-
-	;INC Objects_Var5,X
-
-;need some sorta timing
-
-	JSR SubHorzPos
-	TYA
-	STA Objects_Var4,x
-
-	LDA Sprite_X_Speed,x
-	LDY Objects_Var4,x
-	BNE MoveLeft
-
-	CMP #$20
-	BPL NoMore
-
-	INC Sprite_X_Speed,x
-	INC Sprite_X_Speed,x
-	JMP NoMore
-
-MoveLeft:
-	CMP #$E0
-	BMI NoMore
-
-	DEC Sprite_X_Speed,x
-	DEC Sprite_X_Speed,x
-
-;i'll leave like this for now...
-
-NoMore:
-;cycle through colors
-
+	LDY #$00
 	LDA Counter_1
+	AND #$04
+	BEQ StoreFlip
+	;LSR
+	;LSR
+	;BCC StoreFlip
+	;LDY #$01
+	INY
+	BNE StoreFlip
+
+HorzAnim:
+	LDA Counter_1
+	AND #$08
 	LSR A
-	BCS NoPal
+	LSR A
+	LSR A
+	;BNE NoFlip
 
-	LDA Objects_SprAttr,x				;change from pal 1 to pal 3 and back
-	AND #$03
-	CLC
-	ADC #$01
-	CMP #$04
-	BNE NoOverFlow
+	;LDA Objects_Var10,x
+	;EOR #$01
+	STA Objects_Var10,x
 
-	LDA #$01							;no palette 0
-
-NoOverFlow:
-	STA $00
-
-	LDA Objects_SprAttr,x
-	AND #$FC
-	ORA $00
-	STA Objects_SprAttr,x
-
-	;LDA Objects_SprAttr,x
-	;AND #$FC
-	;STA $00
-
-	;LDA Objects_SprAttr,x
-	;AND #$03
-	;CLC
-	;ADC #$01
-	;CMP #$04
-	;BNE NoOverFlow
-
-	;LDA #$01
-
-;NoOverFlow:
-	;ORA $00
-	;STA Objects_SprAttr,x				;whichever is more effective, too lazy to check
-
-NoPal:
-
-;COPY-PASTE FROM bank 0!
-    TXA
-    CLC
-    ADC Counter_1
-    LSR A
-    BCC NoSprToSprCollision  ; Semi-randomly jump to PRG000_CD46
-
-    JSR ObjectToObject_HitTest
-    BCC NoSprToSprCollision  ; If object has not hit another object, jump to PRG000_CD46
-
-    ; Play object-to-object collision sound
-    LDA Sound_QPlayer
-    ORA #SND_PLAYERKICK
-    STA Sound_QPlayer
-
-    ; Knock object in same general direction as the kicked shell object
-    LDA Objects_XVel,X
-    ASL A
-    LDA #$10     ; A = $10
-    BCC AB
-    LDA #-$10    ; A = -$10
-AB:							;wouldve use + but it breaks sublabels
-    STA Objects_XVel,Y
-
-	LDA Level_ObjectID,Y
-	CMP #DiscoShell_ID				;if another sprite we killed was a disco shell (which is never in a kicked state)
-	BEQ KillEachOther				;do kill each other
-
-    LDA Objects_State,Y
-    CMP #OBJSTATE_KICKED
-    BNE Ignorance  ; If the impacted object's state is not Kicked, jump to PRG000_CD36
-
-    ; Another kicked object on the way... (slam and kill eachother)
-KillEachOther:
-    LDA Objects_KillTally,Y
-    JSR Score_Get100PlusPts  ; Get the total score this OTHER kicked shell object earned
-    JSR ObjectKill_SetShellKillVars  ; Kill our kicked object and set ShellKill variables
-
-    ; Set X Velocity of our kicked object in the direction of the impacted object
-    LDA Objects_XVel,Y
-    ASL A
-    LDA #$10
-    BCS AA
-    LDA #-$10
-AA:
-    STA Objects_XVel,X
-
-Ignorance:
-    TYA
-    TAX      ; X = the other object we just hit
-    JSR ObjectKill_SetShellKillVars  ; Kill the impacted object and set ShellKill variables
-
-    LDX SlotIndexBackup         ; X = object slot index (our kicked object)
-    LDA Objects_KillTally,X
-    INC Objects_KillTally,X     ; Increase our kicked object's kill tally...
-    JSR Score_Get100PlusPtsY    ; Get points by the kill tally!  (Incidentally, Score_Get100PlusPts would work too)
-
-NoSprToSprCollision:
-	JSR Object_HitTestRespond
-
-	;JSR Object_HandleBumpUnderneath				;turns out this makes player interact with the shell as normal. totally makes sense (NO!)
-												;thankfully not needed, iirc SMW version can't be affected by bumping from underneath
-	JSR Object_Move
-
-	LDA Objects_DetStat,X			;
-	AND #$03						;
-	BEQ NoWall
+NoFlip:
+	LDA Objects_Var11,x
+	AND #$01
 	TAY
-	LDA DiscoShell_BumpSpeeds-1,y
+
+StoreFlip:
+	LDA CommonSprFlip,Y
+	STA Objects_FlipBits,x
+	;LSR
+	;BCC NO
+
+	;LDA Objects_FlipBits,x
+	;EOR #$40
+	;STA Objects_FlipBits,x
+
+NO:
+	JSR Object_ApplyYVel_NoLimit
+	JSR Object_ApplyXVel
+    ; Apply Y velocity
+
+	LDA Sprite_Y_Speed,X	; sprite Y speed
+	BMI MovingUp	; if the sprite is moving down...
+	CMP #$3F		; and its Y speed has not reached 3F...
+	BCS MaxYSpeed	;
+MovingUp:
+	INC Sprite_Y_Speed,X	; increment its Y speed
+MaxYSpeed:
+
+	TXA		; sprite index -> A
+	EOR Counter_1	;
+	LSR A		; every other frame depending on the sprite index...
+	BCC NoObjInteract	; don't interact with objects
+
+	JSR Object_WorldDetectN1
+
+NoObjInteract:
+	LDA Sprite_Y_Speed,X
+	BMI PlayerInt
+
+	LDA Objects_InWater,X
+	BEQ PlayerInt
+
+	LDA Sprite_Y_Speed,X	;
+	SEC		;
+	SBC #$08		; diminish the sprite Y speed by 8
+	STA Sprite_Y_Speed,X
+	BPL NoSpeedZero
+
+	LDA #$00
+	STA Sprite_Y_Speed,X
+
+NoSpeedZero:
+	LDA Objects_Var12,X
+	BNE JustJump
+
+	;LDY #$02
+	;BNE NotASNormal
+
+Normal:
+	LDA Objects_Var11,X
+	AND #$01
+	TAY
+
+NotASNormal:
+	LDA Sprite_X_Speed,X
+	CLC
+	ADC DolphinHorz_XAccel,Y
 	STA Sprite_X_Speed,x
+	CMP DolphinHorz_MaxXSpd,Y
+	BNE PlayerInt
 
-	LDA Object_TileWall2
-	JSR Object_BumpBlocks				;thanks boom-boom for not using this routine
+JustJump:
+	INC Objects_Var11,X
 
-    LDA Sound_QPlayer
-    ORA #SND_PLAYERBUMP
-    STA Sound_QPlayer
+	LDA #$C0
+	STA Sprite_Y_Speed,X
 
-NoWall:
-	LDA Objects_DetStat,X			;
-	AND #$04						;
-	BEQ Re
-	
-	JSR Object_HitGround
+PlayerInt:
+    JSR Object_HitTest   ; Test if Player is touching object
+    BCC NotOnPlat     ; If not, jump to PRG002_BAEE (RTS)
+    ; Test if Player is standing on top of platform
 
-Re:
-;Never wake up!
-;LDA #$FF
-;STA Objects_Timer4,X
-	RTS
+	;LDA #$00
+	;STA Object_VelCarry				;no vel carry!!! (so the player doesnt slide off)
 
-DiscoShell_Interaction:
-	;JSR Object_HitTest
-	;BCC NoHit
+    LDA Player_SpriteY
+    CLC
+    ADC #20
+    CMP Objects_SpriteY,X
+    BCS NotOnPlat  ; If Player's bottom is beneath object's top, jump to PRG002_BABE
 
-;more copy-paste job
-    LDA Objects_Y,X     ; Get object's Y
+    LDA Player_YVel
+    BMI NotOnPlat  ; If Player is moving upward, jump to PRG002_BABD
+
+    LDA Objects_Y,X
     SEC
-    SBC #$19       ; Subtract Temp_Var2 (height above object considered "stompable" range)
-    ROL Temp_Var1       ; Stores the carry bit into Temp_Var1 bit 0
-    CMP Player_Y
-
-    PHP      ; Save CPU state (the comparison)
-
-    LSR Temp_Var1      ; Restore the carry bit
-    LDA Objects_YHi,X
-    SBC #$00        ; Apply the carry bit to the Objects_YHi as needed for the height subtraction
-
-    PLP      ; Restore CPU state (the comparison)
-
-    SBC Player_YHi     ; Get the difference against the Player_YHi
-    BMI Hurt     ; If negative (Player_YHi > Objects_YHi, Player is lower), jump to PRG000_D20F (Object_HoldKickOrHurtPlayer)
-
-
-    LDA #-$40
-    STA Player_YVel
-
-    ; Play squish sound
-    LDA Sound_QPlayer
-    ORA #SND_PLAYERSWIM
-    STA Sound_QPlayer
+    SBC #28
+    STA Player_Y
 	
-	;no score, no stop, nothing. bounce as much as you want.
+    LDA Objects_YHi,X
+    SBC #$00
+    STA Player_YHi
 
+    ; Flag Player as NOT mid-air
+    LDY #$00
+    STY Player_InAir
+	STY Player_YVel
+
+    LDA Object_VelCarry
+    BPL Carry
+
+    DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
+
+Carry:
+    ; Add to Player_X, with carry
+    CLC
+    ADC Player_X
+    STA Player_X
+    TYA
+    ADC Player_XHi
+    STA Player_XHi
+
+     
+NotOnPlat:
 	RTS
 
-Hurt:
-	JMP Player_GetHurt
+;similar to LogPlat_Draw
+DolphinHorzGFX:
+	LDA Objects_FlipBits,X
+	STA Temp_Var16
+
+;I ain't using Objects_Frame because i think it'd be a bit complicated to calculate gfx stuff. instead just use some other misc table
+	LDA Objects_Var10,X
+	PHA
+	JSR Object_ShakeAndCalcSprite
+	PLA
+	BEQ FirstFrame
+
+	;INX
+	;INX
+	;INX
+	;INX
+	;INX
+
+	TXA									;i think less cpu cycles? same space
+	CLC
+	ADC #$05
+	TAX
+
+FirstFrame:
+	STX Temp_Var15
+
+	;need to figure out what to draw first depending on flipping, 16x16 portion or 24x16 one
+
+    LDA Counter_1
+    LSR A
+    PHP      ; Save CPU state (most importantly the carry flag)
+    BCC SIKE  ; Every other tick, jump to PRG002_B5BD
+
+    ; Y += (11 + C = 12) -- Every other tick, offset Sprite_RAM
+    TYA
+    ADC #$0B
+    TAY
+
+SIKE:
+	LDA Temp_Var16
+	BEQ DrawNorm
+
+	;flipped
+	INX
+	INX
+	INX
+
+DrawNorm:
+	JSR Object_Draw16x16Sprite
+
+	LDA Temp_Var7   ; Get Sprite_RAM offset (as determined by Object_ShakeAndCalcSprite)
+	PLP      ; Restore CPU state
+	BCS Convert  ; Every other opposite tick, jump to PRG002_B5C7
+
+	TYA
+	ADC #$08
+
+Convert:
+	TAY
+
+	INX							;drew first two tiles
+	INX
+
+	LDA #16
+	CLC
+	ADC Temp_Var2
+	STA Temp_Var2
+
+    ; Alters horizontal visibility ??
+	ASL Temp_Var8
+	ASL Temp_Var8
+
+DrawPlz:
+	LDA Temp_Var16
+	BEQ DrawNormTwo
+
+	LDX Temp_Var15
+
+DrawNormTwo:
+	JSR Object_Draw24x16Sprite   ; Draw wide sprite
+
+    LDX SlotIndexBackup         ; X = object slot index
+	RTS

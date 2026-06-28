@@ -5982,7 +5982,7 @@ FirstDivide:
 	STA Objects_State,X
 	LDA #$ff						;reset wake up timer on shells
 	STA Objects_Timer3,X
-KickedShellReturn:			
+KickedShellReturn:
 	RTS
 DropTrickVel:
 	LDA #$28						;drop trick velocity

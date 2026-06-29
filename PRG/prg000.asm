@@ -7037,7 +7037,7 @@ WallCheck:
 	LDA <Objects_XVel,X				;Use CLC/SEC and BPL to do an arithmetic right shift
 	BPL WallBounceDivide			;BPL branch on N=0
 	SEC		
-WallBounceDivide:		
+WallBounceDivide:
 	ROR A							;mod N,Z,C
 									;after this A= object x vel / 2
 	STA <Objects_XVel,X

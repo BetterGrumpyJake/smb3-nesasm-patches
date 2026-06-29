@@ -1503,53 +1503,7 @@ PRG003_A798:
 PRG003_A79F:
 	JSR Object_Move	 ; Do standard movements
 
-	LDA <Objects_DetStat,X
-	AND #$04
-	BEQ PRG003_A7CC	 ; If Bob-omb has not hit floor, jump to PRG003_A7CC
-
-	; This whole block works to get the X velocity arithmetically divided by 2
-	LDA <Objects_XVel,X
-	PHP		 ; Save CPU state
-	; Get absolute value of X velocity
-	BPL PRG003_A7B0
-	JSR Negate
-PRG003_A7B0:
-	LSR A		 ; Divide by 2
-	PLP		 ; Restore CPU state
-	BPL PRG003_A7B7	 ; If the X velocity was positive, jump to PRG003_A7B7
-	JSR Negate	 ; Otherwise, make this negative again
-PRG003_A7B7:
-	STA <Objects_XVel,X	 ; X velocity now divided by 2
-
-	LDA <Objects_YVel,X
-	PHA		 ; Save Y velocity
-
-	JSR Object_HitGround	 ; Align to floor
-
-	PLA		 ; Restore Y velocity
-	BMI PRG003_A7CC	 ; If it's negative, jump to PRG003_A7CC
-
-	; Bob-omb was falling downward...
-	LSR A		; Divide by 2
-	JSR Negate	 ; Negate it (bounce back up)
-	CMP #$fc
-	BGE PRG003_A7CC	 ; If the velocity was small enough, then just stop
-
-	STA <Objects_YVel,X	 ; Otherwise, bounce away
-
-PRG003_A7CC:
-	LDA <Objects_DetStat,X
-	AND #$03
-	BEQ PRG003_A7DC	 ; If Bob-omb did not hit a wall, jump to PRG003_A7DC
-
-	; Otherwise bounce off
-	LDA <Objects_XVel,X
-	JSR Negate
-	STA <Objects_XVel,X
-
-	; ... and sort of arithmetically divide by 2
-	ASL A
-	ROR <Objects_XVel,X
+	JSR ThrowObj_DetectWorld
 
 PRG003_A7DC:
 	JSR Object_HitTest

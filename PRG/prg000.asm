@@ -2176,90 +2176,19 @@ PRG000_CB10:
 	LDA <Player_HaltGame	 
 	BNE PRG000_CB5B	 ; If gameplay is halted, jump to PRG000_CB5B
 
-	JSR Object_ShellDoWakeUp	 ; Handle waking up (MAY not return here, if object "wakes up"!) 
-	JSR Object_Move	 		; Perform standard object movements
+	JSR Object_ShellDoWakeUp		; Handle waking up (MAY not return here, if object "wakes up"!) 
+	JSR Object_Move					; Perform standard object movements
 	JSR AirborneShellKill_30		;handle up and down kicked shells kill enemies
- 
-	LDA <Objects_DetStat,X 
-	AND #$04 
-	BEQ PRG000_CB45	 ; If object DOES NOT hit floor, jump to PRG000_CB45
-	
-	LDA #$00			;if shell touches ground, clear the flag
-	STA Objects_UpDrop,X
-
-	LDA <Objects_YVel,X 
-	BMI PRG000_CB45	 ; If object is moving upward, jump to PRG000_CB45 
-
-	; Object has NOT hit floor and is NOT moving upward...
-
-	PHA		 ; Save Y velocity
-
-	JSR Object_HitGround	 ; Align with ground
- 
-	LDA <Objects_XVel,X	 ; Get X velocity
- 
-	PHP		 ; Save CPU state
-
-	; Get absolute value of X velocity
-	BPL PRG000_CB30 
-	JSR Negate
-PRG000_CB30:
-
-	LSR A		 ; Divide by 2 
-	PLP		 ; Restore CPU state
-
-	; If needed to negate before, negate again
-	BPL PRG000_CB37 
-	JSR Negate
-PRG000_CB37: 
-	STA <Objects_XVel,X	 ; Set as X velocity 
-
-	PLA		 ; Restore Y velocity
- 
-	; Divide by 4
-	LSR A 
-	LSR A 
-	JSR Negate	 ; Negate it 
-	CMP #-$02 
-	BGE PRG000_CB45	 ; If object only lightly moving upward, jump to PRG000_CB45
- 
-	STA <Objects_YVel,X	 ; Set object Y velocity
-
-PRG000_CB45: 
-	LDA <Objects_DetStat,X 
-	AND #$08 
-	BEQ PRG000_CB4F	 ; If object has NOT hit ceiling, jump to PRG000_CB4F
- 
-	; Set object Y velocity to $10 (rebound off ceiling)
-	;LDA #$10 
-	;STA <Objects_YVel,X
-	JSR HitCeilingBumpBlocks_30		;when shell hits ceiling redetect coords and bump blocks
-
-PRG000_CB4F:
-	LDA <Objects_DetStat,X 
-	AND #$03 
-	BEQ PRG000_CB58	 ; If object has NOT hit wall, jump to PRG000_CB58 
-
-	JSR Object_AboutFace	 		; Turn around... 
-	
-	CLC								;do x velocity arithmetic
-	LDA <Objects_XVel,X				;Use CLC/SEC and BPL to do an arithmetic right shift
-	BPL WallBounceDivide			;BPL branch on N=0
-	SEC		
-WallBounceDivide:		
-	ROR A							;mod N,Z,C
-									;after this A= object x vel / 2
-	STA <Objects_XVel,X
+	JSR ThrowObj_DetectWorld
 
 PRG000_CB58:
-	JSR Object_HandleBumpUnderneath	 ; Handle object getting hit from underside 
+	JSR Object_HandleBumpUnderneath	;Handle object getting hit from underside 
 
 PRG000_CB5B:
-	JSR Object_BumpOffOthers	 ; Bump off and turn away from other objects 
+	JSR Object_BumpOffOthers		;Bump off and turn away from other objects 
 
 PRG000_CB5E:
-	JSR Object_DeleteOffScreen	 ; Delete object if it goes off-screen 
-
+	JSR Object_DeleteOffScreen		;Delete object if it goes off-screen
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Object_DrawShelled
@@ -7050,3 +6979,68 @@ Video_3CMFlowBot
 	.byte VU_REPEAT | $08, $A9
 	.byte $00	; Terminator
 
+ThrowObj_DetectWorld:
+	LDA <Objects_DetStat,X 
+	AND #$04 
+	BEQ CeilingCheck	 			;did not hit floor move on to CeilingCheck
+	
+	LDA #$00						;if shell touches ground, clear the flag
+	STA Objects_UpDrop,X
+
+	LDA <Objects_YVel,X
+	BMI CeilingCheck	 			;If object is moving upward, jump to CeilingCheck 
+
+	; Object has NOT hit floor and is NOT moving upward...
+	;do ground bounces, taken from bobomb
+	LDA <Objects_XVel,X
+	PHP
+	BPL Gravity1
+	JSR Negate
+Gravity1:
+	LSR A
+	PLP
+	BPL Gravity2
+	JSR Negate
+Gravity2:
+	STA <Objects_XVel,X
+
+	;diminishing vertical bounce
+	LDA <Objects_YVel,X
+	PHA
+	JSR Object_HitGround
+	PLA
+	BMI CeilingCheck
+	LSR A
+	JSR Negate
+	CMP #$fc
+	BGE CeilingCheck
+	STA <Objects_YVel,X
+
+CeilingCheck: 
+	LDA <Objects_DetStat,X 
+	AND #$08 
+	BEQ WallCheck	 ; If object has NOT hit ceiling, jump to WallCheck
+ 
+	; Set object Y velocity to $10 (rebound off ceiling)
+	;LDA #$10 
+	;STA <Objects_YVel,X
+	JSR HitCeilingBumpBlocks_30		;when shell hits ceiling redetect coords and bump blocks
+
+WallCheck:
+	LDA <Objects_DetStat,X 
+	AND #$03 
+	BEQ ThrowObj_Ret	 ; If object has NOT hit wall, jump to ThrowObj_Ret 
+
+	JSR Object_AboutFace	 		; Turn around... 
+	
+	CLC								;do x velocity arithmetic
+	LDA <Objects_XVel,X				;Use CLC/SEC and BPL to do an arithmetic right shift
+	BPL WallBounceDivide			;BPL branch on N=0
+	SEC		
+WallBounceDivide:		
+	ROR A							;mod N,Z,C
+									;after this A= object x vel / 2
+	STA <Objects_XVel,X
+
+ThrowObj_Ret:
+	RTS

@@ -311,7 +311,7 @@ Object_AttrFlags:
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $0D - OBJ_POWERUP_MUSHROOM
 	.byte OAT_BOUNDBOX09 | OAT_HITNOTKILL	; Object $0E - OBJ_BOSS_KOOPALING
 	.byte OAT_BOUNDBOX00	; Object $0F
-	.byte OAT_BOUNDBOX00	; Object $10
+	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_FIREIMMUNITY | OAT_HITNOTKILL | OAT_BOUNCEOFFOTHERS	; Object $10
 	.byte OAT_BOUNDBOX00	; Object $11
 	.byte OAT_BOUNDBOX00	; Object $12
 	.byte OAT_BOUNDBOX00	; Object $13
@@ -566,25 +566,25 @@ PRG000_C3E7:
 ; FIXME: Anybody want to claim this?
 ; Looks like maybe a leftover debug routine for some kind of "float around" mode maybe!!
 ; $C3EA 
-	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player X velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_XVel
-
-	LDA <Pad_Holding
-	LSR A
-	LSR A
-	AND #((PAD_UP | PAD_DOWN) >> 2)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player Y velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_YVel
-
-	RTS		 ; Return
+;	LDA <Pad_Holding
+;	AND #(PAD_LEFT | PAD_RIGHT)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player X velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_XVel
+;
+;	LDA <Pad_Holding
+;	LSR A
+;	LSR A
+;	AND #((PAD_UP | PAD_DOWN) >> 2)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player Y velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_YVel
+;
+;	RTS		 ; Return
 
 	; Offsets into Sprite_RAM used by objects
 SprRamOffsets:
@@ -2301,6 +2301,8 @@ PRG000_CB8E:
 	JSR Object_ShakeAndDrawMirrored	 ; Draw mirrored sprite
 
 	LDY Level_ObjectID,X
+	CPY #OBJ_HOLDNOTE		;skip holdnote
+	BEQ PRG000_CBB3
 	CPY #OBJ_ICEBLOCK
 	BEQ PRG000_CBB3	 ; If object is an Iceblock, jump to PRG000_CBB3 (RTS)
 
@@ -2841,6 +2843,9 @@ Player_KickObject:
 
 	LDA Level_ObjectID,X
 
+	CMP #OBJ_HOLDNOTE			;holdable notes act just like bobombs
+	BEQ PRG000_CE54
+
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CE54	 ; If this is a Bob-omb ready to explode, jump to PRG000_CE54
 
@@ -3091,6 +3096,11 @@ PRG000_CF49:
 
 	JSR Object_WorldDetectN1	; Detect against world
 	JSR Object_CalcSpriteXY_NoHi	; Calculate low parts of sprite X/Y (never off-screen when held by Player!)
+	
+	LDA Level_ObjectID,X			;skip killing a held noteblock on enemies
+	CMP #OBJ_HOLDNOTE
+	BEQ PRG000_CF98
+	
 	JSR ObjectToObject_HitTest	; Test if this object has collided with another object
 	BCC PRG000_CF98		 ; If this object did not collide with any other objects, jump to PRG000_CF98
 
@@ -3155,14 +3165,14 @@ PRG000_CFA8:
 
 
 	; Unused space... deleted code?
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
+	;NOP
 
 ObjState_Killed:
 	JSR Object_FallAndDelete	; Have object fall and delete if it gets too low (at which point we don't return)
@@ -3434,7 +3444,9 @@ ObjectHeld_WakeUpDir:	.byte $40, $00
 Object_ShellDoWakeUp:
 
 	; If object is a Bob-omb, jump to PRG000_D0EC, otherwise jump to PRG000_D101
-	LDA Level_ObjectID,X	  
+	LDA Level_ObjectID,X
+	CMP #OBJ_HOLDNOTE		;skip holdnote
+    BEQ PRG000_D100
 	CMP #OBJ_BOBOMBEXPLODE 
 	BEQ PRG000_D0EC 
 	CMP #OBJ_BOBOMB 

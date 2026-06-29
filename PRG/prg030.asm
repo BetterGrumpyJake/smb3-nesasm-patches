@@ -5938,4 +5938,3 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
-

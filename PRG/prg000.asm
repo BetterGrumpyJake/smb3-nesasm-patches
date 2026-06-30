@@ -2861,56 +2861,12 @@ PRG000_CE79:
 	LDA #$00	
 	STA Objects_KillTally,X
 
-;	LDA Objects_State,X
-;	CMP #OBJSTATE_HELD
-;	BNE PRG000_CEBE	 ; If object's state is not Held, jump to PRG000_CEBE
-;
-;	; This object is being held by Player...
-;
-;	;LDA Level_ObjectID,X
-;	;CMP #OBJ_ICEBLOCK
-;	;BEQ PRG000_CEB4	 ; If this is an ice block, jump to PRG000_CEB4
-;
-;	LDY #1	 ; Y = 1
-;
-;	LDA <Player_FlipBits
-;	BNE PRG000_CE94	 ; If Player is not turned around, jump to PRG000_CE94
-;
-;	LDY #-1	 ; Y = -1
-;
-;PRG000_CE94:
-;	STY <Objects_XVel,X	 ; Set minimum X velocity on object (to enable wall hit detection)
-;
-;	JSR Object_WorldDetectN1 ; Detect against world
-;
-;	LDA <Objects_DetStat,X
-;	AND #$03	
-;	BEQ PRG000_CEB4	 ; If object has not hit a wall, jump to PRG000_CEB4
-;	
-;	JSR WallPopOut
-
-	; KICK OBJECT INTO WALL LOGIC
-
-	; Flat 100 points
-;	LDA #$05
-;	JSR Score_PopUp
-;
-;	; Object state is Killed
-;	LDA #OBJSTATE_KILLED
-;	STA Objects_State,X
-;
-;	; Set object Y velocity to -$40 (fly up a bit)
-;	LDA #-$40
-;	STA <Objects_YVel,X
-;
-;	; Remove that minimum X velocity
-;	LDA #$00
-;	STA <Objects_XVel,X
-;
-;	JMP PRG000_CF98	 ; Jump to PRG000_CF98
+	LDA Objects_State,X
+	CMP #OBJSTATE_HELD
+	BNE PRG000_CEBE				;bumped shell, was not held/thrown
 
 PRG000_CEB4:
-
+	; Object just held/thrown, not bumped. set Y to which way mario is facing
 	; Object kicked not against wall...
 
 	LDY #0	 	; Y = 0
@@ -2921,7 +2877,7 @@ PRG000_CEB4:
 	INY		; Y = 1
 
 PRG000_CEBB:
-	JMP PRG000_CEC6	; Jump to PRG000_CEC6
+	JMP PRG000_CEC6	; Jump to PRG000_CEC6, skip bumped shell logic
 
 PRG000_CEBE:
 
@@ -7030,17 +6986,14 @@ WallCheck:
 	LDA <Objects_DetStat,X 
 	AND #$03 
 	BEQ ThrowObj_Ret	 ; If object has NOT hit wall, jump to ThrowObj_Ret 
-
-	JSR Object_AboutFace	 		; Turn around... 
 	
-	CLC								;do x velocity arithmetic
-	LDA <Objects_XVel,X				;Use CLC/SEC and BPL to do an arithmetic right shift
-	BPL WallBounceDivide			;BPL branch on N=0
-	SEC		
-WallBounceDivide:
-	ROR A							;mod N,Z,C
-									;after this A= object x vel / 2
+;code from bobomb logic
+	LDA <Objects_XVel,X
+	JSR Negate
 	STA <Objects_XVel,X
+	; ... and sort of arithmetically divide by 2
+	ASL A
+	ROR <Objects_XVel,X
 
 ThrowObj_Ret:
 	RTS

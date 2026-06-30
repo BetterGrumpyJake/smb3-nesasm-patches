@@ -451,9 +451,6 @@ ObjInit_HoldNote:
 ObjNorm_HoldNote:
 	JSR Object_DeleteOffScreen
 	
-	LDA #$00					;set frame to 0
-	STA Objects_Frame,X
-	
 	JSR Object_ShakeAndDrawMirrored
 
 	LDA <Player_HaltGame

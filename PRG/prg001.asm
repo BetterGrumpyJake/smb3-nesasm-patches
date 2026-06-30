@@ -409,7 +409,7 @@ ObjP03:
 ObjP07:
 ObjP0E:
 ObjP0F:
-ObjP10:	.byte $81, $83, $81, $81, $81, $81
+ObjP10:	.byte $81, $81, $81, $81, $81, $81
 ObjP11:
 ObjP12:
 ObjP13:
@@ -454,7 +454,7 @@ ObjNorm_HoldNote:
 	LDA #$00					;set frame to 0
 	STA Objects_Frame,X
 	
-	JSR Object_ShakeAndDraw
+	JSR Object_ShakeAndDrawMirrored
 
 	LDA <Player_HaltGame
 	BNE HoldNote_Ret2

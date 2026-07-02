@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word FireworksInit
+	.word ObjInit_DoNothing
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word Fireworks
+	.word Football_Main
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH8
+	.byte OA1_PAL3 | OA1_HEIGHT16 | OA1_WIDTH16
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP0	; Object $00
+	.byte OA2_TDOGRP1 | OA2_NOSHELLORSQUASH	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -250,7 +250,7 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE 	; Object $00
+	.byte OA3_HALT_JUSTDRAW 	; Object $00
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
@@ -405,8 +405,8 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjPFirework:
-	db $85,$87
+ObjPFootball:
+	.byte $87, $89
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5612,126 +5612,72 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Fireworks_InitSpeeds:
-	db $E2,$E6,$E4,$E0
+BounceHeights:
+	db $A0,$D0,$C0,$D0
 
-Fireworks_InitTimers:
-	db $60,$10,$A0,$FF
+FootballXSpeed:
+    ;.byte $00, -$02,  $02,  $00,  $00,  $80,  $80,  $00 ; $00-$07
+    ;.byte $00,  $80,  $00,  $80, -$01, -$01,  $01,  $01 ; $08-$0F
+	db $00, -$10, $10, $00, $00, $00, $00, $00
+	db $00, $00, $00, $00, -$0A, -$0A, $0A, $0A			;looks about right...
 
-FireworksInit:
-;depend on x-pos...
-;also timer
+;Football from SMW
+Football_Main:
+	;JSR SubOffScreen
+	JSR Object_DeleteOffScreen
 
-	LDA Sprite_X_Position,X
-	AND #$30
-	LSR A
-	LSR A
-	LSR A
-	LSR A
-	TAY
-	LDA Fireworks_InitSpeeds,Y
-	STA Sprite_Y_Speed,X
-	
-	LDA Fireworks_InitTimers,Y
-	STA Sprite_Misc_Timer1,X
-	RTS
+	JSR Player_HitEnemy
 
-Fireworks:
-	JSR SubOffScreen
+	JSR Object_Move
 
-	;LDA Objects_Timer2,X
-	;BNE DoShow
+	LDA Objects_DetStat,X			;
+	AND #$03						;
+	BEQ NoWallHit					;
 
-	;LDA Counter_1
-	;AND #$03
-	;BNE NoGFX
+	JSR Object_AboutFace			;also affects flip, iirc football shouldn't do that. but idk
 
-DoShow:
-;JSR Object_ShakeAndDraw
-    JSR Object_AnySprOffscreen
-    BNE NoGFX  ; If any of Hotfoot's sprites are off-screen, jump to PRG002_A888 (RTS)
+NoWallHit:
+	LDA Objects_DetStat,X			;
+	AND #$04						;
+	BEQ NoFloorHit					;
 
-    JSR Object_CalcSpriteXY_NoHi    ; Calculate Hotfoot's sprites
-    LDY ObjGroupRel_Idx     ; Y = Object's group relative index
-    LDA ObjectGroup_PatternStarts,Y ; Get Hotfoot's starting pattern index
-    CLC
-    ADC Objects_Frame,X     ; Offset by frame
-    TAY             ; -> 'Y'
-    LDA ObjectGroup_PatternSets,Y   ; Get appropriate sprite pattern for this frame
+	;yes random!
+	LDA RandomN,X					;
+	AND #$03						;
+	TAY								;
+	LDA BounceHeights,y				;
+	STA Objects_YVel,x				;
 
-    ; Store pattern into sprite RAM
-    LDY Object_SprRAM,X
-    STA Sprite_RAM+$01,Y
+	;LDY Objects_Var1,x
+	;LDA BounceHeights,y
+	;STA Objects_YVel,x
 
-    ; Store Y coordinate
-    LDA Objects_SpriteY,X
-    STA Sprite_RAM+$00,Y
+	LDY Level_Tile_Slope			;x-speed depending on slope
+	LDA FootballXSpeed,y			;
+	BEQ NotSpeed					;
+	STA Objects_XVel,x				;
 
-    ; Store attributes
-    LDA Objects_SprAttr,X
-    ORA Objects_FlipBits,X
-    STA Sprite_RAM+$02,Y
+NotSpeed:
+	LDA Objects_FlipBits,X
+	EOR #SPR_HFLIP
+	STA Objects_FlipBits,X
 
-    ; Store X coordinate
-    LDA Objects_SpriteX,X
-	CLC
-	ADC #$04
-    STA Sprite_RAM+$03,Y
+	;INC Objects_Var1,x
 
-	;LDA Counter_1
-	;AND #$03
-	;BNE NoGFX
+	;LDA Objects_Var1,x
+	;CMP #$03
+	;BNE NoFloorHit
 
-	LDA Objects_Frame,X
-	EOR #$01
-	STA Objects_Frame,X
+	;LDA #$00
+	;STA Objects_Var1,x
 
-	;LDA #$02
-	;STA Objects_Timer2,X
+NoFloorHit:
+	LDA Objects_DetStat,X			;ceiling?
+	AND #$08						;
+	BEQ Re							;
 
-NoGFX:
-	LDA Sprite_Misc_Timer1,X
-	BNE Return
+	LDA #$00						;no y-speed
+	STA Objects_YVel,x				;
 
-	JSR Object_ApplyYVel
-
-	INC Sprite_Misc_Table1,X
-	LDA Sprite_Misc_Table1,X
-	AND #$03
-	BNE KeepAccel
-
-	INC Sprite_Y_Speed,X
-
-KeepAccel:
-	LDA Sprite_Y_Speed,X
-	CMP #$FC
-	BNE Return
-
-;turn into explosion...
-	LDA #$55
-	STA Level_ObjectID,X
-
-    LDA #$00
-    STA Objects_Var3,X
-
-    ; Set internal state to 2
-    LDA #$02
-    STA Objects_Var5,X
-
-    ; Reset timer to $28 (length of explosion)
-    LDA #$28
-    STA Objects_Timer,X
-
-    ; Ba-boom
-    LDA Sound_QLevel1
-    ORA #SND_LEVELBABOOM
-    STA Sound_QLevel1
-
-    ; Since Bob-omb is exploding, he no longer needs to enforce his pattern bank
-    INC Objects_DisPatChng,X
-	
-    LDA #$10
-    STA RotatingColor_Cnt
-
-Return:
-	RTS
+Re:
+	JMP Object_ShakeAndDraw			;

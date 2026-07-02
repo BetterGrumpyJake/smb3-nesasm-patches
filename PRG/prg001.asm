@@ -25,9 +25,9 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word DolphinVert_Init				;vertical init
-	.word ObjInit_DoNothing				;horizontal init (no init really)	; Object $01
-	.word ObjInit_DoNothing	; Object $02
+	.word EerieInit 				; Eerie
+    .word EerieWaveInit 			; Wave Eerie
+    .word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
 	.word ObjInit_DoNothing	; Object $04
 	.word ObjInit_DoNothing	; Object $05
@@ -67,9 +67,9 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word DolphinVert	; Object $00
-	.word DolphinHorz	; Object $01
-	.word ObjNorm_DoNothing	; Object $02
+	.word EerieMain 				;eeries, big and small, wave and straight
+    .word EerieMain
+    .word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
 	.word ObjNorm_DoNothing	; Object $04
 	.word ObjNorm_DoNothing	; Object $05
@@ -110,9 +110,9 @@ ObjectGroup00_NormalJumpTable:
 
 	.org ObjectGroup_CollideJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_CollideJumpTable:
-	.word ObjHit_DoNothing	; Object $00
-	.word ObjHit_DoNothing	; Object $01
-	.word ObjHit_DoNothing	; Object $02
+	.word ObjHit_DoNothing  		; \eeries
+    .word ObjHit_DoNothing  		; |
+    .word ObjHit_DoNothing	; Object $02
 	.word ObjHit_DoNothing	; Object $03
 	.word ObjHit_DoNothing	; Object $04
 	.word ObjHit_DoNothing	; Object $05
@@ -152,9 +152,9 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL3 | OA1_HEIGHT32 | OA1_WIDTH16	;vertical	; Object $00
-	.byte OA1_PAL3 | OA1_HEIGHT16 | OA1_WIDTH40	;horizontal	; Object $01
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16  ; eeries
+    .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16  ;
+    .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
 	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH16	; Object $04
 	.byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $05
@@ -201,9 +201,9 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP2 | OA2_GNDPLAYERMOD		;v	; Object $00
-	.byte OA2_TDOGRP5 | OA2_GNDPLAYERMOD		;h	; Object $01
-	.byte OA2_TDOGRP1	; Object $02
+	.byte OA2_TDOGRP1   			; eeries (if you didn't figure it out already)
+    .byte OA2_TDOGRP1   			;
+    .byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
 	.byte OA2_TDOGRP2	; Object $04
 	.byte OA2_TDOGRP1	; Object $05
@@ -250,9 +250,9 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE 	; Object $00
-	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE	; Object $01
-	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
+	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE
+    .byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE
+    .byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
 	.byte OA3_HALT_JUSTDRAWTALL 	; Object $04
 	.byte OA3_HALT_JUSTDRAW 	; Object $05
@@ -292,9 +292,9 @@ ObjectGroup00_Attributes3:
 
 	.org ObjectGroup_PatTableSel	; <-- help enforce this table *here*
 ObjectGroup00_PatTableSel:
-	.byte OPTS_SETPT5 | 15				;same as normal chain chomp (duh)	; Object $00
-	.byte OPTS_SETPT5 | 15	; Object $01
-	.byte OPTS_SETPT5 | $4C	; Object $02
+	.byte OPTS_SETPT5 | 15 			; custom graphic
+    .byte OPTS_SETPT5 | 15 			;
+    .byte OPTS_SETPT5 | $4C	; Object $02
 	.byte OPTS_SETPT5 | $48	; Object $03
 	.byte OPTS_SETPT5 | $48	; Object $04
 	.byte OPTS_SETPT5 | $48	; Object $05
@@ -336,8 +336,8 @@ ObjectGroup00_PatTableSel:
 ObjectGroup00_KillAction:
 	.byte KILLACT_STANDARD
 	.byte KILLACT_STANDARD
-	.byte KILLACT_STANDARD	; Object $02
-	.byte KILLACT_STANDARD	; Object $03
+	.byte KILLACT_STANDARD
+	.byte KILLACT_STANDARD
 	.byte KILLACT_STANDARD	; Object $04
 	.byte KILLACT_STANDARD	; Object $05
 	.byte KILLACT_STANDARD	; Object $06 - OBJ_BOUNCEDOWNUP
@@ -405,9 +405,10 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-;can probably be shorter, I just copy-pasted those from vanilla koopas
-ObjPVertDolph:
-	db $A1,$A3,$A5,$A7
+ObjP01:
+ObjPEerie:
+	.byte $81,$83,$85,$87			;only used by small eeries, giant eerie uses it's own table not set in the pattern set (set giant eerie's pattern set to whatever)
+ObjP02:
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -423,11 +424,6 @@ ObjP17:
 ObjP18:	
 ObjP1D:
 ObjP20:	.byte $AD, $AF, $B9, $BB, $B9, $BB
-ObjP01:
-ObjPHorzDolph:
-	db $91,$93,$95,$97,$81				;last tile is tail
-	db $B1,$B3,$B5,$B7,$83
-ObjP02:	.byte $8F, $8F, $99, $9B, $9D, $9F
 ObjP04:	.byte $B1, $B3, $B5, $B7, $B9, $BB, $BD, $BF
 ObjP05:	.byte $A5, $A7, $A1, $A3, $A1, $A3
 ObjP06:	
@@ -5616,268 +5612,82 @@ SubHorzPos = Level_ObjCalcXDiffs
 SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CommonAcceleration:
+	db $01, -$01
+	
 CommonSprFlip:
 	.byte SPR_HFLIP, $00
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DolphinHorz_XAccel:
-	db -$01,$01
 
-DolphinHorz_MaxXSpd:
-	db -$08,$08
-
-DolphinVert_Init:
-	INC Objects_Var12,x
+;standard routine to make sprite face player on init (also can be used to set speed afterwards)
+Init_FacePlayer:
+	JSR SubHorzPos
+	;TYA								;why did I put TYA here???
+	LDA CommonSprFlip,Y
+	STA Objects_FlipBits,X
 	RTS
 
-DolphinVert:
-	;this one is simply 16x32 that flips.
-	JSR Object_Draw16x32Sprite
-	JMP Dolphin_Shared
+CommonAnimate:
+	STA Temp_Var1
+	LDA Sprite_Misc_Timer1,X
+	BNE Meh
 
-DolphinHorz:
-	JSR DolphinHorzGFX
+	LDA Objects_Frame,X
+	EOR #$01
+	STA Objects_Frame,X
+	
+	LDA Temp_Var1
+	STA Sprite_Misc_Timer1,X
 
-Dolphin_Shared:
+Meh:
+	RTS
+
+EerieXSpd:
+	db $10,$F0
+
+EerieYSpd:
+	db $18,$E8
+
+EerieWaveInit:
+	INC Sprite_Misc_Table1,X			;flag indicating this is a wave eerie
+
+EerieInit:
+	JSR Init_FacePlayer					;
+
+	LDA EerieXSpd,Y						;set initial speed
+	STA Sprite_X_Speed,X				;
+	RTS
+
+EerieMain:
 	JSR SubOffScreen
 
-	LDA Player_HaltGame
-	BEQ Continue
-	RTS
+	LDA Player_HaltGame					;only graphics if freeze flag is set
+	BNE GFX							;
 
-Continue:
-	LDA Objects_Var12,x
-	BEQ HorzAnim
-
-	LDY #$00
-	LDA Counter_1
-	AND #$04
-	BEQ StoreFlip
-	;LSR
-	;LSR
-	;BCC StoreFlip
-	;LDY #$01
-	INY
-	BNE StoreFlip
-
-HorzAnim:
-	LDA Counter_1
-	AND #$08
-	LSR A
-	LSR A
-	LSR A
-	;BNE NoFlip
-
-	;LDA Objects_Var10,x
-	;EOR #$01
-	STA Objects_Var10,x
-
-NoFlip:
-	LDA Objects_Var11,x
-	AND #$01
-	TAY
-
-StoreFlip:
-	LDA CommonSprFlip,Y
-	STA Objects_FlipBits,x
-	;LSR
-	;BCC NO
-
-	;LDA Objects_FlipBits,x
-	;EOR #$40
-	;STA Objects_FlipBits,x
-
-NO:
-	JSR Object_ApplyYVel_NoLimit
-	JSR Object_ApplyXVel
-    ; Apply Y velocity
-
-	LDA Sprite_Y_Speed,X	; sprite Y speed
-	BMI MovingUp	; if the sprite is moving down...
-	CMP #$3F		; and its Y speed has not reached 3F...
-	BCS MaxYSpeed	;
-MovingUp:
-	INC Sprite_Y_Speed,X	; increment its Y speed
-MaxYSpeed:
-
-	TXA		; sprite index -> A
-	EOR Counter_1	;
-	LSR A		; every other frame depending on the sprite index...
-	BCC NoObjInteract	; don't interact with objects
-
-	JSR Object_WorldDetectN1
-
-NoObjInteract:
-	LDA Sprite_Y_Speed,X
-	BMI PlayerInt
-
-	LDA Objects_InWater,X
-	BEQ PlayerInt
-
-	LDA Sprite_Y_Speed,X	;
-	SEC		;
-	SBC #$08		; diminish the sprite Y speed by 8
-	STA Sprite_Y_Speed,X
-	BPL NoSpeedZero
-
-	LDA #$00
-	STA Sprite_Y_Speed,X
-
-NoSpeedZero:
-	LDA Objects_Var12,X
-	BNE JustJump
-
-	;LDY #$02
-	;BNE NotASNormal
-
-Normal:
-	LDA Objects_Var11,X
-	AND #$01
-	TAY
-
-NotASNormal:
-	LDA Sprite_X_Speed,X
-	CLC
-	ADC DolphinHorz_XAccel,Y
-	STA Sprite_X_Speed,x
-	CMP DolphinHorz_MaxXSpd,Y
-	BNE PlayerInt
-
-JustJump:
-	INC Objects_Var11,X
-
-	LDA #$C0
-	STA Sprite_Y_Speed,X
-
-PlayerInt:
-    JSR Object_HitTest   ; Test if Player is touching object
-    BCC NotOnPlat     ; If not, jump to PRG002_BAEE (RTS)
-    ; Test if Player is standing on top of platform
-
-	;LDA #$00
-	;STA Object_VelCarry				;no vel carry!!! (so the player doesnt slide off)
-
-    LDA Player_SpriteY
-    CLC
-    ADC #20
-    CMP Objects_SpriteY,X
-    BCS NotOnPlat  ; If Player's bottom is beneath object's top, jump to PRG002_BABE
-
-    LDA Player_YVel
-    BMI NotOnPlat  ; If Player is moving upward, jump to PRG002_BABD
-
-    LDA Objects_Y,X
-    SEC
-    SBC #28
-    STA Player_Y
+	JSR Player_HitEnemy					;collide with player
 	
-    LDA Objects_YHi,X
-    SBC #$00
-    STA Player_YHi
+	LDA #$07							;every X frames, animate
+	JSR CommonAnimate					;
 
-    ; Flag Player as NOT mid-air
-    LDY #$00
-    STY Player_InAir
-	STY Player_YVel
+	JSR Object_ApplyXVel				;update X-pos
 
-    LDA Object_VelCarry
-    BPL Carry
+	LDA Sprite_Misc_Table1,X			;check if it is wavy
+	BEQ GFX							;don't move vertically if not
 
-    DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
+	LDY Sprite_Misc_Table2,X			;vertical direction
+	LDA Sprite_Y_Speed,x				;
+	CLC									;accelerate
+	ADC CommonAcceleration,Y			;
+	STA Sprite_Y_Speed,X				;
+	CMP EerieYSpd,Y						;
+	BNE YSpd							;
 
-Carry:
-    ; Add to Player_X, with carry
-    CLC
-    ADC Player_X
-    STA Player_X
-    TYA
-    ADC Player_XHi
-    STA Player_XHi
+	LDA Sprite_Misc_Table2,X			;change (vertical) direction when hit max speed
+	EOR #$01							;
+	STA Sprite_Misc_Table2,X			;
 
-     
-NotOnPlat:
-	RTS
+YSpd:
+	JSR Object_ApplyYVel_NoLimit		;update pos and stuff
 
-;similar to LogPlat_Draw
-DolphinHorzGFX:
-	LDA Objects_FlipBits,X
-	STA Temp_Var16
-
-;I ain't using Objects_Frame because i think it'd be a bit complicated to calculate gfx stuff. instead just use some other misc table
-	LDA Objects_Var10,X
-	PHA
-	JSR Object_ShakeAndCalcSprite
-	PLA
-	BEQ FirstFrame
-
-	;INX
-	;INX
-	;INX
-	;INX
-	;INX
-
-	TXA									;i think less cpu cycles? same space
-	CLC
-	ADC #$05
-	TAX
-
-FirstFrame:
-	STX Temp_Var15
-
-	;need to figure out what to draw first depending on flipping, 16x16 portion or 24x16 one
-
-    LDA Counter_1
-    LSR A
-    PHP      ; Save CPU state (most importantly the carry flag)
-    BCC SIKE  ; Every other tick, jump to PRG002_B5BD
-
-    ; Y += (11 + C = 12) -- Every other tick, offset Sprite_RAM
-    TYA
-    ADC #$0B
-    TAY
-
-SIKE:
-	LDA Temp_Var16
-	BEQ DrawNorm
-
-	;flipped
-	INX
-	INX
-	INX
-
-DrawNorm:
-	JSR Object_Draw16x16Sprite
-
-	LDA Temp_Var7   ; Get Sprite_RAM offset (as determined by Object_ShakeAndCalcSprite)
-	PLP      ; Restore CPU state
-	BCS Convert  ; Every other opposite tick, jump to PRG002_B5C7
-
-	TYA
-	ADC #$08
-
-Convert:
-	TAY
-
-	INX							;drew first two tiles
-	INX
-
-	LDA #16
-	CLC
-	ADC Temp_Var2
-	STA Temp_Var2
-
-    ; Alters horizontal visibility ??
-	ASL Temp_Var8
-	ASL Temp_Var8
-
-DrawPlz:
-	LDA Temp_Var16
-	BEQ DrawNormTwo
-
-	LDX Temp_Var15
-
-DrawNormTwo:
-	JSR Object_Draw24x16Sprite   ; Draw wide sprite
-
-    LDX SlotIndexBackup         ; X = object slot index
-	RTS
+GFX:
+	JMP Object_ShakeAndDraw				;or not

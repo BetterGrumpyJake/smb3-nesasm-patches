@@ -25,9 +25,9 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word EerieInit 				; Eerie
-    .word EerieWaveInit 			; Wave Eerie
-    .word ObjInit_DoNothing	; Object $02
+	.word ExplodingPlatform_Init
+	.word ObjInit_DoNothing	; Object $01
+	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
 	.word ObjInit_DoNothing	; Object $04
 	.word ObjInit_DoNothing	; Object $05
@@ -67,9 +67,9 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word EerieMain 				;eeries, big and small, wave and straight
-    .word EerieMain
-    .word ObjNorm_DoNothing	; Object $02
+	.word ExplodingPlatform
+	.word ObjNorm_DoNothing	; Object $01
+	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
 	.word ObjNorm_DoNothing	; Object $04
 	.word ObjNorm_DoNothing	; Object $05
@@ -110,9 +110,9 @@ ObjectGroup00_NormalJumpTable:
 
 	.org ObjectGroup_CollideJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_CollideJumpTable:
-	.word ObjHit_DoNothing  		; \eeries
-    .word ObjHit_DoNothing  		; |
-    .word ObjHit_DoNothing	; Object $02
+	.word ObjHit_DoNothing	; Object $00
+	.word ObjHit_DoNothing	; Object $01
+	.word ObjHit_DoNothing	; Object $02
 	.word ObjHit_DoNothing	; Object $03
 	.word ObjHit_DoNothing	; Object $04
 	.word ObjHit_DoNothing	; Object $05
@@ -152,9 +152,9 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16  ; eeries
-    .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16  ;
-    .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16
+	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
 	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH16	; Object $04
 	.byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $05
@@ -201,9 +201,9 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP1   			; eeries (if you didn't figure it out already)
-    .byte OA2_TDOGRP1   			;
-    .byte OA2_TDOGRP1	; Object $02
+	.byte OA2_TDOGRP1	; Object $00
+	.byte OA2_TDOGRP1	; Object $01
+	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
 	.byte OA2_TDOGRP2	; Object $04
 	.byte OA2_TDOGRP1	; Object $05
@@ -250,9 +250,9 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE
-    .byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE
-    .byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE 	; Object $00
+	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
+	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
 	.byte OA3_HALT_JUSTDRAWTALL 	; Object $04
 	.byte OA3_HALT_JUSTDRAW 	; Object $05
@@ -292,9 +292,9 @@ ObjectGroup00_Attributes3:
 
 	.org ObjectGroup_PatTableSel	; <-- help enforce this table *here*
 ObjectGroup00_PatTableSel:
-	.byte OPTS_SETPT5 | 15 			; custom graphic
-    .byte OPTS_SETPT5 | 15 			;
-    .byte OPTS_SETPT5 | $4C	; Object $02
+	.byte OPTS_SETPT5 | 15	; Object $00
+	.byte OPTS_SETPT5 | $48	; Object $01
+	.byte OPTS_SETPT5 | $4C	; Object $02
 	.byte OPTS_SETPT5 | $48	; Object $03
 	.byte OPTS_SETPT5 | $48	; Object $04
 	.byte OPTS_SETPT5 | $48	; Object $05
@@ -334,10 +334,10 @@ ObjectGroup00_PatTableSel:
 
 	.org ObjectGroup_KillAction	; <-- help enforce this table *here*
 ObjectGroup00_KillAction:
-	.byte KILLACT_STANDARD
-	.byte KILLACT_STANDARD
-	.byte KILLACT_STANDARD
-	.byte KILLACT_STANDARD
+	.byte KILLACT_STANDARD	; Object $00
+	.byte KILLACT_STANDARD	; Object $01
+	.byte KILLACT_STANDARD	; Object $02
+	.byte KILLACT_STANDARD	; Object $03
 	.byte KILLACT_STANDARD	; Object $04
 	.byte KILLACT_STANDARD	; Object $05
 	.byte KILLACT_STANDARD	; Object $06 - OBJ_BOUNCEDOWNUP
@@ -405,10 +405,13 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjP01:
-ObjPEerie:
-	.byte $81,$83,$85,$87			;only used by small eeries, giant eerie uses it's own table not set in the pattern set (set giant eerie's pattern set to whatever)
-ObjP02:
+ObjPExplodingPlat:
+	.byte $91,$93
+	.byte $95,$97
+	.byte $99,$9B
+	.byte $9D,$9F
+	.byte $B1,$B3				;1 unpressed
+	.byte $B5,$B7				;4 unpressed
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -424,6 +427,8 @@ ObjP17:
 ObjP18:	
 ObjP1D:
 ObjP20:	.byte $AD, $AF, $B9, $BB, $B9, $BB
+ObjP01:	.byte $81, $81
+ObjP02:	.byte $8F, $8F, $99, $9B, $9D, $9F
 ObjP04:	.byte $B1, $B3, $B5, $B7, $B9, $BB, $BD, $BF
 ObjP05:	.byte $A5, $A7, $A1, $A3, $A1, $A3
 ObjP06:	
@@ -5587,7 +5592,6 @@ PRG001_BF9B:
 	RTS		 ; Return
 
 ; Rest of ROM bank was empty
-
 ;;;;;;;;;;;;RussianMan defines;;;;;;;;;;
 Sprite_Number = Level_ObjectID
 Sprite_State = Objects_State
@@ -5613,81 +5617,124 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-CommonAcceleration:
-	db $01, -$01
-	
-CommonSprFlip:
-	.byte SPR_HFLIP, $00
 
-;standard routine to make sprite face player on init (also can be used to set speed afterwards)
-Init_FacePlayer:
-	JSR SubHorzPos
-	;TYA								;why did I put TYA here???
-	LDA CommonSprFlip,Y
-	STA Objects_FlipBits,X
-	RTS
+ExplodingPlatform_TickTime = $30
 
-CommonAnimate:
-	STA Temp_Var1
-	LDA Sprite_Misc_Timer1,X
-	BNE Meh
+ExplodingPlatform_Init:
+	LDY #$04
+	LDA Sprite_X_Position,X							;odd or even position determines initial number
+	AND #$10
+	BEQ AAA
+	INY
 
-	LDA Objects_Frame,X
-	EOR #$01
+AAA:
+	TYA
 	STA Objects_Frame,X
-	
-	LDA Temp_Var1
-	STA Sprite_Misc_Timer1,X
-
-Meh:
 	RTS
 
-EerieXSpd:
-	db $10,$F0
-
-EerieYSpd:
-	db $18,$E8
-
-EerieWaveInit:
-	INC Sprite_Misc_Table1,X			;flag indicating this is a wave eerie
-
-EerieInit:
-	JSR Init_FacePlayer					;
-
-	LDA EerieXSpd,Y						;set initial speed
-	STA Sprite_X_Speed,X				;
-	RTS
-
-EerieMain:
+ExplodingPlatform:
 	JSR SubOffScreen
 
-	LDA Player_HaltGame					;only graphics if freeze flag is set
-	BNE GFX							;
+	JSR Object_ShakeAndDraw
 
-	JSR Player_HitEnemy					;collide with player
+	LDA Player_HaltGame
+	BEQ Continue
+	RTS												;how did I miss this???
+
+Continue:
+	LDA Sprite_Misc_Table2,X						;check pressed flag
+	BEQ NotExploding
+
+	LDA Sprite_Misc_Timer1,X
+	BNE NotExploding
+
+	LDA Objects_Frame,X								;if it was at 1
+	BEQ Disappear									;"explode"
+
+	LDA Sound_QLevel1								;tick sound
+	ORA #SND_LEVELBLIP
+	STA Sound_QLevel1
+
+	DEC Objects_Frame,X								;next frame
+
+	LDA #ExplodingPlatform_TickTime
+	STA Sprite_Misc_Timer1,X
+	BNE NotExploding
+
+Disappear:
+	JSR Object_PoofDie
+
+	LDA Sound_QLevel1
+	ORA #SND_LEVELBABOOM
+	STA Sound_QLevel1
+
+NotExploding:
+;copy-pasted from bank 2, and slightly modified to match graphics
+
+    JSR Object_HitTest   ; Test if Player is touching object
+    BCC NotOnPlat     ; If not, jump to PRG002_BAEE (RTS)
+
+    ; Test if Player is standing on top of platform
+
+	LDA #$00
+	STA Object_VelCarry				;no vel carry!!! (so the player doesnt slide off)
+
+    LDA Player_SpriteY
+    CLC
+    ADC #20
+    CMP Objects_SpriteY,X
+    BCS NotOnPlat  ; If Player's bottom is beneath object's top, jump to PRG002_BABE
+
+    LDA Player_YVel
+    BMI NotOnPlat  ; If Player is moving upward, jump to PRG002_BABD
+
+    LDA Objects_Y,X
+    SEC
+    SBC #28
+    STA Player_Y
 	
-	LDA #$07							;every X frames, animate
-	JSR CommonAnimate					;
+    LDA Objects_YHi,X
+    SBC #$00
+    STA Player_YHi
 
-	JSR Object_ApplyXVel				;update X-pos
+    ; Flag Player as NOT mid-air
+    LDY #$00
+    STY Player_InAir
 
-	LDA Sprite_Misc_Table1,X			;check if it is wavy
-	BEQ GFX							;don't move vertically if not
+    LDA Object_VelCarry
+    BPL Carry
 
-	LDY Sprite_Misc_Table2,X			;vertical direction
-	LDA Sprite_Y_Speed,x				;
-	CLC									;accelerate
-	ADC CommonAcceleration,Y			;
-	STA Sprite_Y_Speed,X				;
-	CMP EerieYSpd,Y						;
-	BNE YSpd							;
+    DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
 
-	LDA Sprite_Misc_Table2,X			;change (vertical) direction when hit max speed
-	EOR #$01							;
-	STA Sprite_Misc_Table2,X			;
+Carry:
+    ; Add to Player_X, with carry
+    CLC
+    ADC Player_X
+    STA Player_X
+    TYA
+    ADC Player_XHi
+    STA Player_XHi
+	
+	LDA Sprite_Misc_Table2,X				;is platform already going to explode?
+	BNE NotOnPlat							;if so, don't care
+	
+;set platform to explode
+	
+	LDA #ExplodingPlatform_TickTime			;set timer
+	STA Sprite_Misc_Timer1,X
+	
+	INC Sprite_Misc_Table2,X				;press it
+	
+	LDY #$00								;set pressed frame from unpressed. this is for 1
+	LDA Objects_Frame,X
+	CMP #$04
+	BEQ Yes
+	
+	LDY #$03								;this is for 4
+	
+Yes:
+	TYA
+	STA Objects_Frame,X						;set correct pressed frame
 
-YSpd:
-	JSR Object_ApplyYVel_NoLimit		;update pos and stuff
-
-GFX:
-	JMP Object_ShakeAndDraw				;or not
+NotOnPlat:
+	RTS

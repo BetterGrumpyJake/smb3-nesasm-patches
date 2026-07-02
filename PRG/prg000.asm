@@ -295,9 +295,9 @@ Object_BoundBox:
 
 Object_AttrFlags:
 	; Defines flags which set attributes of objects
-	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL    ; eerie
-    .byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL    ; eerie wave
-    .byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $02
+	.byte OAT_BOUNDBOX01    ; exploding platform
+    .byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $01
+	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $02
 	.byte OAT_BOUNDBOX00	; Object $03
 	.byte OAT_BOUNDBOX02	; Object $04
 	.byte OAT_BOUNDBOX01	; Object $05

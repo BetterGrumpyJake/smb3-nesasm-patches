@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word ExplodingPlatform_Init
+	.word FireworksInit
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word ExplodingPlatform
+	.word Fireworks
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH8
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP1	; Object $00
+	.byte OA2_TDOGRP0	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -405,13 +405,8 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjPExplodingPlat:
-	.byte $91,$93
-	.byte $95,$97
-	.byte $99,$9B
-	.byte $9D,$9F
-	.byte $B1,$B3				;1 unpressed
-	.byte $B5,$B7				;4 unpressed
+ObjPFirework:
+	db $85,$87
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5617,124 +5612,126 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Fireworks_InitSpeeds:
+	db $E2,$E6,$E4,$E0
 
-ExplodingPlatform_TickTime = $30
+Fireworks_InitTimers:
+	db $60,$10,$A0,$FF
 
-ExplodingPlatform_Init:
-	LDY #$04
-	LDA Sprite_X_Position,X							;odd or even position determines initial number
-	AND #$10
-	BEQ AAA
-	INY
+FireworksInit:
+;depend on x-pos...
+;also timer
 
-AAA:
-	TYA
-	STA Objects_Frame,X
+	LDA Sprite_X_Position,X
+	AND #$30
+	LSR A
+	LSR A
+	LSR A
+	LSR A
+	TAY
+	LDA Fireworks_InitSpeeds,Y
+	STA Sprite_Y_Speed,X
+	
+	LDA Fireworks_InitTimers,Y
+	STA Sprite_Misc_Timer1,X
 	RTS
 
-ExplodingPlatform:
+Fireworks:
 	JSR SubOffScreen
 
-	JSR Object_ShakeAndDraw
+	;LDA Objects_Timer2,X
+	;BNE DoShow
 
-	LDA Player_HaltGame
-	BEQ Continue
-	RTS												;how did I miss this???
+	;LDA Counter_1
+	;AND #$03
+	;BNE NoGFX
 
-Continue:
-	LDA Sprite_Misc_Table2,X						;check pressed flag
-	BEQ NotExploding
+DoShow:
+;JSR Object_ShakeAndDraw
+    JSR Object_AnySprOffscreen
+    BNE NoGFX  ; If any of Hotfoot's sprites are off-screen, jump to PRG002_A888 (RTS)
 
-	LDA Sprite_Misc_Timer1,X
-	BNE NotExploding
-
-	LDA Objects_Frame,X								;if it was at 1
-	BEQ Disappear									;"explode"
-
-	LDA Sound_QLevel1								;tick sound
-	ORA #SND_LEVELBLIP
-	STA Sound_QLevel1
-
-	DEC Objects_Frame,X								;next frame
-
-	LDA #ExplodingPlatform_TickTime
-	STA Sprite_Misc_Timer1,X
-	BNE NotExploding
-
-Disappear:
-	JSR Object_PoofDie
-
-	LDA Sound_QLevel1
-	ORA #SND_LEVELBABOOM
-	STA Sound_QLevel1
-
-NotExploding:
-;copy-pasted from bank 2, and slightly modified to match graphics
-
-    JSR Object_HitTest   ; Test if Player is touching object
-    BCC NotOnPlat     ; If not, jump to PRG002_BAEE (RTS)
-
-    ; Test if Player is standing on top of platform
-
-	LDA #$00
-	STA Object_VelCarry				;no vel carry!!! (so the player doesnt slide off)
-
-    LDA Player_SpriteY
+    JSR Object_CalcSpriteXY_NoHi    ; Calculate Hotfoot's sprites
+    LDY ObjGroupRel_Idx     ; Y = Object's group relative index
+    LDA ObjectGroup_PatternStarts,Y ; Get Hotfoot's starting pattern index
     CLC
-    ADC #20
-    CMP Objects_SpriteY,X
-    BCS NotOnPlat  ; If Player's bottom is beneath object's top, jump to PRG002_BABE
+    ADC Objects_Frame,X     ; Offset by frame
+    TAY             ; -> 'Y'
+    LDA ObjectGroup_PatternSets,Y   ; Get appropriate sprite pattern for this frame
 
-    LDA Player_YVel
-    BMI NotOnPlat  ; If Player is moving upward, jump to PRG002_BABD
+    ; Store pattern into sprite RAM
+    LDY Object_SprRAM,X
+    STA Sprite_RAM+$01,Y
 
-    LDA Objects_Y,X
-    SEC
-    SBC #28
-    STA Player_Y
-	
-    LDA Objects_YHi,X
-    SBC #$00
-    STA Player_YHi
+    ; Store Y coordinate
+    LDA Objects_SpriteY,X
+    STA Sprite_RAM+$00,Y
 
-    ; Flag Player as NOT mid-air
-    LDY #$00
-    STY Player_InAir
+    ; Store attributes
+    LDA Objects_SprAttr,X
+    ORA Objects_FlipBits,X
+    STA Sprite_RAM+$02,Y
 
-    LDA Object_VelCarry
-    BPL Carry
+    ; Store X coordinate
+    LDA Objects_SpriteX,X
+	CLC
+	ADC #$04
+    STA Sprite_RAM+$03,Y
 
-    DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
+	;LDA Counter_1
+	;AND #$03
+	;BNE NoGFX
 
-Carry:
-    ; Add to Player_X, with carry
-    CLC
-    ADC Player_X
-    STA Player_X
-    TYA
-    ADC Player_XHi
-    STA Player_XHi
-	
-	LDA Sprite_Misc_Table2,X				;is platform already going to explode?
-	BNE NotOnPlat							;if so, don't care
-	
-;set platform to explode
-	
-	LDA #ExplodingPlatform_TickTime			;set timer
-	STA Sprite_Misc_Timer1,X
-	
-	INC Sprite_Misc_Table2,X				;press it
-	
-	LDY #$00								;set pressed frame from unpressed. this is for 1
 	LDA Objects_Frame,X
-	CMP #$04
-	BEQ Yes
-	
-	LDY #$03								;this is for 4
-	
-Yes:
-	TYA
-	STA Objects_Frame,X						;set correct pressed frame
+	EOR #$01
+	STA Objects_Frame,X
 
-NotOnPlat:
+	;LDA #$02
+	;STA Objects_Timer2,X
+
+NoGFX:
+	LDA Sprite_Misc_Timer1,X
+	BNE Return
+
+	JSR Object_ApplyYVel
+
+	INC Sprite_Misc_Table1,X
+	LDA Sprite_Misc_Table1,X
+	AND #$03
+	BNE KeepAccel
+
+	INC Sprite_Y_Speed,X
+
+KeepAccel:
+	LDA Sprite_Y_Speed,X
+	CMP #$FC
+	BNE Return
+
+;turn into explosion...
+	LDA #$55
+	STA Level_ObjectID,X
+
+    LDA #$00
+    STA Objects_Var3,X
+
+    ; Set internal state to 2
+    LDA #$02
+    STA Objects_Var5,X
+
+    ; Reset timer to $28 (length of explosion)
+    LDA #$28
+    STA Objects_Timer,X
+
+    ; Ba-boom
+    LDA Sound_QLevel1
+    ORA #SND_LEVELBABOOM
+    STA Sound_QLevel1
+
+    ; Since Bob-omb is exploding, he no longer needs to enforce his pattern bank
+    INC Objects_DisPatChng,X
+	
+    LDA #$10
+    STA RotatingColor_Cnt
+
+Return:
 	RTS

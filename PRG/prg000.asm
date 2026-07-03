@@ -295,7 +295,7 @@ Object_BoundBox:
 
 Object_AttrFlags:
 	; Defines flags which set attributes of objects
-	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_FIREIMMUNITY | OAT_HITNOTKILL    ; grinder
+	.byte OAT_BOUNDBOX00 | OAT_WEAPONIMMUNITY | OAT_FIREIMMUNITY | OAT_HITNOTKILL     ; jetpack
     .byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $01
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $02
 	.byte OAT_BOUNDBOX00	; Object $03

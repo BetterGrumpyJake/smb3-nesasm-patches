@@ -6386,11 +6386,11 @@ PRG008_BD89:
 
 	; It's a spike tile...
 
-	LDA Player_Kuribo
-	BEQ PRG008_BD93	 ; If Player is NOT in a Kuribo's shoe, jump to PRG008_BD93
+	;LDA Player_Kuribo
+	;BEQ PRG008_BD93	 ; If Player is NOT in a Kuribo's shoe, jump to PRG008_BD93
 
-	LDA Player_HitCeiling
-	BEQ PRG008_BD96	 ; If Player has not just hit head off ceiling, jump to PRG008_BD96
+	;LDA Player_HitCeiling
+	;BEQ PRG008_BD96	 ; If Player has not just hit head off ceiling, jump to PRG008_BD96
 
 PRG008_BD93:
 	JMP Player_GetHurt	; Hurt Player!!
@@ -6409,11 +6409,11 @@ PRG008_BD98:
 
 	; Kuribo-on-muncher handling
 PRG008_BDA4:
-	LDA Player_Kuribo
-	BEQ PRG008_BDAE	 ; If Player does NOT have Kuribo's shoe, jump to PRG008_BDAE (get hurt!)
+	;LDA Player_Kuribo
+	;BEQ PRG008_BDAE	 ; If Player does NOT have Kuribo's shoe, jump to PRG008_BDAE (get hurt!)
 
-	LDA Player_HitCeiling
-	BEQ PRG008_BDB4	 ; If Player has not just hit off ceiling, jump to PRG008_BDB4
+	;LDA Player_HitCeiling
+	;BEQ PRG008_BDB4	 ; If Player has not just hit off ceiling, jump to PRG008_BDB4
 
 PRG008_BDAE:
 	JMP Player_GetHurt	 ; Get hurt!
@@ -6464,8 +6464,8 @@ PRG008_BDE3:
 	; Gonna get hurt!
 
 	; SB: Interesting ... this never happens of course...
-	LDA Player_Kuribo
-	BNE PRG008_BDEB	 ; If Player is wearing Kuribo's shoe, jump to PRG008_BDEB
+	;LDA Player_Kuribo
+	;BNE PRG008_BDEB	 ; If Player is wearing Kuribo's shoe, jump to PRG008_BDEB
 
 	JSR Player_GetHurt	 ; Get hurt!
 

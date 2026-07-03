@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word ObjInit_DoNothing
+	.word GrinderInit
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word Football_Main
+	.word Grinder
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL3 | OA1_HEIGHT16 | OA1_WIDTH16
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_TDOGRP1 | OA2_NOSHELLORSQUASH	; Object $00
+	.byte OA2_TDOGRP1 | OA2_GNDPLAYERMOD | OA2_STOMPDONTCARE	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -250,7 +250,7 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_JUSTDRAW 	; Object $00
+	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE | OA3_NOTSTOMPABLE 	; Object $00
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
@@ -405,8 +405,8 @@ ObjectGroup00_PatternStarts:
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
 ObjP00:
-ObjPFootball:
-	.byte $87, $89
+GrinderTiles:
+	.byte $81, $83, $91, $93
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5612,72 +5612,64 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-BounceHeights:
-	db $A0,$D0,$C0,$D0
+Grinder_XSpeed = $18
 
-FootballXSpeed:
-    ;.byte $00, -$02,  $02,  $00,  $00,  $80,  $80,  $00 ; $00-$07
-    ;.byte $00,  $80,  $00,  $80, -$01, -$01,  $01,  $01 ; $08-$0F
-	db $00, -$10, $10, $00, $00, $00, $00, $00
-	db $00, $00, $00, $00, -$0A, -$0A, $0A, $0A			;looks about right...
+GrinderInit:
+	;JSR Init_FacePlayer
+	JSR SubHorzPos
+	LDA #Grinder_XSpeed
+	DEY
+	BMI Store
 
-;Football from SMW
-Football_Main:
-	;JSR SubOffScreen
-	JSR Object_DeleteOffScreen
+	LDA #-Grinder_XSpeed
 
-	JSR Player_HitEnemy
+Store:
+	STA Sprite_X_Speed,X
+	RTS
 
-	JSR Object_Move
+Grinder:
+	JSR SubOffScreen
 
-	LDA Objects_DetStat,X			;
-	AND #$03						;
-	BEQ NoWallHit					;
+	JSR Object_ShakeAndDraw
 
-	JSR Object_AboutFace			;also affects flip, iirc football shouldn't do that. but idk
+	;GFX done, actual code
+	LDA Player_HaltGame
+	BNE Re
 
-NoWallHit:
-	LDA Objects_DetStat,X			;
-	AND #$04						;
+	;animate
+
+	LDA Counter_1					;animate and make noise every few frames
+	AND #$03
+	BNE NoGFX
+
+	LDA Objects_Frame,X				;animate
+	EOR #$01					;
+	STA Objects_Frame,X				;
+
+	LDA Sound_QLevel2
+	ORA #SND_BOOMERANG				;I want to point out how surprisingly well this sound fits
+	STA Sound_QLevel2
+
+NoGFX:
+	JSR Object_Move					;interact with objects
+	
+	LDA Objects_DetStat,X				;
+	AND #$04					;
 	BEQ NoFloorHit					;
-
-	;yes random!
-	LDA RandomN,X					;
-	AND #$03						;
-	TAY								;
-	LDA BounceHeights,y				;
-	STA Objects_YVel,x				;
-
-	;LDY Objects_Var1,x
-	;LDA BounceHeights,y
-	;STA Objects_YVel,x
-
-	LDY Level_Tile_Slope			;x-speed depending on slope
-	LDA FootballXSpeed,y			;
-	BEQ NotSpeed					;
-	STA Objects_XVel,x				;
-
-NotSpeed:
-	LDA Objects_FlipBits,X
-	EOR #SPR_HFLIP
-	STA Objects_FlipBits,X
-
-	;INC Objects_Var1,x
-
-	;LDA Objects_Var1,x
-	;CMP #$03
-	;BNE NoFloorHit
-
-	;LDA #$00
-	;STA Objects_Var1,x
-
+	
+	JSR Object_HitGround				;stay on ground
+	
 NoFloorHit:
-	LDA Objects_DetStat,X			;ceiling?
-	AND #$08						;
-	BEQ Re							;
-
-	LDA #$00						;no y-speed
-	STA Objects_YVel,x				;
+	LDA Objects_DetStat,X				;if hit wall, invert speed and shiz
+	AND #$03					;
+	BEQ NoWall					;
+	
+	LDA Objects_XVel,X				; only speed, don't really care about flips
+	JSR Negate
+	STA Objects_XVel,X
+	
+NoWall:
+	JSR Player_HitEnemy				;interact witht the player
 
 Re:
-	JMP Object_ShakeAndDraw			;
+	RTS

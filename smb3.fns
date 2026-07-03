@@ -3761,6 +3761,7 @@ ChainChomp_ChaseXVel             = $BA41
 PRG003_B833                      = $B833
 PRG003_B41E                      = $B41E
 ToadMsg_High                     = $B437
+Eject_Goomba                     = $B09C
 ObjNorm_HotfootShy               = $A806
 LemmyBall_Right                  = $B6FE
 PRG001_B6A0                      = $B6A0

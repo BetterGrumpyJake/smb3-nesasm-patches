@@ -3392,6 +3392,7 @@ PRG002_B098:
 	CPY #$0b
 	BNE PRG002_B0A3	 ; If Var5 <> $0B, jump to PRG002_B0A3
 
+Eject_Goomba:
 	JSR Shoe_EjectGoomba	 ; Eject the occupant of the Shoe
 	INC <Objects_Var4,X	 ; Var4++
 
@@ -3459,7 +3460,7 @@ PRG002_B0C1:
 
 	; Set Goomba's Y 16 pixels higher than shoe
 	LDA Objects_Y,Y
-	SUB #16
+	SUB #00
 	STA <Objects_Y,X
 	LDA Objects_YHi,Y
 	SBC #$00
@@ -3519,7 +3520,7 @@ PRG002_B119:
 	JMP Player_GetHurt ; Hurt Player and don't come back!
 
 PRG002_B126:
-	JMP PRG000_D2B4	 ; Jump to PRG000_D2B4 (hijacks the kill routine)
+	JMP Eject_Goomba
 
 	; The Y offset for the Goomba riding in the shoe
 Shoe_GoombaYOff:

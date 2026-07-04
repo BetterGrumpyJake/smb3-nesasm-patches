@@ -3392,7 +3392,6 @@ PRG002_B098:
 	CPY #$0b
 	BNE PRG002_B0A3	 ; If Var5 <> $0B, jump to PRG002_B0A3
 
-Eject_Goomba:
 	JSR Shoe_EjectGoomba	 ; Eject the occupant of the Shoe
 	INC <Objects_Var4,X	 ; Var4++
 
@@ -3460,7 +3459,7 @@ PRG002_B0C1:
 
 	; Set Goomba's Y 16 pixels higher than shoe
 	LDA Objects_Y,Y
-	SUB #00
+	SUB #16
 	STA <Objects_Y,X
 	LDA Objects_YHi,Y
 	SBC #$00
@@ -3520,7 +3519,14 @@ PRG002_B119:
 	JMP Player_GetHurt ; Hurt Player and don't come back!
 
 PRG002_B126:
-	JMP Eject_Goomba
+	JSR PRG000_D2B4 ; Jump to PRG000_D2B4 (hijacks the kill routine)
+	LDA #OBJSTATE_NORMAL
+	STA Objects_State,X
+	LDA #$0e
+	STA <Objects_Var5,X
+	;LDA #-$40
+	;STA <Player_YVel	
+	RTS
 
 	; The Y offset for the Goomba riding in the shoe
 Shoe_GoombaYOff:
@@ -6329,8 +6335,8 @@ PRG002_BFD3:
 	RTS		 ; Return
 
 	; ?? Someone wanna claim this?
-PRG002_BFD4:
-	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
-	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
-	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
+;PRG002_BFD4:
+;	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
+;	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
+;	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
 

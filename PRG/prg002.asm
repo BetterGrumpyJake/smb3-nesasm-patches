@@ -31,7 +31,7 @@ ObjectGroup01_InitJumpTable:
 	.word ObjInit_WoodenPlat	; Object $28 - OBJ_OSCILLATING_V
 	.word ObjInit_TowardsPlayer	; Object $29 - OBJ_SPIKE
 	.word ObjInit_Patooie		; Object $2A - OBJ_PATOOIE
-	.word ObjInit_DoNothing		; Object $2B - OBJ_GOOMBAINSHOE
+	.word ObjInit_GoombaInShoe		; Object $2B - OBJ_GOOMBAINSHOE
 	.word ObjInit_CloudPlatform	; Object $2C - OBJ_CLOUDPLATFORM
 	.word ObjInit_ChasingFish	; Object $2D - OBJ_BIGBERTHA
 	.word ObjInit_InvisibleLift	; Object $2E - OBJ_INVISIBLELIFT
@@ -3298,6 +3298,9 @@ PatooiePiranha_StartTileX:
 PRG002_B02A:
 	RTS		 ; Return
 
+ObjInit_GoombaInShoe:
+	LDA #$01
+	STA <Objects_Var4,X
 
 ObjNorm_GoombaInShoe:
 
@@ -6328,8 +6331,8 @@ PRG002_BFD3:
 	RTS		 ; Return
 
 	; ?? Someone wanna claim this?
-PRG002_BFD4:
-	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
-	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
-	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
+;PRG002_BFD4:
+;	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
+;	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
+;	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
 

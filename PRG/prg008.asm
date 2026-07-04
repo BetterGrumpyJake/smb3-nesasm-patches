@@ -1204,8 +1204,8 @@ Player_RootJumpVel:	.byte PLAYER_JUMP
 Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
-	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
-	.byte $08, $04
+;	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
+;	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
 Player_SomersaultFlipBits:
@@ -1309,14 +1309,14 @@ Player_ControlJmp:
 
 ; FIXME: Anybody want to claim this?
 ; $A6AD
-	.byte $35, $35, $03
-
-; FIXME: Anybody want to claim this?
-; $A6B0 
-	ORA <Temp_Var4
-	JSR Player_ApplyXVelocity
-	JSR Player_ApplyYVelocity
-	JMP Player_Draw29
+;	.byte $35, $35, $03
+;
+;; FIXME: Anybody want to claim this?
+;; $A6B0 
+;	ORA <Temp_Var4
+;	JSR Player_ApplyXVelocity
+;	JSR Player_ApplyYVelocity
+;	JMP Player_Draw29
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Player_Control
@@ -2253,6 +2253,7 @@ Swim_Tanooki:
 Move_Kuribo:
 	JSR Player_GroundHControl ; Do Player left/right input control
 	JSR Player_JumpFlyFlutter ; Do Player jump, fly, flutter wag
+	JSR BootInputs
 
 	LDA <Player_InAir
 	BNE PRG008_AAFF	 ; If Player is mid air, jump to PRG008_AAFF

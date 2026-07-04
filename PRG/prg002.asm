@@ -3481,6 +3481,9 @@ PRG002_B0FB:
 
 
 ObjHit_GoombaInShoe:
+	LDA Objects_Timer2,X
+	BNE PRG002_B118
+
 	LDA <Objects_Var4,X
 	BEQ PRG002_B119	 ; If Var4 = 0, jump to PRG002_B119
 

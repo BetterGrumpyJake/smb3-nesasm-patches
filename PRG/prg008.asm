@@ -6946,6 +6946,9 @@ Player_ApplyYVelocity:
 	CMP #FALLRATE_MAX
 	BLS PRG008_BFF9	 ; If Player_YVelo < FALLRATE_MAX, jump to PRG008_BFF9
 
+	LDA ShoeStompFlag		;skip when shoe stomping to bypass max fallrate cap
+	BNE PRG008_BFF9
+
 	; Cap Y velocity at FALLRATE_MAX
 	LDA #FALLRATE_MAX
 	STA <Player_YVel ; Player_YVel = FALLRATE_MAX

@@ -1824,7 +1824,7 @@ ASCONFIG_HDISABLE	= $80	; Disables horizontal auto scroll coordinate adjustment 
 	Level_Tile_Whack:	.ds 1	; Tile last hit by tail attack or shell
 	Level_Tile_Quad:	.ds 4	; $0608-$060B Quadrant of tile for each of the positions above
 
-				.ds 1	; $060C unused
+	Level_Tile_Whack_Old:			.ds 1	; $060C unused
 
 	; Level_Tile_Slope: Slope of tile for each of the positions above (first byte also used by objects)
 	; 0: Slope shape at feet
@@ -2477,7 +2477,9 @@ Tile_Mem:	.ds 6480	; $6000-$794F Space used to store the 16x16 "tiles" that make
 
 	Player_NoSlopeStick:	.ds 1	; If set, Player does not stick to slopes (noticeable running downhill)
 
-				.ds 105	; $7997-$79FF unused
+	ShoeStompFlag:			.ds 1	;$7997
+	
+				.ds 104	; $7998-$79FF unused
 	; Auto scroll effect variables -- everything to do with screens that aren't scrolling in the normal way
 	; NOTE: Post-airship cinematic scene with Toad and King ONLY uses $7A01-$7A11 MMC3 SRAM (from Level_AScrlSelect to Level_AScrlHVelCarry)
 

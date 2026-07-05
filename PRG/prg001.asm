@@ -988,6 +988,7 @@ PRG001_A4BF:
 
 	LDA #$00
 	STA Player_Flip	 ; Cancel invincibility somersault
+	STA ShoeStompFlag				;clear stomp flag
 
 PRG001_A4C6:
 	LDA Player_Bounce

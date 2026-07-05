@@ -5938,16 +5938,79 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
+DoStomp:
+									;player stomped. pushed down, was not moving on ground, was in air
+	LDA #$60						;set hard downward yvel/zero xvel
+	STA <Player_YVel
+
+	LDA <Pad_Input
+	AND #PAD_UP
+	BNE ShoeStompCancel				;UP was pressed, clear and RTS
+	
+	LDA <Player_InAir				;if in air just RTS and check again next frame
+	BNE BootRet
+
+ShoeStompLanded:
+	LDA Sound_QLevel2
+	ORA #SND_LEVELCRUMBLE
+	STA Sound_QLevel2
+
+	LDA #$20						;use offsets roughly from TileAttrAndQuad_OffsFlat in prg1
+	STA <Temp_Var10					;Temp_Var10 is a Y offset
+	LDA #$08
+	STA <Temp_Var11					;Temp_Var11 is an X offset
+	JSR Player_GetTileAndSlope
+	;A=tile value
+
+	LDX #$04						;set x=04 to reach PRG008_B6E4 in Level_DoBumpBlocks
+	STA Level_Tile_GndL,X			;store A(tile value) into the Whack slot
+	JSR Level_DoBumpBlocks
+	LDA #$00						;set bouncedir to 0 so that blocks bump up/down and not sideways
+	STA Player_BounceDir			;also powerups spawn under blocks
+	BEQ ShoeStompClear
+
+ShoeStompCancel:
+	LDA #-$20						;UP was pressed, "ground pound cancel"
+	STA <Player_YVel
+
+	LDA Sound_QLevel1
+	ORA #SND_LEVELSHOE
+	STA Sound_QLevel1
+
+ShoeStompClear:
+	LDA #$00
+	STA ShoeStompFlag				;clear stomp flag
+
 BootRet:
 	RTS
 
 BootInputs:
+	LDA ShoeStompFlag
+	BNE DoStomp
+
+	LDA <Pad_Input
+	AND #PAD_DOWN
+	BEQ BootInputs_CheckUp			;down not pressed, check for UP held
+
+	LDA Player_KuriboDir			;requesting move, don't do stomp
+	BNE BootRet
+	LDA <Player_InAir				;not in air, RTS. otherwise stomp
+	BEQ BootRet
+
+	STA ShoeStompFlag				;set stompflag
+	LDA #$00						;zero mario x vel
+	STA <Player_XVel
+	LDA Sound_QPlayer
+	ORA #SND_PLAYERFIRE 
+	STA Sound_QPlayer
+
+BootInputs_CheckUp:
 	LDA <Pad_Holding
 	AND #PAD_UP
-	BEQ BootRet						;down not held, RTS
+	BEQ BootRet						;UP was not held, RTS
 
 	BIT <Pad_Input
-	BVC BootRet						;b not pressed, RTS
+	BVC BootRet						;b not pressed, RTS. otherwise fall through to ejection
 
 ;up+b pressed fall through to do boot eject
 SpawnEmptyBoot:
@@ -5998,7 +6061,7 @@ SpawnEmptyBoot_SlotFound:
 	
 	LDA #$00
 	STA Player_Kuribo
-	
+
 	LDA Sound_QPlayer
 	ORA #SND_PLAYERJUMP	 
 	STA Sound_QPlayer

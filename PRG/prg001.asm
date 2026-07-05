@@ -1766,8 +1766,6 @@ ObjHit_PUpMush:
 	STA <Temp_Var1
 
 PRG001_A897:
-	JSR PowerUp_PlaySound	 ; Play Power Up sound
-
 	LDA <Player_Suit
 	BNE PUp_GeneralCollect	; If Player is not small, jump to PUp_GeneralCollect
 
@@ -1779,6 +1777,8 @@ PRG001_A897:
 	BEQ PRG001_A8AB	 ; If Player is NOT in a Kuribo's shoe, jump to PRG001_A8AB
 
 	JMP PRG001_A825	 ; Jump to PRG001_A825
+	
+	JSR PowerUp_PlaySound	 ; Play Power Up sound
 
 PRG001_A8AB:
 

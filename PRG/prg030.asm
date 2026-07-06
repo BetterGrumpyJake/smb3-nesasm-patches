@@ -5938,11 +5938,31 @@ PRG030_9FAF:
 	JMP IntIRQ_32PixelPartition_Part3
 
 ; NOTE: The remaining ROM space was all blank ($FF)
+SpawnPoof:					;A = signed X offset from Player_X
+	LDY #$05
+SpawnStompPoof_FindSlot:
+	LDA SpecialObj_ID,Y
+	BEQ SpawnStompPoof_Found
+	DEY
+	BPL SpawnStompPoof_FindSlot
+	RTS						;no free slot, skip
+SpawnStompPoof_Found:
+	LDA #SOBJ_POOF
+	STA SpecialObj_ID,Y
+	LDA #$20
+	STA SpecialObj_Data,Y
+	LDA <Player_Y
+	ADD #$20
+	STA SpecialObj_YLo,Y
+	LDA <Player_YHi
+	ADC #$00
+	STA SpecialObj_YHi,Y
+	ADD <Player_X
+	STA SpecialObj_XLo,Y
+	RTS
+
 DoStomp:
 									;player stomped. pushed down, was not moving on ground, was in air
-	LDA #$60						;set hard downward yvel/zero xvel
-	STA <Player_YVel
-
 	LDA <Pad_Input
 	AND #PAD_UP
 	BNE ShoeStompCancel				;UP was pressed, clear and RTS
@@ -5954,6 +5974,8 @@ ShoeStompLanded:
 	LDA Sound_QLevel2
 	ORA #SND_LEVELCRUMBLE
 	STA Sound_QLevel2
+	
+	JSR SpawnPoof
 
 	LDA #$20						;use offsets roughly from TileAttrAndQuad_OffsFlat in prg1
 	STA <Temp_Var10					;Temp_Var10 is a Y offset
@@ -5970,12 +5992,12 @@ ShoeStompLanded:
 	BEQ ShoeStompClear
 
 ShoeStompCancel:
-	LDA #-$20						;UP was pressed, "ground pound cancel"
-	STA <Player_YVel
-
 	LDA Sound_QLevel1
 	ORA #SND_LEVELSHOE
 	STA Sound_QLevel1
+
+	LDA #-$10						;UP was pressed, "ground pound cancel"
+	STA <Player_YVel
 
 ShoeStompClear:
 	LDA #$00
@@ -6003,6 +6025,7 @@ BootInputs:
 	LDA Sound_QPlayer
 	ORA #SND_PLAYERFIRE 
 	STA Sound_QPlayer
+	STA <Player_YVel
 
 BootInputs_CheckUp:
 	LDA <Pad_Holding

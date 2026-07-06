@@ -3466,6 +3466,10 @@ PRG005_B0F5:
 
 
 ObjNorm_ParaBeetle:
+	LDA <Player_X
+	STA <Objects_X,X
+	LDA <Player_XHi
+	STA <Objects_XHi,X
 	LDA <Objects_XVel,X
 	BPL PRG005_B0FD	 ; If Parabeetle is not moving to the left, jump to PRG005_B0FD
 

@@ -25,7 +25,7 @@
 
 	.org ObjectGroup_InitJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_InitJumpTable:
-	.word JetPack_Init
+	.word KaboombaInit
 	.word ObjInit_DoNothing	; Object $01
 	.word ObjInit_DoNothing	; Object $02
 	.word ObjInit_DoNothing	; Object $03
@@ -67,7 +67,7 @@ ObjectGroup00_InitJumpTable:
 
 	.org ObjectGroup_NormalJumpTable	; <-- help enforce this table *here*
 ObjectGroup00_NormalJumpTable:
-	.word JetPack
+	.word Kaboomba
 	.word ObjNorm_DoNothing	; Object $01
 	.word ObjNorm_DoNothing	; Object $02
 	.word ObjNorm_DoNothing	; Object $03
@@ -152,7 +152,7 @@ ObjectGroup00_CollideJumpTable:
 
 	.org ObjectGroup_Attributes	; <-- help enforce this table *here*
 ObjectGroup00_Attributes:
-	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH8					;only palette matters
+    .byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH16	;initial palette doesn't matter, as it's tied to initial X-pos
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $01
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $02
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $03
@@ -201,7 +201,7 @@ ObjectGroup00_Attributes:
 
 	.org ObjectGroup_Attributes2	; <-- help enforce this table *here*
 ObjectGroup00_Attributes2:
-	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP1	; Object $00
+	.byte OA2_TDOGRP0	; Object $00
 	.byte OA2_TDOGRP1	; Object $01
 	.byte OA2_TDOGRP1	; Object $02
 	.byte OA2_TDOGRP5	; Object $03
@@ -250,7 +250,7 @@ ObjectGroup00_Attributes2:
 
 	.org ObjectGroup_Attributes3	; <-- help enforce this table *here*
 ObjectGroup00_Attributes3:
-	.byte OA3_HALT_NORMALONLY 	; Object $00
+	.byte OA3_HALT_JUSTDRAW 	; Object $00
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $01
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $02
 	.byte OA3_HALT_JUSTDRAWWIDE 	; Object $03
@@ -404,9 +404,14 @@ ObjectGroup00_PatternStarts:
 	.org ObjectGroup_PatternSets	; <-- help enforce this table *here*
 ObjectGroup00_PatternSets:
 	; (End restricted alignment space)
-;ObjP:
-;this doesnt' matter at all, can be anything
 ObjP00:
+ObjPKaboomba:
+	db $93,$95
+	db $97,$99
+	db $9B,$9D
+	db $B3,$B5
+	db $B7,$B9
+	db $93,$95
 ObjP03:
 ObjP07:
 ObjP0E:
@@ -5612,235 +5617,309 @@ SubVertPos = Level_ObjCalcYDiffs
 
 SubOffScreen = Object_DeleteOffScreen
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-JetPack_Tile = $AD
+;standard routine to make sprite face player on init (also can be used to set speed afterwards)
+CommonSprFlip:
+	.byte SPR_HFLIP, $00
 
-JetPack_FuelDecayTime = $10
+Init_FacePlayer:
+	JSR SubHorzPos
+	;TYA								;why did I put TYA here???
+	LDA CommonSprFlip,y
+	STA Objects_FlipBits,X
+	RTS
 
-JetPack_NumberTiles:
-	db $B5,$B3,$B1,$AF
+TimePerShootFrame = $09
+InitialSpawnTime = $60
 
-JetPack_MaxFuel = $03					;this value means 0, which means no more fuel. if you wish to add more, don't forget JetPack_NumberTiles
+SpawnedSprite = $6C
+SpawnedSprite_YSpd = $E0
+SpawnedSprite_State = OBJSTATE_KICKED
 
-JetPack:
-	LDY #$02+8
-	LDA Player_FlipBits
-	STA Objects_FlipBits,x					;flip sprite with player
-	AND #$40
-	BEQ Diff
-	LDY #-$02								;and also x-disposition related to the player
+SpawnedShellXSpd:
+	db $E8,$18
 
-Diff:
-	TYA
-	STA Temp_Var1
+ShellXDisp:
+	db $F0+4,$10-4
+
+ShellXDispHi:
+	db $FF,$00
+
+ShellYDisp = $F0+4
+
+Kaboomba:
+	JSR Object_DeleteOffScreen
+
+	LDA Sprite_Misc_Table1,x
+	BEQ WalkNorm
+
+	;Shoot
+	JSR DoShootin
+	LDA #$00
+	BEQ StoreSpd
+	;most of this is copy-pasted from shyguy i made
+
+WalkNorm:
+	;LDA #$08     ; A = $08
+	;JSR CommonAnimate
+
+	;check frame counter and animate
+
+	LDA Counter_1
+	AND #$07
+	BNE NoFrame
+
+	LDA Objects_Frame,X
+	EOR #$01
+	STA Objects_Frame,X
+
+NoFrame:
+	LDA #$08
+	LDY Objects_FlipBits,X
+	BNE StoreSpd  ; If flipped, jump to PRG004_B275
+
+	LDA #-$08    ; A = -$08
+
+StoreSpd:
+	STA Sprite_X_Speed,x
+
+	JSR Object_ApplyYVel
+	JSR Object_ApplyXVel
+	JSR Object_WorldDetect4
+
+	LDA Objects_DetStat,X
+	AND #$03
+	BEQ NoWallz  			; If troopa has not hit a wall, jump to PRG004_B283
+
+	JSR Object_FlipFace
+
+NoWallz:
+	LDA Objects_DetStat,X
+	AND #$04
+	BNE HitGround				; If troopa has hit ground, jump to PRG004_B29B
+
+	LDA Sprite_Y_Speed,x
+	;CMP #ShyGuyGravity
+	;BEQ Stop
 	CLC
-	ADC Player_X
-	STA Objects_X,x
+	ADC #OBJECT_FALLRATE		;CommonAcceleration
+	STA Sprite_Y_Speed,x
+	JMP Stop
+
+HitGround:
+	LDA #$00
+	STA Sprite_Y_Speed,x
+
+	JSR Object_HitGround
+
+Stop:
+	JSR Object_HitTest
+	BCC NoHit
+
+	JSR SubVertPos
+	LDA Temp_Var16
+	CMP #$E8
+	BPL Hurt
+
+	LDA Player_YVel
+	BMI NoHit
+
+	LDA Objects_Y,X
+	SEC
+	SBC #28
+	STA Player_Y
+
+	LDA Objects_YHi,X
+	SBC #$00
+	STA Player_YHi
 
 	LDY #$00
-	LDA Temp_Var1
-	BPL Shiz
-	DEY
-Shiz:
-	TYA
-	ADC Player_XHi
-	STA Objects_XHi,x
+	STY Player_InAir
+	STY Player_YVel
 
-	;get the player's size
-	LDA Player_Y
-	STA Objects_Y,x
+	LDA Player_SpriteX
+	CMP #16
+	BLT NoHit
 
-	LDA Player_YHi
-	STA Objects_YHi,x
+	LDA Object_VelCarry
+	BPL NoDEY  ; If platform X velocity carried, jump to PRG005_AFB8
 
-	LDA Player_Suit
-	BEQ Draw
+	DEY      ; Y = $FF (16-bit sign extension)
 
-	LDA Player_IsDucking
-	BNE Draw								;fits fine when ducking
+NoDEY:
+	CLC
+	ADC Player_X        ; Add carry value to Player X
+	STA Player_X        ; Update Player X
 
-	LDA Player_Statue						;don't displace anyway if in statue mode
+	TYA      ; Sign extension -> 'A'
+	ADC Player_XHi      ; Apply carry
+	STA Player_XHi      ; Update Player X Hi
+	JMP NoHit						;sadly
+
+Hurt:
+	JSR Player_GetHurt
+
+NoHit:
+	LDA Sprite_Misc_Table1,x
 	BNE Draw
 
-	;displace if big
-	LDA Objects_Y,x
-	SEC
-	SBC #$08
-	STA Objects_Y,x
+	LDA Sprite_Misc_Timer1,x
+	BNE Draw
 
-	LDA Objects_YHi,x
-	SBC #$00
-	STA Objects_YHi,x
+	INC Sprite_Misc_Table1,x
+
+	LDA #TimePerShootFrame		;set timer again
+	STA Sprite_Misc_Timer1,x	
+
+	LDA #$02
+	STA Objects_Frame,X
 
 Draw:
-;unfortunately my jetpack is of non-standart size - 8x32.
-    JSR Object_ShakeAndCalcSprite
+	JMP Object_ShakeAndDraw
 
-    LDA Temp_Var8  ; Testing bit 7 of horizontal sprite visibility
-    BMI NotVisi ; If bit 7 is set (this sprite is horizontally off-screen), jump to PRG000_D68E
+DoShootin:
+	LDA Sprite_Misc_Timer1,x		;check if between frames timer is up
+	BNE ReKaboomba				;if not, return
 
-    LDA Temp_Var4			;kinda w/e tbh
-	STA Sprite_RAM+$02,Y     ; Store into both sprite's attributes (don't care for horizontal flip for number
-    ORA Temp_Var3       ; Joins base attributes to H-flip flag
-    STA Sprite_RAM+$06,Y     ; Store into both sprite's attributes
+	LDA #TimePerShootFrame		;set timer again
+	STA Sprite_Misc_Timer1,x			;
 
-    LDA Temp_Var5  ; Check sprite vertical visibility
-    LSR A       ; Shift right (checking lowest bit)
-	STA Temp_Var5
-    BCS TryAnother ; If this bit is set, this sprite piece is invisible, jump to PRG000_D6C6 (RTS)
+	INC Objects_Frame,X			;next frame
+	LDA Objects_Frame,X		;
+	CMP #$04			;check for specific frame
+	BNE NoShoot			;if not the right one, don't shoot
 
-    LDA Temp_Var1  ; Get sprite Y
-    STA Sprite_RAM+$00,Y     ; Otherwise, OK to set sprite Y
-	
-	LDA Temp_Var2      ; Get sprite X
-    STA Sprite_RAM+$03,Y
-	
-	;set the sprite tile later
-	
-TryAnother:
-    ;LDA Temp_Var1  ; Get sprite Y
-	;CLC
-	;ADC #$10
-	;STA Temp_Var1
-	
-	LDA Temp_Var5
-	LSR A
-	BCS NotVisi
-	
-	LDA Temp_Var1
-	CLC
-	ADC #$10
-	STA Sprite_RAM+$04,Y
+	JSR SpawnAProjectile		;spawn a projectile
 
-	LDA Temp_Var2      ; Get sprite X
-    STA Sprite_RAM+$07,Y
-	
-	LDA #JetPack_Tile
-	STA Sprite_RAM+$05,Y
+NoShoot:
+	INC Sprite_Misc_Table1,x			;next state (frame)
+	LDA Sprite_Misc_Table1,x			;
+	CMP #$05			;
+	BNE ReKaboomba				;if it isn't yet time to end shooting animation, return
 
-NotVisi:
+	LDA #$00
+	STA Objects_Frame,X			;reset frame
+	STA Sprite_Misc_Table1,x			;and state
+
+KaboombaSetTimer:
+	LDA #InitialSpawnTime			;\(re-)initialize timer
+	STA Sprite_Misc_Timer1,x			;|
+
+ReKaboomba:
+	RTS
+
+KaboombaInit:
+	JSR Init_FacePlayer
+	JMP KaboombaSetTimer
+
+	SpawnAProjectile:
+	LDY #$04
+
+Loop:
+	;CPY SlotIndexBackup
+	;BEQ Next
+
+	LDA Objects_State,y
+	BEQ Spawned
+
+Next:
+	DEY
+	BPL Loop
+	RTS
+
+Spawned:
+	TYA
+	TAX
+	JSR Level_PrepareNewObject
 	LDX SlotIndexBackup
-	STY Temp_Var1
-	LDY Objects_Var11,x							;fuel state
-	LDA JetPack_NumberTiles,y
-	LDY Temp_Var1
-	STA Sprite_RAM+$01,Y
 
-	LDA Player_HaltGame
-	BNE Re
+	LDA #SpawnedSprite_State
+	STA Objects_State,y
 
-	;check for air and stuff
+	LDA #$ff								;this is specifically for the shell, can change or remove
+	STA Objects_Timer3,y
 
-	LDA Objects_Var10,x						;flag for jetpack activation
-	BNE CanKeep
+	LDA Objects_FlipBits,X
+	STA Objects_FlipBits,y
+	STY $00
 
-	LDA Player_InAir						;player in air?
-	BEQ Re
+	LDY #$00
+	AND #$40
+	BEQ NoChange
 
-	LDA Player_YVel							;must hit downard speed first to activate
-	BMI Re
+	INY
 
-	INC Objects_Var10,x						;now can activate jetpack
+NoChange:
+	STY $01
 
-SetTime:
-	LDA #JetPack_FuelDecayTime
-	STA Objects_Var12,x						;manual timer
-	RTS
+	LDA SpawnedShellXSpd,y
+	LDY $00
+	STA Sprite_X_Speed,y
 
-CanKeep:
-	LDA Player_InAir						;must be airborn to use jetpack
-	BEQ NoMore								;bad news - doesn't work with solid platform sprites. most likely slot related. (to-do: add a check for if player's on platform? more copy-pasta work)
+	LDA #SpawnedSprite_YSpd
+	STA Sprite_Y_Speed,y
 
-	LDA Objects_Var11,x						;ran out of fuel = return
-	CMP #JetPack_MaxFuel
-	BEQ Re
+	LDY $01
+	LDA ShellXDisp,y
+	STA $02
 
-	LDA Pad_Holding							;holding A?
-	BPL Re									;if not, return
+	LDA ShellXDispHi,y
+	STA $03
 
-	;spawn smoke plz
-	LDA Counter_1							;spawn smoke every few frames if the player's holding the button
-	AND #$0F
-	BNE NoSmoke
+	LDY $00
+	LDA Objects_X,x
+	CLC
+	ADC $02
+	STA Objects_X,y
 
-	JSR JetPack_SpawnSmoke
+	LDA Objects_XHi,x
+	ADC $03
+	STA Objects_XHi,y
 
-NoSmoke:
-	LDA Objects_Var12,x						;timer zero?
-	BNE Count								;if not, keep counting
+	LDA Objects_Y,x
+	CLC
+	ADC #ShellYDisp
+	STA Objects_Y,y
 
-	INC Objects_Var11,x						;next fuel value
-	JSR SetTime							;slightly less space and thats about it
-	;LDA #JetPack_FuelDecayTime
-	;STA Objects_Var12,x	
-	BNE NoCount
+	LDA Objects_YHi,x
+	ADC #$FF
+	STA Objects_YHi,y
 
-Count:
-	DEC Objects_Var12,x						;timer--
+	LDA #SpawnedSprite
+	STA Level_ObjectID,y
 
-NoCount:
-	LDA Player_HitCeiling					;prevent player from clipping through blocks (like activated ?-blocks)
-	BNE KeepZero
+	LDA Objects_SprAttr,X						;to-do: define?
+	STA Objects_SprAttr,y
 
-	LDA Player_YVel
-	BPL DoDifferent
-	CMP #$C0								;max upward speed
-	BCC Set
+	;spawn smoke
 
-Do:
-	LDA Player_YVel
-	SEC
-	SBC #$05								;acceleration (kinda beats natural gravity?)
-	STA Player_YVel
-
-Re:
-	RTS
-
-NoMore:
-	STA Objects_Var10,x
-	STA Objects_Var11,x						;reset back to 3
-	RTS
-
-Set:
-	LDA #$C0								;always stay at max
-	STA Player_YVel							;
-	RTS
-
-DoDifferent:
-	Lda #$EA
-	STA Player_YVel
-	;LDA Player_YVel
-	;SEC
-	;SBC #$1A							;man, is downward speed heavy!
-	;STA Player_YVel
-	RTS
-
-KeepZero:
-	LDA #$20							;give player enough downward speed to cancel next Y-speed setting (since it becomes positive it'll change to DoDifferent value)
-	STA Player_YVel
-
-JetPack_Init:
-	RTS
-
-JetPack_SpawnSmoke:
 	JSR SpecialObj_FindEmptyAbort
 
-    LDA Objects_X,X
-    CLC
-    ADC #$F8+4
-    STA SpecialObj_XLo,Y
-
-    LDA Objects_Y,X
-    CLC
-    ADC #$20
-    STA SpecialObj_YLo,Y
-	
-    LDA Objects_YHi,X
-    ADC #$00
-    STA SpecialObj_YHi,Y
-
 	LDA #SOBJ_POOF
-	STA SpecialObj_ID,Y
+	STA SpecialObj_ID,y
 
-    LDA #$1f
-    STA SpecialObj_Data,Y
+    ; SpecialObj_Data = $1F
+	LDA #$1f
+	STA SpecialObj_Data,y
+
+	LDA Objects_X,x
+	CLC
+	ADC $02
+	STA SpecialObj_XLo,y
+
+	;LDA Objects_XHi,x
+	;ADC $03
+	;STA Objects_XHi,y
+
+	LDA Objects_Y,x
+	CLC
+	ADC #ShellYDisp
+	STA SpecialObj_YLo,y
+
+	LDA Objects_YHi,x
+	ADC #$FF
+	STA SpecialObj_YHi,y
+
+	LDA Sound_QLevel1
+	ORA #$08
+	STA Sound_QLevel1
 	RTS

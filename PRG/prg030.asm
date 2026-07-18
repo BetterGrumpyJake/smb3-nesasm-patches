@@ -5963,11 +5963,8 @@ UpDownThrowVel:
 	
 	STA ThrowDirection				;zero ThrowDirection
 
-	LDA #OBJSTATE_SHELLED			;set state to shelled
-	STA Objects_State,X
-	LDA #$ff						;reset wake up timer on shells
-	STA Objects_Timer3,X
-
+	JSR Object_SetShellState		;set state to shelled
+									;reset wake up timer on shells
 ;any kicked object
 SkipShellStuff_30:		
 ;set kicked X vel

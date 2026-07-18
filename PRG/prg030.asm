@@ -422,13 +422,15 @@ PAGE_A000_ByTileset: ; $83E9
 	; The normal level VROM page cycle set
 PT2_Anim:	.byte $60, $62, $64, $66
 
-PAUSE_Sprites:
-	.byte $58, $F1, $03, $60	; P
-	.byte $58, $F5, $03, $70	; A
-	.byte $58, $F9, $03, $80	; U
-	.byte $58, $FD, $03, $90	; S
-	.byte $58, $FF, $03, $A0	; E
-PAUSE_Sprites_End
+;PAUSE_Sprites:
+;	.byte $58, $F1, $03, $60	; P
+;	.byte $58, $F5, $03, $70	; A
+;	.byte $58, $F9, $03, $80	; U
+;	.byte $58, $FD, $03, $90	; S
+;	.byte $58, $FF, $03, $A0	; E
+;PAUSE_Sprites_End
+	;free space
+	.ds 20
 
 	; The BGM per world (see also World_BGM_Restore in PRG010)
 World_BGM:	
@@ -3539,26 +3541,22 @@ RestartLevelPRG030:		; This is jumped to from Level_MainLoop->RunPauseMenu->DoMe
 	JSR Sprite_RAM_Clear
 	JSR Scroll_PPU_Reset
 	
-	LDA #$01
-	STA Level_TimerEn    ; Disable the clock ($0747)   addition to kill the timer nerdalert CUSTOM
-	LDA #$00
-	STA Level_TimerMSD   ; Optional: Set visual display to 000
-	
 	LDA #$10
 	STA Map_Operation
 
-	LDA Map_Prev_XOff
+	LDX Player_Current
+	LDA Map_Prev_XOff,X
 	STA <Horz_Scroll
-	LDA Map_Prev_XHi
+	LDA Map_Prev_XHi,X
 	STA <Horz_Scroll_Hi
-	LDA Map_Entered_Y
-	STA <World_Map_Y
-	LDA Map_Entered_XHi
-	STA <World_Map_XHi
-	LDA Map_Entered_X
-	STA <World_Map_X
-	LDA Map_Previous_UnusedPVal2
-	STA <Map_UnusedPlayerVal2
+	LDA Map_Entered_Y,X
+	STA <World_Map_Y,X
+	LDA Map_Entered_XHi,X
+	STA <World_Map_XHi,X
+	LDA Map_Entered_X,X
+	STA <World_Map_X,X
+	LDA Map_Previous_UnusedPVal2,X
+	STA <Map_UnusedPlayerVal2,X
 
 	JMP PRG030_8732
 
@@ -3589,7 +3587,7 @@ _not_restarting2:
 	RTS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; Removed 2-player vs and game over
-	.ds 0x2DF
+	.ds 0x2E6
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

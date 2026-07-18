@@ -2351,42 +2351,8 @@ PRG030_8E79:
 	;NOP
 	;NOP
 	;NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-
-	LDA #$32
-	STA PatTable_BankSel+5	; Set patterns needed for P A U S E sprites
-
-	JSR Sprite_RAM_Clear	 ; Clear other sprites
-
-	; Copy in the P A U S E sprites
-	LDY #(PAUSE_Sprites_End - PAUSE_Sprites - 1)
-PRG030_8E9D:
-	LDA PAUSE_Sprites,Y
-	STA Sprite_RAM+$00,Y
-	DEY		 ; Y--
-	BPL PRG030_8E9D	 ; While Y >= 0, loop!
-
-	; Updates palette
-	LDA #$06	 
-	STA <Graphics_Queue
-
-	; Nothing else to do while paused; loop!
-	JMP Level_MainLoop
-
+	;free space
+	.ds 41
 
 PRG030_8EAD:
 	; Not paused!
@@ -2862,8 +2828,13 @@ PRG030_910C:
 	LDA Map_PlayerLost2PVs
 	BNE PRG030_9128	 ; If Map_PlayerLost2PVs is set, jump to PRG030_9128
 
-	DEC Player_Lives,X	; One less life for the Player...
-	BMI PRG030_9133	 	; If fell below zero, GAMEOVER!; jump to PRG030_9133
+	;DEC Player_Lives,X	; One less life for the Player...
+	;BMI PRG030_9133	 	; If fell below zero, GAMEOVER!; jump to PRG030_9133
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 PRG030_9128:
 
@@ -2874,241 +2845,241 @@ PRG030_9128:
 	STY Map_Operation	 ; Map_Operation = 2
 	JMP PRG030_84D7	 	; Jump to PRG030_84D7
 
-PRG030_9133:
-
-	; GAME OVER!!
-
-	; Set Player as twirling (in case they Continue...)
-	LDA #$01	 
-	STA World_Map_Twirl,X
-
-	; Init map vars
-	LDA #$00
-	STA Level_Tileset
-	STA <Map_EnterLevelFX
-	STA <Map_WarpWind_FX
-	STA Map_Intro_Tick
-
-	; Map_GameOver_CursorY = $60
-	LDA #$60
-	STA Map_GameOver_CursorY
-
-PRG030_9149:
-	JSR Sprite_RAM_Clear	 
-	JSR Scroll_PPU_Reset	 
-	JSR Reset_PPU_Clear_Nametables
-
-	LDA #%00101000	 	; use 8x16 sprites, sprites use PT2 (NOTE: No VBlank trigger!)
-	STA PPU_CTL1	 	
-	STA <PPU_CTL1_Copy	; Keep PPU_CTL1_Copy in sync!
-
-	LDA World_EnterState
-	BNE PRG030_9163	 ; If World_EnterState <> 0, jump to PRG030_9163
-
-	; Otherwise, gotta player the game over music!
-	LDA #MUS1_GAMEOVER
-	STA Sound_QMusic1
-
-PRG030_9163:
-
-	; Load up graphics
-	LDA #$14
-	STA PatTable_BankSel
-	LDA #$16
-	STA PatTable_BankSel+1
-	LDX #$20
-	STX PatTable_BankSel+2
-	INX
-	STX PatTable_BankSel+3
-	INX
-	STX PatTable_BankSel+4
-	INX
-	STX PatTable_BankSel+5
-	JSR SetPages_ByTileset
-
-
-	; Set both Players to their previous map values
-	LDX Total_Players
-	DEX		 ; X = Total_Players - 1
-
-PRG030_9185:
-	LDA Map_Entered_Y,X
-	STA <World_Map_Y,X
-	LDA Map_Entered_XHi,X
-	STA <World_Map_XHi,X
-	LDA Map_Entered_X,X
-	STA <World_Map_X,X
-	LDA Map_Previous_UnusedPVal2,X
-	STA <Map_UnusedPlayerVal2,X
-
-	; Set Player's previous travel direction
-	LDA Map_Previous_Dir,X
-	STA <World_Map_Dir,X
-
-	DEX		 ; X--
-	BPL PRG030_9185	; While X >= 0, loop!
-
-	JSR Scroll_Map_SpriteBorder	 ; Keep that map border going!
-
-	; Set page @ A000 to 12
-	LDA #12
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-	JSR Map_Reload_with_Completions	 ; Load map and set already completed levels
-
-	LDX Player_Current	 ; X = Player_Current
-
-	; Set Player's previous movement direction
-	LDA Map_Previous_Dir,X
-	STA <World_Map_Dir,X
-
-	LDA #%00101000	 	; use 8x16 sprites, sprites use PT2 (NOTE: No VBlank trigger!)
-	STA PPU_CTL1	 	
-	STA <PPU_CTL1_Copy	; Keep PPU_CTL1_Copy in sync!
-
-	LDY #$00	 ; Y = 0
-
-	LDA World_Num
-	CMP #$07
-	BNE PRG030_91D1	 ; If World_Num <> 7 (World 8), jump to PRG030_91D1
-
-	; World 8 only...
-
-	LDX Player_Current	 ; X = Player_Current
-
-	LDA <World_Map_XHi,X
-	CMP #$02
-	BNE PRG030_91D1	 ; If Player is not on the "dark" part of World 8, jump to PRG030_91D1
-
-	INY		 ; Y = 1 (enable the World 8 darkness)
-
-PRG030_91D1:
-	STY World_8_Dark	 ; Set World_8_Dark appropriately
-
-	LDY Player_Current	 ; Y = Player_Current
-
-	; Scroll updates
-	LDA Map_Prev_XOff,Y
-	STA <Scroll_Temp
-	LDA Map_Prev_XHi,Y
-	JSR Scroll_Update_Ranges
-
-	LDA <Scroll_ColumnL
-	STA <Scroll_ColumnR
-
-	; Scroll_Cols2Upd = 32 (full dirty scroll update sweep)
-	LDA #32
-	STA Scroll_Cols2Upd
-
-	; This (re)draws the status bar
-	LDA #$02
-	JSR Video_Do_Update
-
-	; Set page @ A000 to 26
-	LDA #26		
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-	JSR StatusBar_Update_Cards	 ; Update status bar cards
-	JSR StatusBar_UpdateValues	 ; Update other status bar stuff
-	JSR StatusBar_Fill_MorL	 	 ; Patch in correct M or L on status bar
-	JSR StatusBar_Fill_World	 ; Fill in correct world number
-
-	LDA #$00		 ; A = 0 (Graphics buffer push)
-	JSR Video_Do_Update	 ; Push through what's in graphics buffer
-
-	JSR Scroll_Dirty_Update 	; Do a full draw of the map tiles
-
-	LDA World_8_Dark
-	BEQ PRG030_9214	 	; If World_8_Dark = 0 (not doing the effect), jump to PRG030_9214
-
-	JSR Map_W8DarknessFill	; Fill in the entire screen with black
-
-PRG030_9214:
-
-	LDY Player_Current	 ; Y =  Player_Current
-
-	LDA Map_Prev_XOff,Y
-	STA <Horz_Scroll
-	STA <Scroll_Temp
-	LDA Map_Prev_XHi,Y
-	STA <Horz_Scroll_Hi
-	JSR Scroll_Update_Ranges
-
-PRG030_9226:
-	JSR Map_DrawAndPan	 ; Draw and pan map as necessary
-
-	LDA #$00		 ; A = 0 (Graphics buffer push)
-	JSR Video_Do_Update	 ; Push through what's in graphics buffer
-
-	LDA Map_DrawPanState
-	BNE PRG030_9226	 	; If some kind of map drawing/panning activity is occurring, loop around
-
-	LDA World_EnterState
-	BNE PRG030_9257	 ; If World_EnterState <> 0, jump to PRG030_9257
-
-	; Set page @ A000 to 11
-	LDA #11
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-
-	JSR Map_IntroAttrSave	; Pick up the current attribute info under the box
-
-	LDX #$12 		; X = $12 (standard $00 aligned GAME OVER box)
-
-	LDA <Horz_Scroll 	; A = Horz_Scroll
-	BEQ PRG030_924B	 	; If Horz_Scroll = 0, jump to PRG030_924B
-
-	LDX #$13		; Otherwise, X = $13 (map halfway scroll $80 aligned GAME OVER box)
-
-PRG030_924B:
-	TXA		 ; A = X
-	JSR Video_Do_Update	 ; Draw up the Game Over! box
-
-	JSR GameOver_PatchPlayerName	 ; Add MARIO/LUIGI to gameover box
-
-	LDA #$00		 ; A = 0 (Graphics buffer push)
-	JSR Video_Do_Update	 ; Push through what's in graphics buffer
-
-PRG030_9257:
-	LDA #$ef	 	
-	STA <Vert_Scroll	; Vert_Scroll = $EF (map always stays at this height)
-
-	LDA #$c0	 	
-	STA Update_Select	; Update_Select = $C0 (Normal)
-
-	; Switch bank A000 to page 27
-	LDA #27
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR Setup_PalData	 ; On page 27 -- PalData now holds palette data for world map tiles/objects
-
-	; Switch bank A000 to page 26
-	LDA #26
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR Palette_FadeIn	 ; On page 26 -- Fade in the world map
-
-	; Switch bank A000 to page 11
-	LDA #11	 
-	STA PAGE_A000	 
-	JSR PRGROM_Change_A000
-
-PRG030_927E:
-	JSR GraphicsBuf_Prep_And_WaitVSync	; This is probably just using it to VSync
-	JSR Sprite_RAM_Clear	 		; Clear sprites!
-	JSR GameOver_Loop	 		; Do Gameover stuff
-	JSR World5_Sky_AddCloudDeco	 	; World 5 sky area gets an extra cloud sprite (strange?)
-
-	LDA GameOver_State
-
-	CMP #$06
-	;BEQ PRG030_929C	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_929C
-	BEQ PRG030_927E	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_927E
-
-	CMP #$09
-	BNE PRG030_927E	 ; If GameOver_State <> 9 (Player did not choose to END), jump to PRG030_927E (loop around)
+;PRG030_9133:
+;
+;	; GAME OVER!!
+;
+;	; Set Player as twirling (in case they Continue...)
+;	LDA #$01	 
+;	STA World_Map_Twirl,X
+;
+;	; Init map vars
+;	LDA #$00
+;	STA Level_Tileset
+;	STA <Map_EnterLevelFX
+;	STA <Map_WarpWind_FX
+;	STA Map_Intro_Tick
+;
+;	; Map_GameOver_CursorY = $60
+;	LDA #$60
+;	STA Map_GameOver_CursorY
+;
+;PRG030_9149:
+;	JSR Sprite_RAM_Clear	 
+;	JSR Scroll_PPU_Reset	 
+;	JSR Reset_PPU_Clear_Nametables
+;
+;	LDA #%00101000	 	; use 8x16 sprites, sprites use PT2 (NOTE: No VBlank trigger!)
+;	STA PPU_CTL1	 	
+;	STA <PPU_CTL1_Copy	; Keep PPU_CTL1_Copy in sync!
+;
+;	LDA World_EnterState
+;	BNE PRG030_9163	 ; If World_EnterState <> 0, jump to PRG030_9163
+;
+;	; Otherwise, gotta player the game over music!
+;	LDA #MUS1_GAMEOVER
+;	STA Sound_QMusic1
+;
+;PRG030_9163:
+;
+;	; Load up graphics
+;	LDA #$14
+;	STA PatTable_BankSel
+;	LDA #$16
+;	STA PatTable_BankSel+1
+;	LDX #$20
+;	STX PatTable_BankSel+2
+;	INX
+;	STX PatTable_BankSel+3
+;	INX
+;	STX PatTable_BankSel+4
+;	INX
+;	STX PatTable_BankSel+5
+;	JSR SetPages_ByTileset
+;
+;
+;	; Set both Players to their previous map values
+;	LDX Total_Players
+;	DEX		 ; X = Total_Players - 1
+;
+;PRG030_9185:
+;	LDA Map_Entered_Y,X
+;	STA <World_Map_Y,X
+;	LDA Map_Entered_XHi,X
+;	STA <World_Map_XHi,X
+;	LDA Map_Entered_X,X
+;	STA <World_Map_X,X
+;	LDA Map_Previous_UnusedPVal2,X
+;	STA <Map_UnusedPlayerVal2,X
+;
+;	; Set Player's previous travel direction
+;	LDA Map_Previous_Dir,X
+;	STA <World_Map_Dir,X
+;
+;	DEX		 ; X--
+;	BPL PRG030_9185	; While X >= 0, loop!
+;
+;	JSR Scroll_Map_SpriteBorder	 ; Keep that map border going!
+;
+;	; Set page @ A000 to 12
+;	LDA #12
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	JSR Map_Reload_with_Completions	 ; Load map and set already completed levels
+;
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	; Set Player's previous movement direction
+;	LDA Map_Previous_Dir,X
+;	STA <World_Map_Dir,X
+;
+;	LDA #%00101000	 	; use 8x16 sprites, sprites use PT2 (NOTE: No VBlank trigger!)
+;	STA PPU_CTL1	 	
+;	STA <PPU_CTL1_Copy	; Keep PPU_CTL1_Copy in sync!
+;
+;	LDY #$00	 ; Y = 0
+;
+;	LDA World_Num
+;	CMP #$07
+;	BNE PRG030_91D1	 ; If World_Num <> 7 (World 8), jump to PRG030_91D1
+;
+;	; World 8 only...
+;
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	LDA <World_Map_XHi,X
+;	CMP #$02
+;	BNE PRG030_91D1	 ; If Player is not on the "dark" part of World 8, jump to PRG030_91D1
+;
+;	INY		 ; Y = 1 (enable the World 8 darkness)
+;
+;PRG030_91D1:
+;	STY World_8_Dark	 ; Set World_8_Dark appropriately
+;
+;	LDY Player_Current	 ; Y = Player_Current
+;
+;	; Scroll updates
+;	LDA Map_Prev_XOff,Y
+;	STA <Scroll_Temp
+;	LDA Map_Prev_XHi,Y
+;	JSR Scroll_Update_Ranges
+;
+;	LDA <Scroll_ColumnL
+;	STA <Scroll_ColumnR
+;
+;	; Scroll_Cols2Upd = 32 (full dirty scroll update sweep)
+;	LDA #32
+;	STA Scroll_Cols2Upd
+;
+;	; This (re)draws the status bar
+;	LDA #$02
+;	JSR Video_Do_Update
+;
+;	; Set page @ A000 to 26
+;	LDA #26		
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	JSR StatusBar_Update_Cards	 ; Update status bar cards
+;	JSR StatusBar_UpdateValues	 ; Update other status bar stuff
+;	JSR StatusBar_Fill_MorL	 	 ; Patch in correct M or L on status bar
+;	JSR StatusBar_Fill_World	 ; Fill in correct world number
+;
+;	LDA #$00		 ; A = 0 (Graphics buffer push)
+;	JSR Video_Do_Update	 ; Push through what's in graphics buffer
+;
+;	JSR Scroll_Dirty_Update 	; Do a full draw of the map tiles
+;
+;	LDA World_8_Dark
+;	BEQ PRG030_9214	 	; If World_8_Dark = 0 (not doing the effect), jump to PRG030_9214
+;
+;	JSR Map_W8DarknessFill	; Fill in the entire screen with black
+;
+;PRG030_9214:
+;
+;	LDY Player_Current	 ; Y =  Player_Current
+;
+;	LDA Map_Prev_XOff,Y
+;	STA <Horz_Scroll
+;	STA <Scroll_Temp
+;	LDA Map_Prev_XHi,Y
+;	STA <Horz_Scroll_Hi
+;	JSR Scroll_Update_Ranges
+;
+;PRG030_9226:
+;	JSR Map_DrawAndPan	 ; Draw and pan map as necessary
+;
+;	LDA #$00		 ; A = 0 (Graphics buffer push)
+;	JSR Video_Do_Update	 ; Push through what's in graphics buffer
+;
+;	LDA Map_DrawPanState
+;	BNE PRG030_9226	 	; If some kind of map drawing/panning activity is occurring, loop around
+;
+;	LDA World_EnterState
+;	BNE PRG030_9257	 ; If World_EnterState <> 0, jump to PRG030_9257
+;
+;	; Set page @ A000 to 11
+;	LDA #11
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;
+;	JSR Map_IntroAttrSave	; Pick up the current attribute info under the box
+;
+;	LDX #$12 		; X = $12 (standard $00 aligned GAME OVER box)
+;
+;	LDA <Horz_Scroll 	; A = Horz_Scroll
+;	BEQ PRG030_924B	 	; If Horz_Scroll = 0, jump to PRG030_924B
+;
+;	LDX #$13		; Otherwise, X = $13 (map halfway scroll $80 aligned GAME OVER box)
+;
+;PRG030_924B:
+;	TXA		 ; A = X
+;	JSR Video_Do_Update	 ; Draw up the Game Over! box
+;
+;	JSR GameOver_PatchPlayerName	 ; Add MARIO/LUIGI to gameover box
+;
+;	LDA #$00		 ; A = 0 (Graphics buffer push)
+;	JSR Video_Do_Update	 ; Push through what's in graphics buffer
+;
+;PRG030_9257:
+;	LDA #$ef	 	
+;	STA <Vert_Scroll	; Vert_Scroll = $EF (map always stays at this height)
+;
+;	LDA #$c0	 	
+;	STA Update_Select	; Update_Select = $C0 (Normal)
+;
+;	; Switch bank A000 to page 27
+;	LDA #27
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;	JSR Setup_PalData	 ; On page 27 -- PalData now holds palette data for world map tiles/objects
+;
+;	; Switch bank A000 to page 26
+;	LDA #26
+;	STA PAGE_A000
+;	JSR PRGROM_Change_A000
+;	JSR Palette_FadeIn	 ; On page 26 -- Fade in the world map
+;
+;	; Switch bank A000 to page 11
+;	LDA #11	 
+;	STA PAGE_A000	 
+;	JSR PRGROM_Change_A000
+;
+;PRG030_927E:
+;	JSR GraphicsBuf_Prep_And_WaitVSync	; This is probably just using it to VSync
+;	JSR Sprite_RAM_Clear	 		; Clear sprites!
+;	JSR GameOver_Loop	 		; Do Gameover stuff
+;	JSR World5_Sky_AddCloudDeco	 	; World 5 sky area gets an extra cloud sprite (strange?)
+;
+;	LDA GameOver_State
+;
+;	CMP #$06
+;	;BEQ PRG030_929C	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_929C
+;	BEQ PRG030_927E	 ; If GameOver_State = 6 (Player aligning to start panel Y), jump to PRG030_927E
+;
+;	CMP #$09
+;	BNE PRG030_927E	 ; If GameOver_State <> 9 (Player did not choose to END), jump to PRG030_927E (loop around)
 
 ;	; Player chose to END...
 ;
@@ -3513,48 +3484,24 @@ InitializePauseMenu:
 	STA Level_PauseFlag	; Toggle pause flag
 	STA PauseMenuSel	; Set our menu selection (0 for unpaused, 1 for pausing)
 	RTS
-	
+
 RunPauseMenu13:
 	LDA PAGE_A000
 	PHA
 
-	; Set page @ A000 to 13
-;	LDA #$09
 	LDA #13
 	STA PAGE_A000
 	JSR PRGROM_Change_A000
-	
+
 	JSR RunPauseMenu
-	
+
 	PLA
 	STA PAGE_A000
 	JSR PRGROM_Change_A000
-	RTS
-	
-DoSoundEngineSave13:
-	LDA PAGE_A000
-	PHA
-	LDA #13
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR DoSoundEngineSave
-	PLA
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
+
 	RTS
 
-DoSoundEngineRestore13:
-	LDA PAGE_A000
-	PHA
-	LDA #13
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	JSR DoSoundEngineRestore
-	PLA
-	STA PAGE_A000
-	JSR PRGROM_Change_A000
-	RTS
-	
+
 DeathRestartLevel:
 	PLA
 	PLA			; Remove Player_DrawAndDoActions29
@@ -3564,7 +3511,7 @@ DeathRestartLevel:
 	PLA			; Remove Player_DoGameplay
 	LDA #0			; This is the page that the PRG008 death routine would restore
 	PHA			; Fall into RestartLevelPRG030
-	
+
 RestartLevelPRG030:		; This is jumped to from Level_MainLoop->RunPauseMenu->DoMenuInput->PauseMenuRestartLevel
 	PLA			; Restore the A000 page saved by RunPauseMenu13 before getting here
 	TAY
@@ -3574,12 +3521,12 @@ RestartLevelPRG030:		; This is jumped to from Level_MainLoop->RunPauseMenu->DoMe
 	STA PAGE_A000
 	JSR PRGROM_Change_A000
 	
+	LDA #$00
+	STA Level_GetWandState   ; Reset the boss state machine
+	STA <Player_HaltGame     ; Unfreeze the screen
+	
 	INC LevelRestarting			; Flag that we're restarting the level
 
-	LDA SoundEngineBackedUp
-	BNE _no_sound_engine_save
-	JSR DoSoundEngineSave13			; We don't want to save if we already saved at the death song
-_no_sound_engine_save:
 	; Switch bank A000 to page 26
 	LDA #26
 	STA PAGE_A000
@@ -3591,7 +3538,12 @@ _no_sound_engine_save:
 
 	JSR Sprite_RAM_Clear
 	JSR Scroll_PPU_Reset
-
+	
+	LDA #$01
+	STA Level_TimerEn    ; Disable the clock ($0747)   addition to kill the timer nerdalert CUSTOM
+	LDA #$00
+	STA Level_TimerMSD   ; Optional: Set visual display to 000
+	
 	LDA #$10
 	STA Map_Operation
 
@@ -3609,7 +3561,7 @@ _no_sound_engine_save:
 	STA <Map_UnusedPlayerVal2
 
 	JMP PRG030_8732
-	
+
 CheckPlayLevelEntrySound:
 	TAX
 	LDA LevelRestarting
@@ -3624,7 +3576,10 @@ CheckQueueLevelsMusic:
 	TAX
 	LDA LevelRestarting
 	BEQ _not_restarting2
-	JSR DoSoundEngineRestore13
+	;;;JSR DoSoundEngineRestore13
+	LDA #0
+	STA Sound_IsPaused
+	STA SndCur_Pause	; Stop the pause sound hold
 	DEC LevelRestarting		; Restarting the level done
 	RTS
 _not_restarting2:
@@ -3632,19 +3587,9 @@ _not_restarting2:
 	STA Level_MusicQueue
 	STA Level_MusicQueueRestore
 	RTS
-
-AllowDeathSongToContinueMusic:
-	JSR DoSoundEngineSave13
-	LDA #1
-	STA SoundEngineBackedUp
-	; Queue death song
-	LDA Sound_QLevel1
-	ORA #SND_LEVELSHOE
-	STA Sound_QLevel1
-	RTS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;; Removed 2-player vs and game over
-	.ds 0x14C
+	.ds 0x2DF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

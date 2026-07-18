@@ -348,8 +348,7 @@ LeveLoad_FixedSizeGen_TS14:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-PauseMenu_Sprites:
+PauseMenu_Sprites:                              ;CUSTOM PAUSE MENU ALL THE WAY TO END OF FILE. DELETED SOME JUNK AT THE END OF FILE NERDALERT
 	.byte $48, $C1, $03, $78	; c
 	.byte $48, $C3, $03, $80	; o +4
 	.byte $48, $C5, $03, $88	; n +8
@@ -393,7 +392,7 @@ _load_pause_loop:
 	DEY
 	LDA PauseMenu_CursorY,Y
 	STA Sprite_RAM+(PauseMenu_CursorSprite-PauseMenu_Sprites)
-	
+
 	JSR DoMenuInput
 
 	RTS
@@ -428,13 +427,13 @@ _menu_chk_a:
 	JSR DynJump
 	.word PauseMenuCont			;  0 - cont. Do nothing, just return
 	.word PauseMenuReturnToMap		;  1 - Return to map
-	.word PauseMenuRestartLevel		;  2 - Restart Level
+	.word PauseMenuRestartLevel		;  2 - Restart Level   ;CUSTOM PAUSE MENU
 _set_menu_sel:
 	STA PauseMenuSel
 _menu_input_rts:
 	RTS
-	
-PauseMenuRestartLevel:
+
+PauseMenuRestartLevel:                   ;CUSTOM PAUSE MENU/QUICK RESTART
 	LDA #0
 	JSR InitializePauseMenu
 
@@ -466,127 +465,10 @@ PauseMenuReturnToMap:
 
 	LDA #$01
 	STA <Level_ExitToMap
-	STA Map_PlayerLost2PVs	;skips decrement life in PRG030_910C
 	STA Map_ReturnStatus	 ; Map_ReturnStatus = 1 (Player died, level is not clear)
 
 	JMP PRG030_8F42
-	
-DoSoundEngineRestore:
-	LDA #0
-	STA Sound_IsPaused
-	STA SndCur_Pause	; Stop the pause sound hold
-	STA PAPU_EN		; Disable all sound channels
-	STA SndCur_Player	; Kill player sound
-	STA SndCur_Level1	; Kill level 1 sound
-	STA SndCur_Level2	; Kill level 2 sound
-	STA SndCur_Music1	; Kill BGM 1
-	STA SndCur_Map		; Kill Map sounds
-	STA Music2_Hold		; Clear any hold on a Set 2 song
-	;STA SndCur_Music2	; Don't kill BGM 2 (level music)
-	;LDA #MUS1_STOPMUSIC
-	;STA Sound_QMusic1	; Stop BGM
 
-	LDA Level_MusicQueueRestore
-	STA Level_MusicQueue
-
-	LDY #0
-_restore_engine_loop:
-	LDA SoundEngineBackupArray,Y
-	STA Music_TriTrkPos,Y
-	LDA #0
-	STA SoundEngineBackupArray,Y
-	INY
-	CPY #16
-	BNE _restore_engine_loop
-
-	LDA SoundEngineBackupArray,Y
-	STA SndCur_Music2
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Base_L
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Base_H
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Sq1TrkOff
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Sq2TrkOff
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_RestH_Base
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Sq1RestH
-	INY
-
-	LDA SoundEngineBackupArray,Y
-	STA Music_Sq1AltRamp
-	INY
-
-	LDX #0
-_restore_loop2:
-	LDA SoundEngineBackupArray,Y
-	STA Sound_Sq1_CurFL,X
-	INX
-	INY
-	CPY #30
-	BNE _restore_loop2
-
-	LDA #0
-	STA SoundEngineBackedUp
-
-	RTS
-
-DoSoundEngineSave:
-	LDY #0
-_save_engine_loop:
-	LDA Music_TriTrkPos,Y
-	STA SoundEngineBackupArray,Y
-	INY
-	CPY #16
-	BNE _save_engine_loop
-	LDA SndCur_Music2
-	STA SoundEngineBackupArray,Y	; Y = 16
-	INY
-	LDA Music_Base_L
-	STA SoundEngineBackupArray,Y	; Y = 17
-	INY
-	LDA Music_Base_H
-	STA SoundEngineBackupArray,Y	; Y = 18
-	INY
-	LDA Music_Sq1TrkOff
-	STA SoundEngineBackupArray,Y	; Y = 19
-	INY
-	LDA Music_Sq2TrkOff
-	STA SoundEngineBackupArray,Y	; Y = 20
-	INY
-	LDA Music_RestH_Base
-	STA SoundEngineBackupArray,Y	; Y = 21
-	INY
-	LDA Music_Sq1RestH		; *
-	STA SoundEngineBackupArray,Y	; Y = 22
-	INY
-	LDA Music_Sq1AltRamp
-	STA SoundEngineBackupArray,Y	; Y = 23
-	INY
-
-	LDX #0
-_save2_loop:
-	LDA Sound_Sq1_CurFL,X
-	STA SoundEngineBackupArray,Y	; Y = 24 - 29
-	INX
-	INY
-	CPY #30
-	BNE _save2_loop
-	RTS
 
 PRG013_MASSIVE_FREE_SPACE:
 	.byte $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA, $AA

@@ -94,7 +94,6 @@ Sound_Process:
 	JSR Sound_PlayMapSounds	 ; Map sounds
 	JSR Sound_PlayMusic	 ; Music
 
-PRG028_A087:
 	; Clear any music queues
 	LDA #$00	 
 	STA Sound_QMusic2

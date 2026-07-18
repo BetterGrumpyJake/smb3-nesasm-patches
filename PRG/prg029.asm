@@ -741,7 +741,7 @@ PRG029_D094:
 	LDA #$00
 	ADC Player_AboveTop
 
-	BNE PRG029_D0BC	 ; If Player is completely off the top of screen, jump to PRG029_D0BC
+	BNE OffScreenIndicator	 ; If Player is completely off the top of screen, jump to PRG029_D0BC
 	BEQ PRG029_D0D3	 ; If Player is not at all off the top of screen, jump to PRG029_D0D3
 
 PRG029_D0AE:
@@ -755,22 +755,37 @@ PRG029_D0AE:
 	BGE PRG029_D0C9	 ; If Player_SpriteY >= $B0, he's halway below the status bar, so jump to PRG029_D0C9
 	BLT PRG029_D0D3	 ; Otherwise, Player is totally visible, jump to PRG029_D0D3
 
+OffScreenIndicator:
+	;LDA #$5e				;select bank to swap in for offscreen indicator
+	;STA PatTable_BankSel+2
+	
+	LDA #$00				;y position of indicator
+	STA Sprite_RAM+$10,X
+	
+	;49=coin, 73=star, 65/67=fireball, d7=hammer, cd=wings, 17=air bubble, 4b=blotch, ed=dot, ff=microgoomba
+	LDA #$73				;tile index value, easily to find with mesen tile viewer
+	STA Sprite_RAM+$11,X
+	
+	;LDA #$01				;attribute
+	;STA Sprite_RAM+$12,X
+
 PRG029_D0BC:
 	INC Player_OffScreen	; Player is off screen
 
 	; Prevent "second row" sprites from being displayed
+	;lower half
 	TYA		 	; A = $FF
 	STA Sprite_RAM+$0C,X
-	STA Sprite_RAM+$10,X
+	;STA Sprite_RAM+$10,X
 	STA Sprite_RAM+$14,X
 
 PRG029_D0C9:
-
 	; Prevent "first row" sprites from being displayed
+	;upper half
 	TYA		 	; A = $FF
-	STA Sprite_RAM+$00,X	
-	STA Sprite_RAM+$04,X	
-	STA Sprite_RAM+$08,X	
+	STA Sprite_RAM+$00,X
+	STA Sprite_RAM+$04,X
+	STA Sprite_RAM+$08,X
 
 PRG029_D0D3:
 

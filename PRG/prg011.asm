@@ -194,7 +194,10 @@ PRG011_A23E:
 	DEX		 ; X--
 	BPL PRG011_A23E	 ; As long as we have another player to init, loop!
 
-	STX Map_2PVsGame ; Map_2PVsGame = $FF (since game increments at start, this will play game style 0)
+	;STX Map_2PVsGame ; Map_2PVsGame = $FF (since game increments at start, this will play game style 0)
+	NOP
+	NOP
+	NOP
 
 	; Clear the following
 	STA Map_Unused7995	; Cleared here, but never used

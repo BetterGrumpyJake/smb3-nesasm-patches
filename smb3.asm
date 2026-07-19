@@ -395,7 +395,8 @@ PAD_RIGHT	= $01
 
 	VBlank_TickEn:		.ds 1	; Enables the VBlank_Tick decrement and typically other things like joypad reading
 
-	Map_Enter2PFlag:	.ds 1	; If $00, entering level, otherwise set if entering 2P VS mode
+	;Map_Enter2PFlag:	.ds 1	; If $00, entering level, otherwise set if entering 2P VS mode
+						.ds 1	; unused
 
 
 	Map_EnterViaID:		.ds 1	; Overrides whatever spot on the map you entered with something special (see Map_DoEnterViaID)
@@ -760,10 +761,10 @@ PAD_RIGHT	= $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.org $75	; $75-$F3 is available for this context-dependent situation
 
-	Vs_State:		.ds 1	; 2P Vs Mode state
-	Vs_IsPaused:		.ds 1	; If set, 2P Vs is paused
+	;Vs_State:		.ds 1	; 2P Vs Mode state
+	;Vs_IsPaused:		.ds 1	; If set, 2P Vs is paused
 
-				.ds 125	; $77-$F3 unused
+				.ds 127	; $77-$F3 unused
 
 	; ASSEMBLER BOUNDARY CHECK, END OF CONTEXT @ $F4
 .BoundZP_Vs:	BoundCheck .BoundZP_Vs, $F4, Zero Page 2P Vs Context
@@ -2117,9 +2118,9 @@ OBJSTATE_POOFDEATH	= 8	; "Poof" Death (e.g. Piranha death)
 	Random_Pool:		.ds 10	; $0781-$078A (or $0789?) Data pool for pseudo-random number generator algorithm
 RandomN = Random_Pool+1			; Pull a random number from the sequence (NOTE: RandomN+1 is also good; If you need multiple random numbers, call Randomize)
 
-	Map_PlayerLost2PVs:	.ds 1	; When > 0, (1=Mario, 2=Luigi) doesn't lose a life for "death" exiting to map, but does lose their turn
+	;Map_PlayerLost2PVs:	.ds 1	; When > 0, (1=Mario, 2=Luigi) doesn't lose a life for "death" exiting to map, but does lose their turn
 
-				.ds 1	; $078C unused
+				.ds 2	;$078B-$078C unused
 
 	Player_RescuePrincess:	.ds 1	; Player will jump to the princess rescue when Level_ExitToMap is nonzero (instead of map)
 
@@ -2212,8 +2213,10 @@ RandomN = Random_Pool+1			; Pull a random number from the sequence (NOTE: Random
 ; 2P Vs Only
 	.data
 	.org $6800
+	
+						.ds 428
 
-	Vs_MemStart:			; Should be at "top"; this point and 512 bytes forward are cleared at start of 2P Vs
+	;Vs_MemStart:			; Should be at "top"; this point and 512 bytes forward are cleared at start of 2P Vs
 
 	; Vs_PlayerFrame
 	; 0/1: Standing (0) / walking (0/1) / falling-not-jumped (1) frames
@@ -2223,171 +2226,171 @@ RandomN = Random_Pool+1			; Pull a random number from the sequence (NOTE: Random
 	; 5: Kicking
 	; 6: Dying
 	; 7: Climbing
-	Vs_PlayerFrame:		.ds 2	; $6800-$6801 Mario/Luigi Frame
-	Vs_PlayerState:		.ds 2	; $6802-$6803 Mario/Luigi State (0=Init, 1=Normal, 2=Dying, 3=Ladder climbing)
-	Vs_ObjectState:		.ds 12	; $6804-$680F Objects State (0=Dead/empty, 1=Normal, 2=Flipped over, 3=Dying)
-
-				.ds 1	; $6810 unused
-
-	Vs_PlayerBlkHitCnt:	.ds 2	; $6811-$6812 Mario/Luigi Hit block counter value
-	Vs_PlayerY:		.ds 2	; $6813-$6814 Mario/Luigi Y
-	Vs_ObjectsY:		.ds 12	; $6815-$6820 Objects Y
-
-				.ds 1	; $6821 unused
-
-	Vs_PlayerBlkHitY:	.ds 2	; $6822-$6823 Mario/Luigi Aligned Y position where block was hit
-	Vs_PlayerX:		.ds 2	; $6824-$6825 Mario/Luigi X
-	Vs_ObjectsX:		.ds 12	; $6826-$6831 Objects X
-
-				.ds 1	; $6832 unused
-
-	Vs_PlayerBlkHitX:	.ds 2	; $6833-$6834 Mario/Luigi Aligned Y position where block was hit
-	Vs_PlayerYVel:		.ds 2	; $6835-$6836 Mario/Luigi Y Velocity
-	Vs_ObjectYVel:		.ds 12	; $6837-$6842 Objects Y Velocity
-
-				.ds 1	; $6843 unused
-
-	Vs_PlayerBlkHitYVel:	.ds 2	; $6844-$6845 Mario/Luigi Hit block Y velocity
-	Vs_PlayerXVel:		.ds 2	; $6846-$6847 Mario/Luigi X Velocity
-	Vs_ObjectXVel:		.ds 12	; $6848-$6853 Objects X Velocity
-
-				.ds 3	; $6854-$6856 unused
-
-	Vs_PlayerClimbFrame:	.ds 2	; $6857-$6858 incremented as Player climbs
-	Vs_ObjectAnimCnt:	.ds 12	; $6859-$6864 A continuous counter per object for animating (typically 2 frames)
-
-				.ds 1	; $6865 unused
-
-	Vs_PlayerDir:		.ds 2	; $6866-$6867 Mario/Luigi direction (1=Right, 2=Left)
-	Vs_ObjectDir:		.ds 12	; $6868-$6873 Objects direction (1=Right, 2=Left)
-
-				.ds 1	; $6874 unused
-
-	Vs_PlayerYVelFrac:	.ds 2	; $6875-$6876 Mario/Luigi Y velocity fractional accumulator
-	Vs_ObjectYVelFrac:	.ds 12	; $6877-$6882
-
-				.ds 3	; $6883-$6885 unused
-
-	Vs_PlayerXVelFrac:	.ds 2	; $6886-$6887 Mario/Luigi X velocity fractional accumulator
-	Vs_ObjectXVelFrac:	.ds 12	; $6888-$6893
-
-				.ds 3	; $6894-$6896 unused
-
-	Vs_PlayerDetStat:	.ds 2	; $6897-$6898 Mario/Luigi detection status
-	Vs_ObjectDetStat:	.ds 12	; $6899-$68A4 Objects detection status
-
-				.ds 3	; $68A5-$68A7 unused
-
-	Vs_ObjectVar1:		.ds 12	; $68A8-$68B3 General variable 1
-
-				.ds 1	; $68B4 unused
-
-	Vs_PlayerKick:		.ds 2	; $68B5-$68B6 Mario/Luigi Player is kicking until decrements to zero
-	Vs_PlayerDizzy:		.ds 2	; $68B7-$68B8 Mario/Luigi Player "dizzy" face until decrements to zero
-	Vs_PlayerStick:		.ds 2	; $68B9-$68BA Mario/Luigi Mario/Luigi Player "sticking" to ceiling; decrements to zero
-	Vs_PlayerBumpTimer:	.ds 1	; Mario/Luigi Players bumped off eachother (and can't again until zero); decrements to zero
-	Vs_POWBlockCnt:		.ds 1	; POW block counter; decrements to zero; until then, POW shaking!
-
-	; 2P Vs Object IDs
-VSOBJID_SPINY		= 0	; Spiny
-VSOBJID_SIDESTEPPER	= 2	; Sidestepper
-VSOBJID_FIGHTERFLY	= 3	; Fighter Fly
-VSOBJID_FIREBALL_HORZ	= 4	; Horizontal Fireball that spawns to keep Players from hiding down at the bottom
-VSOBJID_FIREBALL_ENDER	= 5	; Game Ender Fireball (bounces around, attempts to kill Players who've stuck around too long!)
-VSOBJID_FIREBALL_FOUNTAIN= 6	; Fountain Fireball
-VSOBJID_COIN		= 7	; Coin (from [?] block)
-VSOBJID_MUSHROOMCARD	= 8	; Mushroom card
-VSOBJID_FLOWERCARD	= 9	; Flower card
-VSOBJID_STARCARD	= 10	; Star card
-VSOBJID_KICKEDBLOCK	= 11	; Kicked block (from [?] block match)
-	Vs_ObjectId:		.ds 12	; $68BD-$68C8 Objects ID
-
-				.ds 1	; $68C9 unused
-
-	Vs_ObjectSprRAMOff:	.ds 1	; Current object Sprite RAM offset
-	Vs_ObjectSprRAMSel:	.ds 1	; Counter that runs $D to $0 (inclusive) and helps distribute Sprite RAM offsets among the objects
-	Vs_EnemyCount:		.ds 1	; Number of spawned enemies (in the typical game)
-	Vs_PlayerHaltTimer:	.ds 2	; $68CD-$68CE Mario/Luigi timer which halts gameplay; decrements to zero
-	Vs_ObjHaltTimer:	.ds 12	; $68CF-$68DA Object timer which halts object when greater than zero; decrements to zero
-
-				.ds 1	; $68DB unused
-
-	Vs_ObjectTimer3:	.ds 12	; $68DC-$68E7
-
-				.ds 1	; $68E8 unused
-
-	Vs_PlayerCnt:		.ds 2	; $68E9-$68EA Mario/Luigi "counter" value; decrements to zero
-	Vs_EnemyGetUpTimer:	.ds 12	; $68EB-$68F6 Timer for flipped-over enemy; decrements to zero
-
-				.ds 1	; $68F7 unused
-
-	Vs_PlayerJumped:	.ds 2	; $68F8-$68F9 Set to 1 if Player jumped; prevents Player from jumping again until they hit floor
-	Vs_PlayerTileL:		.ds 2	; $68FA-$68FB Mario/Luigi Tile detected at Player's feet
-	Vs_ObjectTileL:		.ds 12	; $68FC-$6907
-
-				.ds 2	; $6908-$6909 unused
-
-	Vs_PlayerBlkHit:	.ds 2	; $690A-$690B Mario/Luigi Holds Tile_Mem offset to bounce block they hit
-	Vs_PlayerFlashInv:	.ds 2	; $690C-$690D Mario/Luigi Flashing invicibility (?)
-	Vs_SpawnCnt2:		.ds 1	; FIXME describe better
-	Vs_TooLongCnt:		.ds 1	; Increments after each round of spawning; if it overflows, "game ender" fireballs are spawned 
-	Vs_CurIndex:		.ds 1	; Current index (Player or object)
-	Vs_PlayerTileU:		.ds 2	; $6911-$6912 Mario/Luigi Tile detected above Player's feet
-
-				.ds 13	; $6913-$691F unused
-
-	Vs_ObjectPipeTimer:	.ds 12	; $6920-$692B Timer used for enemies to exit and emerge from pipes; decrements to zero
-
-				.ds 1	; $692C unused
-
-	Vs_Random:		.ds 3	; $692D-$692F Random generator for 2P Vs mode
-	Vs_PlayerCoins:		.ds 2	; $6930-$6931 Player's coins (in 2P Vs); 5 wins the match
-	Vs_TimeToExit:		.ds 1	; Decrements to zero then exits the 2P Vs
-	Vs_ObjectIsLast:	.ds 12	; $6933-$693E Set if this is the last object (turns blue, move fast)
-
-				.ds 1	; $693F unused
-
-	Vs_POWHits:		.ds 1	; Number of times POW block has been hit (disabled on 3)
-	Vs_PlayerYOff:		.ds 2	; $6941-$6942 Mario/Luigi Y offset applied
-	Vs_UNKGAMECnt:		.ds 1	; Unknown "game" counter; after overflow, we exit
-	Vs_PlayerYHi:		.ds 2	; $6944-$6945 Mario/Luigi Y Hi
-	Vs_ObjectYHi:		.ds 12	; $6946-$6951 Object Y Hi
-
-				.ds 3	; $6952-$6954 unused
-	Vs_ObjectIsAngry:	.ds 12	; $6955-$6960 Set when Sidestepper is angry (not used for anything else)
-
-				.ds 1	; $6961 unused
-
-	Vs_AngrySidesteppers:	.ds 1	; When greater than zero, and spawning a Sidestepper, next one is an "angry" Sidestepper (then decrement)
-
-				.ds 1	; $6963 unused
-
-	Vs_ObjectVDir:		.ds 12	; $6964-$696F Objects vertical direction (4=Down, 8=Up)
-
-				.ds 1	; $6970
-
-	Vs_ObjectRestoreXVel:	.ds 12	; $6971-$697C Flipped over object restore X velocity
-
-				.ds 1	; $697D unused
-
-	Vs_ObjTimer2:		.ds 12	; $697E-$6989 Object timer; decrements to zero
-
-				.ds 1	; $698A unused
-
-	Vs_CardFlash:		.ds 2	; $698B-$698C Mario/Luigi Cycles color for card (when picked up from another Player)
-	Vs_HaltTimerBackup:	.ds 15	; $698D-$699B Backs up all halt timers
-	Vs_EnemySet:		.ds 1	; Specifies an index of active enemy set, selecting one of the quintuples from Vs_5EnemySets
-	Vs_ObjectXOff:		.ds 1	; A one-shot X offset for display of object FIXME: When?
-	Vs_PlayerWalkCnt:	.ds 2	; $699E-$699F Mario/Luigi counts up and overflows to toggle walk frames
-	Vs_PlayerWalkFrame:	.ds 2	; $69A0-$69A1 Mario/Luigi incremented when Vs_PlayerWalkCnt overflows
-	Vs_NextObjectIsLast:	.ds 1	; If there are 5 enemies and this is set, next enemy out is the "last" (turns blue, moves fast)
-
-	; Display of "x Up" after getting 3 cards
-	Vs_xUpCnt:		.ds 2	; $69A3-$69A4 Mario/Luigi "x Up" counter
-	Vs_xUpY:		.ds 2	; $69A5-$69A6 Mario/Luigi "x Up" Y pos
-	Vs_xUpX:		.ds 2	; $69A7-$69A8 Mario/Luigi "x Up" X pos
-	Vs_xUpLives:		.ds 2	; $69A9-$69AA Mario/Luigi "x Up" Lives amount (1, 2, 3, 5)
-	Vs_SpawnCnt:		.ds 1	; Spawn counter; increments and triggers spawning
+;	Vs_PlayerFrame:		.ds 2	; $6800-$6801 Mario/Luigi Frame
+;	Vs_PlayerState:		.ds 2	; $6802-$6803 Mario/Luigi State (0=Init, 1=Normal, 2=Dying, 3=Ladder climbing)
+;	Vs_ObjectState:		.ds 12	; $6804-$680F Objects State (0=Dead/empty, 1=Normal, 2=Flipped over, 3=Dying)
+;
+;				.ds 1	; $6810 unused
+;
+;	Vs_PlayerBlkHitCnt:	.ds 2	; $6811-$6812 Mario/Luigi Hit block counter value
+;	Vs_PlayerY:		.ds 2	; $6813-$6814 Mario/Luigi Y
+;	Vs_ObjectsY:		.ds 12	; $6815-$6820 Objects Y
+;
+;				.ds 1	; $6821 unused
+;
+;	Vs_PlayerBlkHitY:	.ds 2	; $6822-$6823 Mario/Luigi Aligned Y position where block was hit
+;	Vs_PlayerX:		.ds 2	; $6824-$6825 Mario/Luigi X
+;	Vs_ObjectsX:		.ds 12	; $6826-$6831 Objects X
+;
+;				.ds 1	; $6832 unused
+;
+;	Vs_PlayerBlkHitX:	.ds 2	; $6833-$6834 Mario/Luigi Aligned Y position where block was hit
+;	Vs_PlayerYVel:		.ds 2	; $6835-$6836 Mario/Luigi Y Velocity
+;	Vs_ObjectYVel:		.ds 12	; $6837-$6842 Objects Y Velocity
+;
+;				.ds 1	; $6843 unused
+;
+;	Vs_PlayerBlkHitYVel:	.ds 2	; $6844-$6845 Mario/Luigi Hit block Y velocity
+;	Vs_PlayerXVel:		.ds 2	; $6846-$6847 Mario/Luigi X Velocity
+;	Vs_ObjectXVel:		.ds 12	; $6848-$6853 Objects X Velocity
+;
+;				.ds 3	; $6854-$6856 unused
+;
+;	Vs_PlayerClimbFrame:	.ds 2	; $6857-$6858 incremented as Player climbs
+;	Vs_ObjectAnimCnt:	.ds 12	; $6859-$6864 A continuous counter per object for animating (typically 2 frames)
+;
+;				.ds 1	; $6865 unused
+;
+;	Vs_PlayerDir:		.ds 2	; $6866-$6867 Mario/Luigi direction (1=Right, 2=Left)
+;	Vs_ObjectDir:		.ds 12	; $6868-$6873 Objects direction (1=Right, 2=Left)
+;
+;				.ds 1	; $6874 unused
+;
+;	Vs_PlayerYVelFrac:	.ds 2	; $6875-$6876 Mario/Luigi Y velocity fractional accumulator
+;	Vs_ObjectYVelFrac:	.ds 12	; $6877-$6882
+;
+;				.ds 3	; $6883-$6885 unused
+;
+;	Vs_PlayerXVelFrac:	.ds 2	; $6886-$6887 Mario/Luigi X velocity fractional accumulator
+;	Vs_ObjectXVelFrac:	.ds 12	; $6888-$6893
+;
+;				.ds 3	; $6894-$6896 unused
+;
+;	Vs_PlayerDetStat:	.ds 2	; $6897-$6898 Mario/Luigi detection status
+;	Vs_ObjectDetStat:	.ds 12	; $6899-$68A4 Objects detection status
+;
+;				.ds 3	; $68A5-$68A7 unused
+;
+;	Vs_ObjectVar1:		.ds 12	; $68A8-$68B3 General variable 1
+;
+;				.ds 1	; $68B4 unused
+;
+;	Vs_PlayerKick:		.ds 2	; $68B5-$68B6 Mario/Luigi Player is kicking until decrements to zero
+;	Vs_PlayerDizzy:		.ds 2	; $68B7-$68B8 Mario/Luigi Player "dizzy" face until decrements to zero
+;	Vs_PlayerStick:		.ds 2	; $68B9-$68BA Mario/Luigi Mario/Luigi Player "sticking" to ceiling; decrements to zero
+;	Vs_PlayerBumpTimer:	.ds 1	; Mario/Luigi Players bumped off eachother (and can't again until zero); decrements to zero
+;	Vs_POWBlockCnt:		.ds 1	; POW block counter; decrements to zero; until then, POW shaking!
+;
+;	; 2P Vs Object IDs
+;VSOBJID_SPINY		= 0	; Spiny
+;VSOBJID_SIDESTEPPER	= 2	; Sidestepper
+;VSOBJID_FIGHTERFLY	= 3	; Fighter Fly
+;VSOBJID_FIREBALL_HORZ	= 4	; Horizontal Fireball that spawns to keep Players from hiding down at the bottom
+;VSOBJID_FIREBALL_ENDER	= 5	; Game Ender Fireball (bounces around, attempts to kill Players who've stuck around too long!)
+;VSOBJID_FIREBALL_FOUNTAIN= 6	; Fountain Fireball
+;VSOBJID_COIN		= 7	; Coin (from [?] block)
+;VSOBJID_MUSHROOMCARD	= 8	; Mushroom card
+;VSOBJID_FLOWERCARD	= 9	; Flower card
+;VSOBJID_STARCARD	= 10	; Star card
+;VSOBJID_KICKEDBLOCK	= 11	; Kicked block (from [?] block match)
+;	Vs_ObjectId:		.ds 12	; $68BD-$68C8 Objects ID
+;
+;				.ds 1	; $68C9 unused
+;
+;	Vs_ObjectSprRAMOff:	.ds 1	; Current object Sprite RAM offset
+;	Vs_ObjectSprRAMSel:	.ds 1	; Counter that runs $D to $0 (inclusive) and helps distribute Sprite RAM offsets among the objects
+;	Vs_EnemyCount:		.ds 1	; Number of spawned enemies (in the typical game)
+;	Vs_PlayerHaltTimer:	.ds 2	; $68CD-$68CE Mario/Luigi timer which halts gameplay; decrements to zero
+;	Vs_ObjHaltTimer:	.ds 12	; $68CF-$68DA Object timer which halts object when greater than zero; decrements to zero
+;
+;				.ds 1	; $68DB unused
+;
+;	Vs_ObjectTimer3:	.ds 12	; $68DC-$68E7
+;
+;				.ds 1	; $68E8 unused
+;
+;	Vs_PlayerCnt:		.ds 2	; $68E9-$68EA Mario/Luigi "counter" value; decrements to zero
+;	Vs_EnemyGetUpTimer:	.ds 12	; $68EB-$68F6 Timer for flipped-over enemy; decrements to zero
+;
+;				.ds 1	; $68F7 unused
+;
+;	Vs_PlayerJumped:	.ds 2	; $68F8-$68F9 Set to 1 if Player jumped; prevents Player from jumping again until they hit floor
+;	Vs_PlayerTileL:		.ds 2	; $68FA-$68FB Mario/Luigi Tile detected at Player's feet
+;	Vs_ObjectTileL:		.ds 12	; $68FC-$6907
+;
+;				.ds 2	; $6908-$6909 unused
+;
+;	Vs_PlayerBlkHit:	.ds 2	; $690A-$690B Mario/Luigi Holds Tile_Mem offset to bounce block they hit
+;	Vs_PlayerFlashInv:	.ds 2	; $690C-$690D Mario/Luigi Flashing invicibility (?)
+;	Vs_SpawnCnt2:		.ds 1	; FIXME describe better
+;	Vs_TooLongCnt:		.ds 1	; Increments after each round of spawning; if it overflows, "game ender" fireballs are spawned 
+;	Vs_CurIndex:		.ds 1	; Current index (Player or object)
+;	Vs_PlayerTileU:		.ds 2	; $6911-$6912 Mario/Luigi Tile detected above Player's feet
+;
+;				.ds 13	; $6913-$691F unused
+;
+;	Vs_ObjectPipeTimer:	.ds 12	; $6920-$692B Timer used for enemies to exit and emerge from pipes; decrements to zero
+;
+;				.ds 1	; $692C unused
+;
+;	Vs_Random:		.ds 3	; $692D-$692F Random generator for 2P Vs mode
+;	Vs_PlayerCoins:		.ds 2	; $6930-$6931 Player's coins (in 2P Vs); 5 wins the match
+;	Vs_TimeToExit:		.ds 1	; Decrements to zero then exits the 2P Vs
+;	Vs_ObjectIsLast:	.ds 12	; $6933-$693E Set if this is the last object (turns blue, move fast)
+;
+;				.ds 1	; $693F unused
+;
+;	Vs_POWHits:		.ds 1	; Number of times POW block has been hit (disabled on 3)
+;	Vs_PlayerYOff:		.ds 2	; $6941-$6942 Mario/Luigi Y offset applied
+;	Vs_UNKGAMECnt:		.ds 1	; Unknown "game" counter; after overflow, we exit
+;	Vs_PlayerYHi:		.ds 2	; $6944-$6945 Mario/Luigi Y Hi
+;	Vs_ObjectYHi:		.ds 12	; $6946-$6951 Object Y Hi
+;
+;				.ds 3	; $6952-$6954 unused
+;	Vs_ObjectIsAngry:	.ds 12	; $6955-$6960 Set when Sidestepper is angry (not used for anything else)
+;
+;				.ds 1	; $6961 unused
+;
+;	Vs_AngrySidesteppers:	.ds 1	; When greater than zero, and spawning a Sidestepper, next one is an "angry" Sidestepper (then decrement)
+;
+;				.ds 1	; $6963 unused
+;
+;	Vs_ObjectVDir:		.ds 12	; $6964-$696F Objects vertical direction (4=Down, 8=Up)
+;
+;				.ds 1	; $6970
+;
+;	Vs_ObjectRestoreXVel:	.ds 12	; $6971-$697C Flipped over object restore X velocity
+;
+;				.ds 1	; $697D unused
+;
+;	Vs_ObjTimer2:		.ds 12	; $697E-$6989 Object timer; decrements to zero
+;
+;				.ds 1	; $698A unused
+;
+;	Vs_CardFlash:		.ds 2	; $698B-$698C Mario/Luigi Cycles color for card (when picked up from another Player)
+;	Vs_HaltTimerBackup:	.ds 15	; $698D-$699B Backs up all halt timers
+;	Vs_EnemySet:		.ds 1	; Specifies an index of active enemy set, selecting one of the quintuples from Vs_5EnemySets
+;	Vs_ObjectXOff:		.ds 1	; A one-shot X offset for display of object FIXME: When?
+;	Vs_PlayerWalkCnt:	.ds 2	; $699E-$699F Mario/Luigi counts up and overflows to toggle walk frames
+;	Vs_PlayerWalkFrame:	.ds 2	; $69A0-$69A1 Mario/Luigi incremented when Vs_PlayerWalkCnt overflows
+;	Vs_NextObjectIsLast:	.ds 1	; If there are 5 enemies and this is set, next enemy out is the "last" (turns blue, moves fast)
+;
+;	; Display of "x Up" after getting 3 cards
+;	Vs_xUpCnt:		.ds 2	; $69A3-$69A4 Mario/Luigi "x Up" counter
+;	Vs_xUpY:		.ds 2	; $69A5-$69A6 Mario/Luigi "x Up" Y pos
+;	Vs_xUpX:		.ds 2	; $69A7-$69A8 Mario/Luigi "x Up" X pos
+;	Vs_xUpLives:		.ds 2	; $69A9-$69AA Mario/Luigi "x Up" Lives amount (1, 2, 3, 5)
+;	Vs_SpawnCnt:		.ds 1	; Spawn counter; increments and triggers spawning
 
 	; ASSEMBLER BOUNDARY CHECK, 2P VS END OF $7950
 .Bound_7950:	BoundCheck .Bound_7950, $7950, 2P VS RAM
@@ -2848,9 +2851,9 @@ MAPOBJ_TOTAL		= $0E	; Total POSSIBLE map objects
 	;  9: Fighter Fly Only 
 	; 10: Sidestepper Only
 	; 11: Ladder and [?] blocks
-	Map_2PVsGame:		.ds 1
+	;Map_2PVsGame:		.ds 1
 
-				.ds 8	; $7F25-$7F2C unused
+				.ds 9	; $7F24-$7F2C unused
 
 	Map_Airship_Dest:	.ds 1	; Airship travel destination; 6 X/Y map coordinates defined per world, after that it just sits still
 	THouse_OpenByID:	.ds 16	; $7F2E-$7F3D UNUSED would keep track of chests opened for a given Toad House ID (THouse_ID)
@@ -4620,29 +4623,29 @@ TILE15_TABLE_LR		= $D3	; Table lower left
 
 ; Tileset 18 (2P Vs)
 ; NOTE: Several tiles 
-TILE18_BLACK		= $02	; Black tile
-
-TILE18_MSTATUS_UL	= $44
-TILE18_STATUS_UM	= $45
-TILE18_MSTATUS_UR	= $46
-TILE18_LSTATUS_UL	= $47
-TILE18_LSTATUS_UR	= $48
-
-TILE18_MSTATUS_LL	= $49
-TILE18_MSTATUS_LML	= $4A
-TILE18_STATUS_LM	= $4B
-TILE18_MSTATUS_LR	= $4C
-TILE18_LSTATUS_LL	= $4D
-TILE18_LSTATUS_LML	= $4E
-TILE18_LSTATUS_LR	= $4F
-
-
-TILE18_BRICKFLOOR	= $50	; Brick floor tiles
-TILE18_DIAMOND		= $51	; NOT USED SMB1-ish diamond blocks
-TILE18_QBLOCK		= $BC
-TILE18_LADDER		= $C0	; Ladder (used in final variation)
-TILE18_BOUNCEBLOCK	= $C1	; Block that bounces when Player hits underneath it
-TILE18_BOUNCEDBLOCK	= $C2	; Temporary tile for when block has been bounced
+;TILE18_BLACK		= $02	; Black tile
+;
+;TILE18_MSTATUS_UL	= $44
+;TILE18_STATUS_UM	= $45
+;TILE18_MSTATUS_UR	= $46
+;TILE18_LSTATUS_UL	= $47
+;TILE18_LSTATUS_UR	= $48
+;
+;TILE18_MSTATUS_LL	= $49
+;TILE18_MSTATUS_LML	= $4A
+;TILE18_STATUS_LM	= $4B
+;TILE18_MSTATUS_LR	= $4C
+;TILE18_LSTATUS_LL	= $4D
+;TILE18_LSTATUS_LML	= $4E
+;TILE18_LSTATUS_LR	= $4F
+;
+;
+;TILE18_BRICKFLOOR	= $50	; Brick floor tiles
+;TILE18_DIAMOND		= $51	; NOT USED SMB1-ish diamond blocks
+;TILE18_QBLOCK		= $BC
+;TILE18_LADDER		= $C0	; Ladder (used in final variation)
+;TILE18_BOUNCEBLOCK	= $C1	; Block that bounces when Player hits underneath it
+;TILE18_BOUNCEDBLOCK	= $C2	; Temporary tile for when block has been bounced
 
 
 

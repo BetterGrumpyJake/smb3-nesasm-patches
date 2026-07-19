@@ -11,374 +11,377 @@
 ; This source file last updated: 2012-01-05 18:11:17.050297840 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
-Tile_Layout_TS18:
-	; This defines the individual 8x8 blocks used to construct one of the tiles
-	; Referenced by Address_Per_Tileset, addressed by Level_Tileset
-	; Stored by upper left, then lower left, then upper right, then lower right
 
-	; Remember that palette is determined by the upper 2 bits of a TILE (not the PATTERN)
-	; I.e. tiles starting at index $00, $40, $80, $C0 are each on that respective palette
-
-	; Upper left 8x8 pattern per tile
-	.byte $FC, $3B, $FF, $CC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
-	.byte $FF, $FF, $BC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
-	.byte $DC, $EC, $EC, $EC, $FF, $FF, $FF, $FF, $FF, $29, $28, $2D, $29, $FF, $2B, $2D ; Tiles $40 - $4F
-	.byte $00, $14, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
-	.byte $50, $40, $52, $42, $BC, $B0, $BE, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $80 - $8F
-	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $90 - $9F
-	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $8C, $8E, $8C ; Tiles $A0 - $AF
-	.byte $8E, $8C, $8E, $8C, $8E, $52, $52, $50, $40, $42, $AC, $AE, $98, $FF, $FF, $FF ; Tiles $B0 - $BF
-	.byte $18, $02, $02, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
-
-	; Lower left 8x8 pattern per tile
-	.byte $FC, $3A, $FF, $CD, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
-	.byte $FF, $FF, $BD, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
-	.byte $DD, $ED, $ED, $ED, $24, $28, $25, $FF, $28, $26, $28, $28, $27, $FF, $28, $28 ; Tiles $40 - $4F
-	.byte $10, $15, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
-	.byte $51, $41, $53, $43, $BD, $B1, $BF, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $80 - $8F
-	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $90 - $9F
-	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $9C, $9E, $9C ; Tiles $A0 - $AF
-	.byte $9E, $9C, $9E, $9C, $9E, $53, $53, $51, $41, $43, $AC, $AE, $99, $FF, $FF, $FF ; Tiles $B0 - $BF
-	.byte $18, $12, $12, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
-
-	; Upper right 8x8 pattern per tile	
-	.byte $FC, $FC, $FF, $CE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
-	.byte $FF, $FF, $BE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
-	.byte $DE, $EE, $EE, $EE, $FF, $FF, $FF, $FF, $FF, $2A, $2D, $2D, $FF, $29, $28, $29 ; Tiles $40 - $4F
-	.byte $01, $16, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
-	.byte $70, $40, $72, $42, $E8, $B0, $EA, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $80 - $8F
-	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $90 - $9F
-	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $8D, $8F, $8D ; Tiles $A0 - $AF
-	.byte $8F, $8D, $8F, $8D, $8F, $72, $72, $70, $40, $42, $AD, $AF, $9A, $FF, $FF, $FF ; Tiles $B0 - $BF
-	.byte $19, $03, $03, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
-
-	; Lower right 8x8 pattern per tile
-	.byte $FC, $FC, $FF, $CF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
-	.byte $FF, $FF, $BF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
-	.byte $DF, $EF, $EF, $EF, $28, $28, $FF, $24, $25, $28, $28, $28, $FF, $26, $28, $27 ; Tiles $40 - $4F
-	.byte $11, $17, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
-	.byte $71, $41, $73, $43, $E9, $B1, $EB, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $80 - $8F
-	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $90 - $9F
-	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $9D, $9F, $9D ; Tiles $A0 - $AF
-	.byte $9F, $9D, $9F, $9D, $9F, $73, $73, $71, $41, $43, $AD, $AF, $9B, $FF, $FF, $FF ; Tiles $B0 - $BF
-	.byte $19, $13, $13, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
-
-Tile_Attributes_TS18:
-	.byte $32, $50, $AD, $C1, $32, $50, $AD, $C1
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; LevelLoad_TS18
+	;free space, lots
+	.ds 1556
+;Tile_Layout_TS18:
+;	; This defines the individual 8x8 blocks used to construct one of the tiles
+;	; Referenced by Address_Per_Tileset, addressed by Level_Tileset
+;	; Stored by upper left, then lower left, then upper right, then lower right
 ;
-; Entry point for loading level layout data for Level_Tileset = 18
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-LevelLoad_TS18:
-	; Clear tiles to black
-	LDY #$00	 ; Y = 0
-PRG014_C40A:
-	LDA #TILE18_BLACK
-	JSR Tile_Mem_ClearB
-	JSR Tile_Mem_ClearA
-
-	CPY #$f0
-	BNE PRG014_C40A
-
-	; Set the brick foor
-	LDY #$d0	 ; Y = $D0
-PRG014_C418:
-	LDA #TILE18_BRICKFLOOR
-	JSR Tile_Mem_ClearA
-
-	CPY #$f0
-	BNE PRG014_C418
-
-	JMP LevelLoad	; Begin actual level loading!
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; LoadLevel_Generator_TS18
+;	; Remember that palette is determined by the upper 2 bits of a TILE (not the PATTERN)
+;	; I.e. tiles starting at index $00, $40, $80, $C0 are each on that respective palette
 ;
-; Based on the values in Temp_Var15 and LL_ShapeDef, chooses an
-; appropriate generator function to builds this piece of the
-; level.  Tedious, but saves space and is paper-design friendly.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-PRG014_C424:
-	.byte 0, 15, 30, 45, 60, 75, 90, 105
-
-LoadLevel_Generator_TS18:
-	LDA <Temp_Var15
-	AND #%11100000
-	LSR A		
-	LSR A		
-	LSR A		
-	LSR A		
-	LSR A		
-	TAX		 	; X = upper 3 bits of Temp_Var15 (0-7) (selects a multiple of 15 as the base)
-
-	LDA LL_ShapeDef
-	LSR A	
-	LSR A	
-	LSR A	
-	LSR A			; A = upper 4 bits of LL_ShapeDef shifted down
-	ADD PRG014_C424,X	; Add multiple of 15
-	TAX
-	DEX
-	TXA		 ; A = ((LL_ShapeDef >> 4) + PRG023_A419[X]) - 1
-
-	; PRG014_C424 provides values reserved for expansion...
-
-	JSR DynJump
-
-	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
-	.word LoadLevel_VsBrickTiles	;  0 - Place a run of brick tiles
-	.word LoadLevel_VsBounceBlocks	;  1 - Place a run of bounce block tiles
-	.word LoadLevel_VsDiamondBlocks	;  2 - Place a run of [UNUSED] SMB1-ish diamond tiles
-	.word LoadLevel_VsCoins		;  3 - UNUSED; Places regular SMB3 coins and employs the coin tracking (Level_BlockGrabHitMem)
-	.word LoadLevel_VsLadder	;  4 - Place a vertical run of ladder tiles
-	.word $0000	;  5 - N/A
-	.word $0000	;  6 - N/A
-	.word $0000	;  7 - N/A
-	.word $0000	;  8 - N/A
-	.word $0000	;  9 - N/A
-	.word $0000	; 10 - N/A
-	.word $0000	; 11 - N/A
-	.word $0000	; 12 - N/A
-	.word $0000	; 13 - N/A
-	.word $0000	; 14 - N/A
-	.word $0000	; 15 - N/A
-	.word $0000	; 16 - N/A
-	.word $0000	; 17 - N/A
-	.word $0000	; 18 - N/A
-	.word $0000	; 19 - N/A
-	.word $0000	; 20 - N/A
-	.word $0000	; 21 - N/A
-	.word $0000	; 22 - N/A
-	.word $0000	; 23 - N/A
-
-	; NOTE: These are stock, I'm not sure which are used or which work correctly.
-	; Of course, little 2P Vs Mario/Luigi don't have code to actually use these
-	; like the pipes they represent...
-	.word LoadLevel_VGroundPipeRun		; 24 - Vertical ground pipe 1 (alt level)
-	.word LoadLevel_VGroundPipeRun		; 25 - Vertical ground pipe 2 (Big [?] area)
-	.word LoadLevel_VGroundPipeRun		; 26 - Vertical ground pipe 3 (no entrance)
-	.word LoadLevel_VCeilingPipeRun		; 27 - Vertical ceiling pipe 1 (alt level)
-	.word LoadLevel_VCeilingPipeRun		; 28 - Vertical ceiling pipe 2 (no entrance)
-	.word LoadLevel_HRightWallPipeRun	; 29 - Horizontal right-hand wall pipe (alt level)
-	.word LoadLevel_HRightWallPipeRun	; 30 - Horizontal right-hand wall pipe (no entrance)
-	.word LoadLevel_HLeftWallPipeRun	; 31 - Horizontal left-hand wall pipe (alt level)
-	.word LoadLevel_HLeftWallPipeRun	; 32 - Horizontal left-hand wall pipe (no entrance)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; LeveLoad_FixedSizeGen_TS18
+;	; Upper left 8x8 pattern per tile
+;	.byte $FC, $3B, $FF, $CC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
+;	.byte $FF, $FF, $BC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
+;	.byte $DC, $EC, $EC, $EC, $FF, $FF, $FF, $FF, $FF, $29, $28, $2D, $29, $FF, $2B, $2D ; Tiles $40 - $4F
+;	.byte $00, $14, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
+;	.byte $50, $40, $52, $42, $BC, $B0, $BE, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $80 - $8F
+;	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $90 - $9F
+;	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $8C, $8E, $8C ; Tiles $A0 - $AF
+;	.byte $8E, $8C, $8E, $8C, $8E, $52, $52, $50, $40, $42, $AC, $AE, $98, $FF, $FF, $FF ; Tiles $B0 - $BF
+;	.byte $18, $02, $02, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 ;
-; Much simpler generators that are fixed-size, commonly used for 
-; just single tile placement styles (although a couple relatively 
-; complex ones exist in here as well)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-LeveLoad_FixedSizeGen_TS18:
-	; It is verified before calling this function that all of
-	; the upper 4 bits of LL_ShapeDef are ZERO
-
-	; So the upper 3 bits of Temp_Var15 serve as the most significant bits
-	; to a value where LL_ShapeDef provide the 4 least significant bits
-
-	LDA <Temp_Var15
-	AND #%11100000
-	LSR A		
-	ADD LL_ShapeDef	
-	TAX		 	; Resultant index is put into 'X'
-	JSR DynJump	 
-
-	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
-	.word LoadLevel_VsLeftPipes	;  0 - Left side of screen pipes that appear in the "typical" levels
-	.word LoadLevel_VsRightPipes	;  1 - Right side of screen pipes that appear in the "typical" levels
-	.word LoadLevel_VsQBlock	;  2 - [?] block from the ladder climbing game
-	.word LoadLevel_VsStatusBar	;  3 - Tiles that make up the status bar
-
-Vs_Battlefields:
-	.word Vs_BattlefieldTypical	;  0: Spiny Only
-	.word Vs_BattlefieldTypical	;  1: Fighter Fly Only
-	.word Vs_BattlefieldTypical	;  2: Spiny and Fighter Fly
-	.word Vs_BattlefieldTypical	;  3: Static coins
-	.word Vs_BattlefieldTypical	;  4: Spiny and Sidestepper
-	.word Vs_BattlefieldTypical	;  5: Fighter Fly and Sidestepper
-	.word Vs_BattlefieldTypical	;  6: Sidestepper Only
-	.word Vs_BattlefieldFountain	;  7: Coin Fountain
-	.word Vs_BattlefieldTypical	;  8: Spiny Only
-	.word Vs_BattlefieldTypical	;  9: Fighter Fly Only 
-	.word Vs_BattlefieldTypical	; 10: Sidestepper Only
-	.word Vs_BattlefieldLadders	; 11: Ladder and [?] blocks
-
-
-	; Broken into another file for ease of integration in NoDice editor
-	.include "PRG/levels/2PVs.asm"
-
-
-LoadLevel_VsBrickTiles:
-	LDX #$00	; X = 0 (place brick tiles)
-	JMP PRG014_C580	 ; Jump to PRG014_C580
-
-LoadLevel_VsBounceBlocks:
-	LDX #$01	; X = 1 (place bounce block tiles)
-	JMP PRG014_C580	 ; Jump to PRG014_C580
-
-PRG014_C57B:
-	.byte TILE18_BRICKFLOOR, TILE18_BOUNCEBLOCK, TILE18_DIAMOND
-
-LoadLevel_VsDiamondBlocks:
-	LDX #$02	; X = 2 (place SMB1-ish diamond tiles)
-
-PRG014_C580:
-
-	; Temp_Var1 = run length of tiles
-	LDA LL_ShapeDef
-	AND #$0f
-	STA <Temp_Var1
-
-	LDY TileAddr_Off	 ; Y = TileAddr_Off
-PRG014_C58A:
-	LDA PRG014_C57B,X	 ; Get tile
-	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
-
-	INY		 ; Y++ (next column)
-
-	DEC <Temp_Var1	 ; Temp_Var1--
-	BPL PRG014_C58A	 ; While Temp_Var1 >= 0, loop
-
-	RTS		 ; Return
-
-
-LoadLevel_VsLadder:
-	; Run -> 'X'
-	LDA LL_ShapeDef
-	AND #$0f
-	TAX
-
-	LDY TileAddr_Off	 ; Y = TileAddr_Off
-PRG014_C59E:
-	LDA #TILE18_LADDER
-	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
-
-	; +16 bytes to next row
-	TYA
-	ADD #16
-	TAY
-
-	DEX		 ; X--
-	BPL PRG014_C59E	 ; While X >= 0, loop
-
-	RTS		 ; Return
-
-LoadLevel_VsLeftPipes:
-	LDX #$00	 ; X = 0 (left pipe offset)
-	JMP PRG014_C5BA	 ; Jump to PRG014_C5BA
-
-PRG014_C5B0:
-	; Left pipe
-	.byte $81, $80
-	.byte $83, $82
-
-	; Right pipe
-	.byte $80, $81
-	.byte $82, $83
-
-LoadLevel_VsRightPipes:
-	LDX #$04	 ; X = 4 (right pipe offset)
-
-PRG014_C5BA:
-	LDY TileAddr_Off	 ; Y = TileAddr_Off
-PRG014_C5BD:
-	LDA PRG014_C5B0,X	 ; PRG014_C5BD 
-	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
-
-	INY		 ; Y++ (next column)
-	INX		 ; X++ (next tile)
-
-	TXA
-	AND #$01
-	BNE PRG014_C5BD	 ; Every other tile, jump to PRG014_C5BD
-
-	LDA TileAddr_Off
-	ADD #16		; +16 to next row
-	TAY		 ; -> 'Y'
-
-	TXA
-	AND #$03
-	BNE PRG014_C5BD	 ; If haven't done 4 tiles yet, jump to PRG014_C5BD
-
-	RTS		 ; Return
-
-LoadLevel_VsQBlock:
-	LDY TileAddr_Off	 ; Y = TileAddr_Off
-
-	LDA #TILE18_QBLOCK
-	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
-
-	RTS		 ; Return
-
-Vs_StatusBarTiles:
-	.byte TILE18_MSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_MSTATUS_UR, TILE18_LSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_LSTATUS_UR
-	.byte TILE18_MSTATUS_LL, TILE18_MSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_MSTATUS_LR, TILE18_LSTATUS_LL, TILE18_LSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_LSTATUS_LR
-Vs_StatusBarTiles_End
-
-LoadLevel_VsStatusBar:
-	LDX #$00		; X = 0
-
-PRG014_C5F4:
-	LDY TileAddr_Off	; Y = TileAddr_Off
-
-	; Temp_Var1 = tiles per row - 1
-	LDA #(((Vs_StatusBarTiles_End - Vs_StatusBarTiles) / 2) - 1)
-	STA <Temp_Var1
-
-PRG014_C5FB:
-	LDA Vs_StatusBarTiles,X
-	STA [Map_Tile_AddrL],Y
-
-	INY		 ; Y++
-	INX		 ; X++
-
-	DEC <Temp_Var1	 ; Temp_Var1--
-	BPL PRG014_C5FB	 ; While Temp_Var1 >= 0, loop
-
-	; Go to next row
-	LDA TileAddr_Off
-	ADD #16
-	STA TileAddr_Off
-
-	CPX #(Vs_StatusBarTiles_End - Vs_StatusBarTiles)
-	BNE PRG014_C5F4	 ; If we have another row to do, loop!
-
-	RTS		 ; Return
+;	; Lower left 8x8 pattern per tile
+;	.byte $FC, $3A, $FF, $CD, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
+;	.byte $FF, $FF, $BD, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
+;	.byte $DD, $ED, $ED, $ED, $24, $28, $25, $FF, $28, $26, $28, $28, $27, $FF, $28, $28 ; Tiles $40 - $4F
+;	.byte $10, $15, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
+;	.byte $51, $41, $53, $43, $BD, $B1, $BF, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $80 - $8F
+;	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $90 - $9F
+;	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $9C, $9E, $9C ; Tiles $A0 - $AF
+;	.byte $9E, $9C, $9E, $9C, $9E, $53, $53, $51, $41, $43, $AC, $AE, $99, $FF, $FF, $FF ; Tiles $B0 - $BF
+;	.byte $18, $12, $12, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
+;
+;	; Upper right 8x8 pattern per tile	
+;	.byte $FC, $FC, $FF, $CE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
+;	.byte $FF, $FF, $BE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
+;	.byte $DE, $EE, $EE, $EE, $FF, $FF, $FF, $FF, $FF, $2A, $2D, $2D, $FF, $29, $28, $29 ; Tiles $40 - $4F
+;	.byte $01, $16, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
+;	.byte $70, $40, $72, $42, $E8, $B0, $EA, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $80 - $8F
+;	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2 ; Tiles $90 - $9F
+;	.byte $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $B2, $8D, $8F, $8D ; Tiles $A0 - $AF
+;	.byte $8F, $8D, $8F, $8D, $8F, $72, $72, $70, $40, $42, $AD, $AF, $9A, $FF, $FF, $FF ; Tiles $B0 - $BF
+;	.byte $19, $03, $03, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
+;
+;	; Lower right 8x8 pattern per tile
+;	.byte $FC, $FC, $FF, $CF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $00 - $0F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $20 - $2F
+;	.byte $FF, $FF, $BF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
+;	.byte $DF, $EF, $EF, $EF, $28, $28, $FF, $24, $25, $28, $28, $28, $FF, $26, $28, $27 ; Tiles $40 - $4F
+;	.byte $11, $17, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $50 - $5F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $60 - $6F
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $70 - $7F
+;	.byte $71, $41, $73, $43, $E9, $B1, $EB, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $80 - $8F
+;	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3 ; Tiles $90 - $9F
+;	.byte $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $B3, $9D, $9F, $9D ; Tiles $A0 - $AF
+;	.byte $9F, $9D, $9F, $9D, $9F, $73, $73, $71, $41, $43, $AD, $AF, $9B, $FF, $FF, $FF ; Tiles $B0 - $BF
+;	.byte $19, $13, $13, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $C0 - $CF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $D0 - $DF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $E0 - $EF
+;	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
+;
+;Tile_Attributes_TS18:
+;	.byte $32, $50, $AD, $C1, $32, $50, $AD, $C1
+;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LevelLoad_TS18
+;;
+;; Entry point for loading level layout data for Level_Tileset = 18
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;LevelLoad_TS18:
+;	; Clear tiles to black
+;	LDY #$00	 ; Y = 0
+;PRG014_C40A:
+;	LDA #TILE18_BLACK
+;	JSR Tile_Mem_ClearB
+;	JSR Tile_Mem_ClearA
+;
+;	CPY #$f0
+;	BNE PRG014_C40A
+;
+;	; Set the brick foor
+;	LDY #$d0	 ; Y = $D0
+;PRG014_C418:
+;	LDA #TILE18_BRICKFLOOR
+;	JSR Tile_Mem_ClearA
+;
+;	CPY #$f0
+;	BNE PRG014_C418
+;
+;	JMP LevelLoad	; Begin actual level loading!
+;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LoadLevel_Generator_TS18
+;;
+;; Based on the values in Temp_Var15 and LL_ShapeDef, chooses an
+;; appropriate generator function to builds this piece of the
+;; level.  Tedious, but saves space and is paper-design friendly.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;PRG014_C424:
+;	.byte 0, 15, 30, 45, 60, 75, 90, 105
+;
+;LoadLevel_Generator_TS18:
+;	LDA <Temp_Var15
+;	AND #%11100000
+;	LSR A		
+;	LSR A		
+;	LSR A		
+;	LSR A		
+;	LSR A		
+;	TAX		 	; X = upper 3 bits of Temp_Var15 (0-7) (selects a multiple of 15 as the base)
+;
+;	LDA LL_ShapeDef
+;	LSR A	
+;	LSR A	
+;	LSR A	
+;	LSR A			; A = upper 4 bits of LL_ShapeDef shifted down
+;	ADD PRG014_C424,X	; Add multiple of 15
+;	TAX
+;	DEX
+;	TXA		 ; A = ((LL_ShapeDef >> 4) + PRG023_A419[X]) - 1
+;
+;	; PRG014_C424 provides values reserved for expansion...
+;
+;	JSR DynJump
+;
+;	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
+;	.word LoadLevel_VsBrickTiles	;  0 - Place a run of brick tiles
+;	.word LoadLevel_VsBounceBlocks	;  1 - Place a run of bounce block tiles
+;	.word LoadLevel_VsDiamondBlocks	;  2 - Place a run of [UNUSED] SMB1-ish diamond tiles
+;	.word LoadLevel_VsCoins		;  3 - UNUSED; Places regular SMB3 coins and employs the coin tracking (Level_BlockGrabHitMem)
+;	.word LoadLevel_VsLadder	;  4 - Place a vertical run of ladder tiles
+;	.word $0000	;  5 - N/A
+;	.word $0000	;  6 - N/A
+;	.word $0000	;  7 - N/A
+;	.word $0000	;  8 - N/A
+;	.word $0000	;  9 - N/A
+;	.word $0000	; 10 - N/A
+;	.word $0000	; 11 - N/A
+;	.word $0000	; 12 - N/A
+;	.word $0000	; 13 - N/A
+;	.word $0000	; 14 - N/A
+;	.word $0000	; 15 - N/A
+;	.word $0000	; 16 - N/A
+;	.word $0000	; 17 - N/A
+;	.word $0000	; 18 - N/A
+;	.word $0000	; 19 - N/A
+;	.word $0000	; 20 - N/A
+;	.word $0000	; 21 - N/A
+;	.word $0000	; 22 - N/A
+;	.word $0000	; 23 - N/A
+;
+;	; NOTE: These are stock, I'm not sure which are used or which work correctly.
+;	; Of course, little 2P Vs Mario/Luigi don't have code to actually use these
+;	; like the pipes they represent...
+;	.word LoadLevel_VGroundPipeRun		; 24 - Vertical ground pipe 1 (alt level)
+;	.word LoadLevel_VGroundPipeRun		; 25 - Vertical ground pipe 2 (Big [?] area)
+;	.word LoadLevel_VGroundPipeRun		; 26 - Vertical ground pipe 3 (no entrance)
+;	.word LoadLevel_VCeilingPipeRun		; 27 - Vertical ceiling pipe 1 (alt level)
+;	.word LoadLevel_VCeilingPipeRun		; 28 - Vertical ceiling pipe 2 (no entrance)
+;	.word LoadLevel_HRightWallPipeRun	; 29 - Horizontal right-hand wall pipe (alt level)
+;	.word LoadLevel_HRightWallPipeRun	; 30 - Horizontal right-hand wall pipe (no entrance)
+;	.word LoadLevel_HLeftWallPipeRun	; 31 - Horizontal left-hand wall pipe (alt level)
+;	.word LoadLevel_HLeftWallPipeRun	; 32 - Horizontal left-hand wall pipe (no entrance)
+;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LeveLoad_FixedSizeGen_TS18
+;;
+;; Much simpler generators that are fixed-size, commonly used for 
+;; just single tile placement styles (although a couple relatively 
+;; complex ones exist in here as well)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;LeveLoad_FixedSizeGen_TS18:
+;	; It is verified before calling this function that all of
+;	; the upper 4 bits of LL_ShapeDef are ZERO
+;
+;	; So the upper 3 bits of Temp_Var15 serve as the most significant bits
+;	; to a value where LL_ShapeDef provide the 4 least significant bits
+;
+;	LDA <Temp_Var15
+;	AND #%11100000
+;	LSR A		
+;	ADD LL_ShapeDef	
+;	TAX		 	; Resultant index is put into 'X'
+;	JSR DynJump	 
+;
+;	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
+;	.word LoadLevel_VsLeftPipes	;  0 - Left side of screen pipes that appear in the "typical" levels
+;	.word LoadLevel_VsRightPipes	;  1 - Right side of screen pipes that appear in the "typical" levels
+;	.word LoadLevel_VsQBlock	;  2 - [?] block from the ladder climbing game
+;	.word LoadLevel_VsStatusBar	;  3 - Tiles that make up the status bar
+;
+;Vs_Battlefields:
+;	.word Vs_BattlefieldTypical	;  0: Spiny Only
+;	.word Vs_BattlefieldTypical	;  1: Fighter Fly Only
+;	.word Vs_BattlefieldTypical	;  2: Spiny and Fighter Fly
+;	.word Vs_BattlefieldTypical	;  3: Static coins
+;	.word Vs_BattlefieldTypical	;  4: Spiny and Sidestepper
+;	.word Vs_BattlefieldTypical	;  5: Fighter Fly and Sidestepper
+;	.word Vs_BattlefieldTypical	;  6: Sidestepper Only
+;	.word Vs_BattlefieldFountain	;  7: Coin Fountain
+;	.word Vs_BattlefieldTypical	;  8: Spiny Only
+;	.word Vs_BattlefieldTypical	;  9: Fighter Fly Only 
+;	.word Vs_BattlefieldTypical	; 10: Sidestepper Only
+;	.word Vs_BattlefieldLadders	; 11: Ladder and [?] blocks
+;
+;
+;	; Broken into another file for ease of integration in NoDice editor
+;	.include "PRG/levels/2PVs.asm"
+;
+;
+;LoadLevel_VsBrickTiles:
+;	LDX #$00	; X = 0 (place brick tiles)
+;	JMP PRG014_C580	 ; Jump to PRG014_C580
+;
+;LoadLevel_VsBounceBlocks:
+;	LDX #$01	; X = 1 (place bounce block tiles)
+;	JMP PRG014_C580	 ; Jump to PRG014_C580
+;
+;PRG014_C57B:
+;	.byte TILE18_BRICKFLOOR, TILE18_BOUNCEBLOCK, TILE18_DIAMOND
+;
+;LoadLevel_VsDiamondBlocks:
+;	LDX #$02	; X = 2 (place SMB1-ish diamond tiles)
+;
+;PRG014_C580:
+;
+;	; Temp_Var1 = run length of tiles
+;	LDA LL_ShapeDef
+;	AND #$0f
+;	STA <Temp_Var1
+;
+;	LDY TileAddr_Off	 ; Y = TileAddr_Off
+;PRG014_C58A:
+;	LDA PRG014_C57B,X	 ; Get tile
+;	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
+;
+;	INY		 ; Y++ (next column)
+;
+;	DEC <Temp_Var1	 ; Temp_Var1--
+;	BPL PRG014_C58A	 ; While Temp_Var1 >= 0, loop
+;
+;	RTS		 ; Return
+;
+;
+;LoadLevel_VsLadder:
+;	; Run -> 'X'
+;	LDA LL_ShapeDef
+;	AND #$0f
+;	TAX
+;
+;	LDY TileAddr_Off	 ; Y = TileAddr_Off
+;PRG014_C59E:
+;	LDA #TILE18_LADDER
+;	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
+;
+;	; +16 bytes to next row
+;	TYA
+;	ADD #16
+;	TAY
+;
+;	DEX		 ; X--
+;	BPL PRG014_C59E	 ; While X >= 0, loop
+;
+;	RTS		 ; Return
+;
+;LoadLevel_VsLeftPipes:
+;	LDX #$00	 ; X = 0 (left pipe offset)
+;	JMP PRG014_C5BA	 ; Jump to PRG014_C5BA
+;
+;PRG014_C5B0:
+;	; Left pipe
+;	.byte $81, $80
+;	.byte $83, $82
+;
+;	; Right pipe
+;	.byte $80, $81
+;	.byte $82, $83
+;
+;LoadLevel_VsRightPipes:
+;	LDX #$04	 ; X = 4 (right pipe offset)
+;
+;PRG014_C5BA:
+;	LDY TileAddr_Off	 ; Y = TileAddr_Off
+;PRG014_C5BD:
+;	LDA PRG014_C5B0,X	 ; PRG014_C5BD 
+;	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
+;
+;	INY		 ; Y++ (next column)
+;	INX		 ; X++ (next tile)
+;
+;	TXA
+;	AND #$01
+;	BNE PRG014_C5BD	 ; Every other tile, jump to PRG014_C5BD
+;
+;	LDA TileAddr_Off
+;	ADD #16		; +16 to next row
+;	TAY		 ; -> 'Y'
+;
+;	TXA
+;	AND #$03
+;	BNE PRG014_C5BD	 ; If haven't done 4 tiles yet, jump to PRG014_C5BD
+;
+;	RTS		 ; Return
+;
+;LoadLevel_VsQBlock:
+;	LDY TileAddr_Off	 ; Y = TileAddr_Off
+;
+;	LDA #TILE18_QBLOCK
+;	STA [Map_Tile_AddrL],Y	 ; Store into tile mem
+;
+;	RTS		 ; Return
+;
+;Vs_StatusBarTiles:
+;	.byte TILE18_MSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_MSTATUS_UR, TILE18_LSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_LSTATUS_UR
+;	.byte TILE18_MSTATUS_LL, TILE18_MSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_MSTATUS_LR, TILE18_LSTATUS_LL, TILE18_LSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_LSTATUS_LR
+;Vs_StatusBarTiles_End
+;
+;LoadLevel_VsStatusBar:
+;	LDX #$00		; X = 0
+;
+;PRG014_C5F4:
+;	LDY TileAddr_Off	; Y = TileAddr_Off
+;
+;	; Temp_Var1 = tiles per row - 1
+;	LDA #(((Vs_StatusBarTiles_End - Vs_StatusBarTiles) / 2) - 1)
+;	STA <Temp_Var1
+;
+;PRG014_C5FB:
+;	LDA Vs_StatusBarTiles,X
+;	STA [Map_Tile_AddrL],Y
+;
+;	INY		 ; Y++
+;	INX		 ; X++
+;
+;	DEC <Temp_Var1	 ; Temp_Var1--
+;	BPL PRG014_C5FB	 ; While Temp_Var1 >= 0, loop
+;
+;	; Go to next row
+;	LDA TileAddr_Off
+;	ADD #16
+;	STA TileAddr_Off
+;
+;	CPX #(Vs_StatusBarTiles_End - Vs_StatusBarTiles)
+;	BNE PRG014_C5F4	 ; If we have another row to do, loop!
+;
+;	RTS		 ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LoadLevel_Door1

@@ -2723,29 +2723,33 @@ PRG010_CE78:
 	ORA <Controller2Press
 	AND #$80	 
 	BEQ PRG010_CEE1		; If neither of the two players are pressing the 'A' button jump to PRG010_CEE1
+	BNE PRG010_CEBF
 
-	LDX Player_Current	; X = Player_Current
-	TXA		 
-	EOR #$01	 	
-	TAY		 	; Y = Player_Current ^ 1 (i.e. the OTHER Player)
+;	LDX Player_Current	; X = Player_Current
+;	TXA		 
+;	EOR #$01	 	
+;	TAY		 	; Y = Player_Current ^ 1 (i.e. the OTHER Player)
+;
+;	LDA Player_Lives,Y
+;	CMP #$ff	 
+;	BEQ PRG010_CEBF	 	; If the other Player is dead, jump to PRG010_CEBF
+;
+;	; Basically if Player 1 and 2 are not standing on top of eachother when one of them pushed A, jump to PRG010_CEBF
+;	LDA <World_Map_XHi,X
+;	CMP World_Map_XHi,Y
+;	BNE PRG010_CEBF	
+;	LDA <World_Map_Y,X
+;	CMP World_Map_Y,Y
+;	BNE PRG010_CEBF	
+;	LDA <World_Map_X,X
+;	CMP World_Map_X,Y
+;	BNE PRG010_CEBF	
+;
+;	LDA #$12
+;	STA <Map_Enter2PFlag	; Map_Enter2PFlag = $12 (enterint 2P Vs)
 
-	LDA Player_Lives,Y
-	CMP #$ff	 
-	BEQ PRG010_CEBF	 	; If the other Player is dead, jump to PRG010_CEBF
-
-	; Basically if Player 1 and 2 are not standing on top of eachother when one of them pushed A, jump to PRG010_CEBF
-	LDA <World_Map_XHi,X
-	CMP World_Map_XHi,Y
-	BNE PRG010_CEBF	
-	LDA <World_Map_Y,X
-	CMP World_Map_Y,Y
-	BNE PRG010_CEBF	
-	LDA <World_Map_X,X
-	CMP World_Map_X,Y
-	BNE PRG010_CEBF	
-
-	LDA #$12
-	STA <Map_Enter2PFlag	; Map_Enter2PFlag = $12 (enterint 2P Vs)
+	;free space
+	.ds 37
 
 PRG010_CEA7:
 	LDA #$10

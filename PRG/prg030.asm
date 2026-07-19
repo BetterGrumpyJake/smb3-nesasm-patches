@@ -396,7 +396,8 @@ ClearPattern_ByTileset:
 	.byte $FF	; 15 - bonus game intro
 	.byte $FF	; 16 - spade game sliders
 	.byte $FF	; 17 - N-spade
-	.byte $FC	; 18 - 2P Vs
+	;.byte $FC	; 18 - 2P Vs
+	NOP
 
 
 	.byte $AB, $83, $C6, $83, $CD, $83
@@ -1055,7 +1056,10 @@ PRG030_87A9:
 
 	LDA #$00
 	STA Map_Operation		; Map_Operation = 0
-	STA Map_PlayerLost2PVs	; Clear Map_PlayerLost2PVs
+	;STA Map_PlayerLost2PVs	; Clear Map_PlayerLost2PVs
+	NOP
+	NOP
+	NOP
 
 	JMP PRG030_84D7	 	; Jump to PRG030_84D7 (partial loop)
 
@@ -1273,38 +1277,41 @@ PRG030_88E9:
 
 	STA [Temp_Var1],Y	; And address $00 is cleared too (though this is technically unnecessary)
 
-	LDA <Map_Enter2PFlag
-	BEQ PRG030_891A	 	; If not entering 2P Vs mode, jump to PRG030_891A
+;	LDA <Map_Enter2PFlag
+;	BEQ PRG030_891A	 	; If not entering 2P Vs mode, jump to PRG030_891A
+;
+;	; 2P Vs mode begin!
+;
+;	; Level_Tileset = 18 (2P Vs)
+;	LDA #18
+;	STA Level_Tileset
+;
+;	JSR SetPages_ByTileset
+;
+;	INC Map_2PVsGame	; Map_2PVsGame++ (play next game style)
+;
+;	LDA Map_2PVsGame
+;	CMP #12
+;	BNE PRG030_890B	 ; If Map_2PVsGame <> 12 (overflow), jump to PRG030_890B
+;
+;	; Otherwise, restart count
+;	LDA #$00
+;	STA Map_2PVsGame
+;
+;PRG030_890B:
+;	ASL A	; Multiply game style by 2
+;	TAX	; -> 'X'
+;
+;	; Load address to battlefield level data
+;	LDA Vs_Battlefields,X
+;	STA <Level_LayPtr_AddrL
+;	LDA Vs_Battlefields+1,X
+;	STA <Level_LayPtr_AddrH
+;
+;	JMP PRG030_892A	 ; Jump to PRG030_892A
 
-	; 2P Vs mode begin!
-
-	; Level_Tileset = 18 (2P Vs)
-	LDA #18
-	STA Level_Tileset
-
-	JSR SetPages_ByTileset
-
-	INC Map_2PVsGame	; Map_2PVsGame++ (play next game style)
-
-	LDA Map_2PVsGame
-	CMP #12
-	BNE PRG030_890B	 ; If Map_2PVsGame <> 12 (overflow), jump to PRG030_890B
-
-	; Otherwise, restart count
-	LDA #$00
-	STA Map_2PVsGame
-
-PRG030_890B:
-	ASL A	; Multiply game style by 2
-	TAX	; -> 'X'
-
-	; Load address to battlefield level data
-	LDA Vs_Battlefields,X
-	STA <Level_LayPtr_AddrL
-	LDA Vs_Battlefields+1,X
-	STA <Level_LayPtr_AddrH
-
-	JMP PRG030_892A	 ; Jump to PRG030_892A
+	;free space
+	.ds 42
 
 PRG030_891A:
 
@@ -1633,10 +1640,14 @@ PRG030_8AC0:
 	JMP PRG030_8FA1	 ; Jump to PRG030_8FA1
 
 PRG030_8AE0:
-	CMP #18
-	BNE PRG030_8AE7	 ; If Level_Tileset <> 18 (2P Vs), jump to PRG030_8AE7
+	;CMP #18
+	;BNE PRG030_8AE7	 ; If Level_Tileset <> 18 (2P Vs), jump to PRG030_8AE7
 
 	;JMP Do_2PVsChallenge	 ; Jump Do_2PVsChallenge
+	NOP
+	NOP
+	NOP
+	NOP
 	NOP
 	NOP
 	NOP
@@ -2827,11 +2838,16 @@ PRG030_910C:
 	LDA #$01
 	STA Map_Player_SkidBack,X
 
-	LDA Map_PlayerLost2PVs
-	BNE PRG030_9128	 ; If Map_PlayerLost2PVs is set, jump to PRG030_9128
+	;LDA Map_PlayerLost2PVs
+	;BNE PRG030_9128	 ; If Map_PlayerLost2PVs is set, jump to PRG030_9128
 
 	;DEC Player_Lives,X	; One less life for the Player...
 	;BMI PRG030_9133	 	; If fell below zero, GAMEOVER!; jump to PRG030_9133
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 	NOP
 	NOP
 	NOP
@@ -3663,7 +3679,9 @@ TileAttribute_ByTileset:
 	.word Tile_Attributes_TS15_TS16_TS17	; 15 - bonus game intro [22]
 	.word Tile_Attributes_TS15_TS16_TS17	; 16 - spade game sliders [22]
 	.word Tile_Attributes_TS15_TS16_TS17	; 17 - N-spade [22]
-	.word Tile_Attributes_TS18		; 18 - 2P Vs [14]
+	;.word Tile_Attributes_TS18		; 18 - 2P Vs [14]
+	NOP
+	NOP
 
 	; NOT USED Tile Attribute values (not valid either; incomplete set!)
 Tile_Attributes_TS15_TS16_TS17:
@@ -4186,7 +4204,7 @@ Level_BG_Pages1:
 	.byte $24	; 15 Bonus Room
 	.byte $2C	; 16 Spade (Roulette)
 	.byte $5C	; 17 N-Spade (Card)
-	.byte $58	; 18 2P Vs
+	.byte $58	; 18 2P Vs removed, UNUSED
 	.byte $6C	; 19 Hills / Underground alternate
 	.byte $68	; 20 3-7 only
 	.byte $34	; 21 World 8 War Vehicle
@@ -4211,7 +4229,7 @@ Level_BG_Pages2:
 	.byte $5E	; 15 Bonus Room
 	.byte $2E	; 16 Spade (Roulette)
 	.byte $5E	; 17 N-Spade (Card)
-	.byte $60	; 18 2P Vs
+	.byte $60	; 18 2P Vs removed, UNUSED
 	.byte $60	; 19 Hills / Underground alternate
 	.byte $60	; 20 3-7 only
 	.byte $70	; 21 World 8 War Vehicle
@@ -4837,7 +4855,9 @@ TileLayout_ByTileset:
 	.word Tile_Layout_TS15_TS16_TS17; 15 - bonus game intro [22]
 	.word Tile_Layout_TS15_TS16_TS17; 16 - spade game sliders [22]
 	.word Tile_Layout_TS15_TS16_TS17; 17 - N-spade [22]
-	.word Tile_Layout_TS18		; 18 - 2P Vs [14]
+	;.word Tile_Layout_TS18		; 18 - 2P Vs [14]
+	NOP
+	NOP
 
 LevelLoad_ByTileset:
 	LDA Level_Tileset
@@ -4865,8 +4885,9 @@ LevelLoad_ByTileset:
 	.word LevelLoad_TS15_TS16_TS17	; 15 - bonus game intro [22]
 	.word LevelLoad_TS15_TS16_TS17	; 16 - spade game sliders [22]
 	.word LevelLoad_TS15_TS16_TS17	; 17 - N-spade [22]
-	.word LevelLoad_TS18		; 18 - 2P Vs [14]
-
+	;.word LevelLoad_TS18		; 18 - 2P Vs [14]
+	NOP
+	NOP
 
 ; RegEx S&R:
 ; LDA LL_ShapeDef.*\n.*AND #\$0f.*\n.*STA <Temp_Var(.)		 ; .*
@@ -4910,7 +4931,9 @@ LeveLoad_Generators:
 	.word LoadLevel_Generator_TS151617	; 15 - bonus game intro
 	.word LoadLevel_Generator_TS151617	; 16 - spade game sliders
 	.word LoadLevel_Generator_TS151617	; 17 - N-spade
-	.word LoadLevel_Generator_TS18		; 18 - 2P Vs
+	;.word LoadLevel_Generator_TS18		; 18 - 2P Vs
+	NOP
+	NOP
 
 LeveLoad_FixedSizeGens:
 	LDA Level_Tileset
@@ -4935,7 +4958,9 @@ LeveLoad_FixedSizeGens:
 	.word LeveLoad_FixedSizeGen_TS151617	; 15 - bonus game intro
 	.word LeveLoad_FixedSizeGen_TS151617	; 16 - spade game sliders
 	.word LeveLoad_FixedSizeGen_TS151617	; 17 - N-spade
-	.word LeveLoad_FixedSizeGen_TS18	; 18 - 2P Vs
+	;.word LeveLoad_FixedSizeGen_TS18	; 18 - 2P Vs
+	NOP
+	NOP
 
 PRG030_9AA1:
 	.byte $01, $FF
@@ -4970,7 +4995,8 @@ TileLayoutPage_ByTileset:
 	.byte 23				; 15 - bonus game intro (WRONG: Should be 22)
 	.byte 23				; 16 - spade game sliders (WRONG: Should be 22)
 	.byte 23				; 17 - N-spade (WRONG: Should be 22)
-	.byte 16				; 18 - 2P Vs (WRONG: Should be 14)
+	;.byte 16				; 18 - 2P Vs (WRONG: Should be 14)
+	NOP
 
 	; CORRECT VALUES:
 	;.byte BANK(Tile_Layout_TS15_TS16_TS17)	; 15 - bonus game intro [22]

@@ -1666,20 +1666,23 @@ PalSet_Sky:
 	.byte $FF, $16, $36, $0F, $FF, $1A, $27, $0F, $FF, $30, $36, $0F, $FF, $16, $30, $0F	; SPR Pal 2 (10)
 	.byte $FF, $16, $36, $0F, $FF, $1A, $27, $0F, $FF, $30, $36, $0F, $FF, $16, $30, $0F	; SPR Pal 3 (11)
 
-PalSet_2PVs:
-	.byte $0F, $0F, $30, $3C, $0F, $17, $36, $27, $0F, $1A, $3B, $2A, $0F, $12, $31, $21	; BG Pal 0
-	.byte $0F, $0F, $30, $3C, $0F, $17, $36, $27, $0F, $12, $31, $21, $0F, $1A, $3A, $2A	; BG Pal 1
-	.byte $0F, $0F, $30, $3C, $0F, $0F, $36, $27, $0F, $0F, $2A, $1C, $0F, $0F, $21, $1C	; BG Pal 2
-	.byte $37, $0F, $30, $3C, $37, $0F, $30, $27, $37, $0F, $3A, $1A, $37, $0F, $36, $27	; BG Pal 3
-	.byte $0F, $0F, $30, $3C, $0F, $10, $30, $3C, $0F, $0B, $1B, $3B, $0F, $00, $10, $30	; BG Pal 4
-	.byte $3C, $0F, $30, $3C, $3C, $0F, $30, $3B, $3C, $0F, $37, $27, $3C, $12, $31, $21	; BG Pal 5
-	.byte $06, $0F, $30, $3C, $06, $17, $36, $26, $06, $0F, $2B, $1A, $06, $0F, $21, $12	; BG Pal 6
-	.byte $07, $0F, $30, $3C, $07, $17, $36, $26, $07, $0F, $2B, $1A, $07, $0F, $21, $12	; BG Pal 7
+	;free space
+	.ds 192
 
-	.byte $FF, $16, $36, $12, $FF, $1A, $36, $0C, $FF, $12, $31, $21, $FF, $16, $30, $27	; SPR Pal 0 (8)
-	.byte $FF, $16, $36, $12, $FF, $30, $36, $1A, $FF, $17, $36, $1A, $FF, $16, $30, $27	; SPR Pal 1 (9)
-	.byte $FF, $16, $36, $0F, $FF, $30, $36, $1A, $FF, $17, $36, $27, $FF, $16, $30, $27	; SPR Pal 2 (10)
-	.byte $FF, $16, $36, $12, $FF, $1A, $36, $12, $FF, $16, $30, $27, $FF, $12, $31, $21	; SPR Pal 3 (11)
+;PalSet_2PVs:
+;	.byte $0F, $0F, $30, $3C, $0F, $17, $36, $27, $0F, $1A, $3B, $2A, $0F, $12, $31, $21	; BG Pal 0
+;	.byte $0F, $0F, $30, $3C, $0F, $17, $36, $27, $0F, $12, $31, $21, $0F, $1A, $3A, $2A	; BG Pal 1
+;	.byte $0F, $0F, $30, $3C, $0F, $0F, $36, $27, $0F, $0F, $2A, $1C, $0F, $0F, $21, $1C	; BG Pal 2
+;	.byte $37, $0F, $30, $3C, $37, $0F, $30, $27, $37, $0F, $3A, $1A, $37, $0F, $36, $27	; BG Pal 3
+;	.byte $0F, $0F, $30, $3C, $0F, $10, $30, $3C, $0F, $0B, $1B, $3B, $0F, $00, $10, $30	; BG Pal 4
+;	.byte $3C, $0F, $30, $3C, $3C, $0F, $30, $3B, $3C, $0F, $37, $27, $3C, $12, $31, $21	; BG Pal 5
+;	.byte $06, $0F, $30, $3C, $06, $17, $36, $26, $06, $0F, $2B, $1A, $06, $0F, $21, $12	; BG Pal 6
+;	.byte $07, $0F, $30, $3C, $07, $17, $36, $26, $07, $0F, $2B, $1A, $07, $0F, $21, $12	; BG Pal 7
+;
+;	.byte $FF, $16, $36, $12, $FF, $1A, $36, $0C, $FF, $12, $31, $21, $FF, $16, $30, $27	; SPR Pal 0 (8)
+;	.byte $FF, $16, $36, $12, $FF, $30, $36, $1A, $FF, $17, $36, $1A, $FF, $16, $30, $27	; SPR Pal 1 (9)
+;	.byte $FF, $16, $36, $0F, $FF, $30, $36, $1A, $FF, $17, $36, $27, $FF, $16, $30, $27	; SPR Pal 2 (10)
+;	.byte $FF, $16, $36, $12, $FF, $1A, $36, $12, $FF, $16, $30, $27, $FF, $12, $31, $21	; SPR Pal 3 (11)
 
 PalSet_Bonus:
 	.byte $0F, $0F, $30, $3C, $0F, $16, $30, $36, $0F, $16, $30, $21, $0F, $17, $30, $27 	; BG Pal 0
@@ -1717,7 +1720,9 @@ Palette_By_Tileset:
 	.word PalSet_Bonus	; 15 - bonus game intro and N-Spade
 	.word PalSet_Bonus	; 16 - spade game sliders
 	.word PalSet_Bonus	; 17 - N-spade
-	.word PalSet_2PVs	; 18 - 2P Vs
+	;.word PalSet_2PVs	; 18 - 2P Vs
+	NOP
+	NOP
 
 BonusGame_PlayerPal:
 	; Player palettes for the bonus game

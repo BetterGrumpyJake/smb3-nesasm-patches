@@ -79,8 +79,8 @@ Video_Upd_Table: ; $803E
 	.word Video_DoWXLuigi00	; $0F - "World X" Intro, Luigi (horizontal scroll at $00)
 	.word Video_DoWXMario80	; $10 - "World X" Intro, Mario (horizontal scroll at $80)
 	.word Video_DoWXLuigi80	; $11 - "World X" Intro, Luigi (horizontal scroll at $80)
-	.word Video_DoGameOver00; $12 - "GAME OVER" Box (horizontal scroll at $00)
-	.word Video_DoGameOver80; $13 - "GAME OVER" Box (horizontal scroll at $80)
+	.word $A000				; $12 - UNUSED "GAME OVER" Box (horizontal scroll at $00)
+	.word $A000				; $13 - UNUSED "GAME OVER" Box (horizontal scroll at $80)
 	.word Video_Blackout	; $14 - Blacks out 3 colors, used during end-level triple card match; not sure what for?
 	.word Video_3CMMushTop	; $15 - End Level Triple Card Match: Mushroom top
 	.word Video_3CMFlowTop	; $16 - End Level Triple Card Match: Flower top

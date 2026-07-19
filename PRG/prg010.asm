@@ -167,172 +167,173 @@ Video_DoWXMario80:
 	.byte VU_REPEAT | 2, $00
 	.byte $00
 
-
-Video_DoGameOver00:
-	vaddr $2908
-	.byte $01, $A0
-
-	vaddr $2909
-	.byte VU_REPEAT | 14, $A1
-
-
-	vaddr $2917
-	.byte $01, $A2
-
-	vaddr $2928
-	.byte VU_REPEAT | VU_VERT | 6, $E6
-
-	vaddr $2929
-	.byte VU_REPEAT | 14, $FE
-
-	vaddr $2937
-	.byte VU_REPEAT | VU_VERT | 6, $E7
-
-	vaddr $2949
-	.byte VU_REPEAT | 14, $FE
-
-	vaddr $2969
-	.byte VU_REPEAT | 14, $FE
-
-	vaddr $2989
-	.byte VU_REPEAT | 14, $FE
-
-	vaddr $29A9
-	.byte VU_REPEAT | 14, $FE
-	
-	vaddr $29C9
-	.byte VU_REPEAT | 14, $FE
-
-	vaddr $29E8
-	.byte $01, $E3
-
-	vaddr $29E9
-	.byte VU_REPEAT | 14, $E4
-
-	vaddr $29F7
-	.byte $01, $E5
-
-	; ----
-
-	vaddr $296B
-	.byte $0A, $EB, $BC, $BA, $E8, $FE, $F0, $6A, $E8, $E9, $6B	; GAME OVER!
-
-	vaddr $29AF
-	.byte $08, $ED, $F0, $DB, $EA, $FC, $DB, $DA, $E8	; CONTINUE
-
-	vaddr $29CF
-	.byte $03, $E8, $DB, $EE	; END
-
-	; ----
-
-	vaddr $2BD2
-	.byte VU_REPEAT | 4, $00
-
-	vaddr $2BDA
-	.byte VU_REPEAT | 4, $00
-
-	.byte $00
-
-
-Video_DoGameOver80:
-	vaddr $2918
-	.byte $01, $A0
-
-	vaddr $2919
-	.byte VU_REPEAT | 7, $A1
-
-	vaddr $2900
-	.byte VU_REPEAT | 7, $A1
-
-	vaddr $2907
-	.byte $01, $A2
-
-	vaddr $2938
-	.byte VU_REPEAT | VU_VERT | 6, $E6
-
-	vaddr $2939
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2920
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2927
-	.byte VU_REPEAT | VU_VERT | 6, $E7
-
-	vaddr $2959
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2940
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2979
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2960
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2999
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $2980
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $29B9
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $29A0
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $29D9
-	.byte VU_REPEAT | 7, $FE
-	
-	vaddr $29C0
-	.byte VU_REPEAT | 7, $FE
-
-	vaddr $29F8
-	.byte $01, $E3
-
-	vaddr $29F9
-	.byte VU_REPEAT | 7, $E4
-
-	vaddr $29E0
-	.byte VU_REPEAT | 7, $E4
-
-	vaddr $29E7
-	.byte $01, $E5
-
-	; ----
-
-	vaddr $297B
-	.byte $04, $EB, $BC, $BA, $E8		; GAME
-
-	vaddr $2960
-	.byte $05, $F0, $6A, $E8, $E9, $6B	; OVER!
-
-	vaddr $29A0
-	.byte $07, $F0, $DB, $EA, $FC, $DB, $DA, $E8
-
-	vaddr $29BF
-	.byte $01, $ED
-
-	vaddr $29C0
-	.byte $02, $DB, $EE	; ND
-
-	vaddr $29DF
-	.byte $01, $E8	; E
-
-	; ----
-
-	vaddr $2BD0
-	.byte VU_REPEAT | 2, $00 
-
-	vaddr $2BD6
-	.byte VU_REPEAT | 4, $00
-
-	vaddr $2BDE
-	.byte VU_REPEAT | 2, $00
-
-	.byte $00
+	;free space
+	.ds 234
+;Video_DoGameOver00:
+;	vaddr $2908
+;	.byte $01, $A0
+;
+;	vaddr $2909
+;	.byte VU_REPEAT | 14, $A1
+;
+;
+;	vaddr $2917
+;	.byte $01, $A2
+;
+;	vaddr $2928
+;	.byte VU_REPEAT | VU_VERT | 6, $E6
+;
+;	vaddr $2929
+;	.byte VU_REPEAT | 14, $FE
+;
+;	vaddr $2937
+;	.byte VU_REPEAT | VU_VERT | 6, $E7
+;
+;	vaddr $2949
+;	.byte VU_REPEAT | 14, $FE
+;
+;	vaddr $2969
+;	.byte VU_REPEAT | 14, $FE
+;
+;	vaddr $2989
+;	.byte VU_REPEAT | 14, $FE
+;
+;	vaddr $29A9
+;	.byte VU_REPEAT | 14, $FE
+;	
+;	vaddr $29C9
+;	.byte VU_REPEAT | 14, $FE
+;
+;	vaddr $29E8
+;	.byte $01, $E3
+;
+;	vaddr $29E9
+;	.byte VU_REPEAT | 14, $E4
+;
+;	vaddr $29F7
+;	.byte $01, $E5
+;
+;	; ----
+;
+;	vaddr $296B
+;	.byte $0A, $EB, $BC, $BA, $E8, $FE, $F0, $6A, $E8, $E9, $6B	; GAME OVER!
+;
+;	vaddr $29AF
+;	.byte $08, $ED, $F0, $DB, $EA, $FC, $DB, $DA, $E8	; CONTINUE
+;
+;	vaddr $29CF
+;	.byte $03, $E8, $DB, $EE	; END
+;
+;	; ----
+;
+;	vaddr $2BD2
+;	.byte VU_REPEAT | 4, $00
+;
+;	vaddr $2BDA
+;	.byte VU_REPEAT | 4, $00
+;
+;	.byte $00
+;
+;
+;Video_DoGameOver80:
+;	vaddr $2918
+;	.byte $01, $A0
+;
+;	vaddr $2919
+;	.byte VU_REPEAT | 7, $A1
+;
+;	vaddr $2900
+;	.byte VU_REPEAT | 7, $A1
+;
+;	vaddr $2907
+;	.byte $01, $A2
+;
+;	vaddr $2938
+;	.byte VU_REPEAT | VU_VERT | 6, $E6
+;
+;	vaddr $2939
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2920
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2927
+;	.byte VU_REPEAT | VU_VERT | 6, $E7
+;
+;	vaddr $2959
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2940
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2979
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2960
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2999
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $2980
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $29B9
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $29A0
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $29D9
+;	.byte VU_REPEAT | 7, $FE
+;	
+;	vaddr $29C0
+;	.byte VU_REPEAT | 7, $FE
+;
+;	vaddr $29F8
+;	.byte $01, $E3
+;
+;	vaddr $29F9
+;	.byte VU_REPEAT | 7, $E4
+;
+;	vaddr $29E0
+;	.byte VU_REPEAT | 7, $E4
+;
+;	vaddr $29E7
+;	.byte $01, $E5
+;
+;	; ----
+;
+;	vaddr $297B
+;	.byte $04, $EB, $BC, $BA, $E8		; GAME
+;
+;	vaddr $2960
+;	.byte $05, $F0, $6A, $E8, $E9, $6B	; OVER!
+;
+;	vaddr $29A0
+;	.byte $07, $F0, $DB, $EA, $FC, $DB, $DA, $E8
+;
+;	vaddr $29BF
+;	.byte $01, $ED
+;
+;	vaddr $29C0
+;	.byte $02, $DB, $EE	; ND
+;
+;	vaddr $29DF
+;	.byte $01, $E8	; E
+;
+;	; ----
+;
+;	vaddr $2BD0
+;	.byte VU_REPEAT | 2, $00 
+;
+;	vaddr $2BD6
+;	.byte VU_REPEAT | 4, $00
+;
+;	vaddr $2BDE
+;	.byte VU_REPEAT | 2, $00
+;
+;	.byte $00
 
 Video_DoW2WZ:	; "WELCOME TO WARP ZONE" banner
 	vaddr $2884
@@ -579,54 +580,56 @@ PRG010_C303:
 ; Note that this is not a "friendly" function, in that
 ; it directly sets the graphics buffer, not inserts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-GameOver_MLName:
-	.byte $BA, $BC, $E9, $FC, $F0, $00	; MARIO[Terminator]
-	.byte $EC, $DA, $FC, $EB, $FC, $00	; LUIGI[Terminator]
-GameOver_MLName_Len = 6
-
-GameOver_PatchPlayerName:
-	LDY Player_Current	; Y = Player_Current
-	LDX #$00	 ; X = 0
-
-	CPY #$00
-	BEQ PRG010_C320	 ; If Player_Current = 0 (Player is Mario), jump to PRG010_C320
-
-	LDX #GameOver_MLName_Len	; X = GameOver_MLName_Len
-
-PRG010_C320:
-	LDY #$00	 ; Y = 0
-PRG010_C322:
-	LDA GameOver_MLName,X	 ; Get patterns for MARIO/LUIGI
-	STA Graphics_Buffer+3,Y	 ; -> graphics buffer
-
-	INX		 ; X++ (next name character pattern)
-	INY		 ; Y++ (next graphics buffer byte)
-
-	CPY #GameOver_MLName_Len
-	BNE PRG010_C322	; While Y < GameOver_MLName_Len, loop!
-
-	; Store VRAM high address
-	LDA #$29
-	STA Graphics_Buffer
-
-	; Store run length
-	LDA #(GameOver_MLName_Len-1)
-	STA Graphics_Buffer+2
-
-	; Store VRAM low address
-	LDA <Horz_Scroll
-	LSR A
-	LSR A
-	LSR A
-	ADD #$2a
-	STA Graphics_Buffer+1
-
-	; Graphics_BufCnt += (GameOver_MLName_Len + 2)
-	LDA Graphics_BufCnt
-	ADD #(GameOver_MLName_Len + 2)
-	STA Graphics_BufCnt
-
-	RTS		 ; Return
+	;free space
+	.ds 68
+;GameOver_MLName:
+;	.byte $BA, $BC, $E9, $FC, $F0, $00	; MARIO[Terminator]
+;	.byte $EC, $DA, $FC, $EB, $FC, $00	; LUIGI[Terminator]
+;GameOver_MLName_Len = 6
+;
+;GameOver_PatchPlayerName:
+;	LDY Player_Current	; Y = Player_Current
+;	LDX #$00	 ; X = 0
+;
+;	CPY #$00
+;	BEQ PRG010_C320	 ; If Player_Current = 0 (Player is Mario), jump to PRG010_C320
+;
+;	LDX #GameOver_MLName_Len	; X = GameOver_MLName_Len
+;
+;PRG010_C320:
+;	LDY #$00	 ; Y = 0
+;PRG010_C322:
+;	LDA GameOver_MLName,X	 ; Get patterns for MARIO/LUIGI
+;	STA Graphics_Buffer+3,Y	 ; -> graphics buffer
+;
+;	INX		 ; X++ (next name character pattern)
+;	INY		 ; Y++ (next graphics buffer byte)
+;
+;	CPY #GameOver_MLName_Len
+;	BNE PRG010_C322	; While Y < GameOver_MLName_Len, loop!
+;
+;	; Store VRAM high address
+;	LDA #$29
+;	STA Graphics_Buffer
+;
+;	; Store run length
+;	LDA #(GameOver_MLName_Len-1)
+;	STA Graphics_Buffer+2
+;
+;	; Store VRAM low address
+;	LDA <Horz_Scroll
+;	LSR A
+;	LSR A
+;	LSR A
+;	ADD #$2a
+;	STA Graphics_Buffer+1
+;
+;	; Graphics_BufCnt += (GameOver_MLName_Len + 2)
+;	LDA Graphics_BufCnt
+;	ADD #(GameOver_MLName_Len + 2)
+;	STA Graphics_BufCnt
+;
+;	RTS		 ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Map_ConfigWorldIntro
@@ -1346,174 +1349,177 @@ WorldIntro_CompleteStars:
 
 PRG010_C6D7:
 	RTS		 ; Return
-
-GameOver_Complete:
-	LDA Map_Intro_Tick
-	BNE PRG010_C6E2	 ; If Map_Intro_Tick <> 0, jump to PRG010_C6E2
-
-	; Map_Intro_Tick = $10
-	LDA #$10
-	STA Map_Intro_Tick
-
-PRG010_C6E2:
-	JSR PRG010_C513
-
-	LDA Map_Intro_Tick
-	BNE PRG010_C6EF	 ; If Map_Intro_Tick <> 0, jump to PRG010_C6EF
-
-	LDA #$00
-	STA Map_Object_ActY
-
-PRG010_C6EF:
-	JMP WorldMap_UpdateAndDraw	 ; Jump to WorldMap_UpdateAndDraw
-
-GameOver_Loop:
-	LDA GameOver_State
-	JSR DynJump
-
-	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
-	.word GameOver_WaitOnBGM	; 0: Wait for "Game Over" music to finish
-	.word GameOver_DoMenu		; 1: Player selects action
-
-	; Player selected CONTINUE...
-	.word Map_Intro_Erase1Strip	; 2: Erase the Gameover box
-	.word GameOver_Timeout		; 3: Short timeout before we decide what to do next
-	.word GameOver_TwirlToStart	; 4: Player twirls back to map start (jumps to State 8 after this)
-	.word GameOver_TwirlFromAfar	; 5: Player twirling in from far away; pretty much straight left
-	.word GameOver_AlignToStartY	; 6: Player aligns to starting map Y
-	.word GameOver_ReturnToStartX	; 7: Player slides back to starting X
-	.word GameOver_Complete		; 8: Complete the sequence
-
-	; NOTE: GameOver_State = 9 is handled specially outside of this routine
-
-GameOver_WaitOnBGM:
-	LDA SndCur_Music1	 
-	BNE PRG010_C712	 ; If Game Over music is still playing, jump to PRG010_C712
-
-	INC GameOver_State	 ; GameOver_State++
-
-PRG010_C712:
-	JMP PRG010_C772	 ; Jump to PRG010_C772
-
-GameOver_DoMenu:
-	LDA <Pad_Input
-	AND #(PAD_UP | PAD_DOWN)
-	BEQ PRG010_C72B	 ; If Player is pressing neither UP nor DOWN, jump to PRG010_C72B
-
-	; Play the bleep noise
-	LDA #SND_MAPPATHMOVE
-	STA Sound_QMap
-
-	; Switch between $60/$68 (cursor up and down)
-	LDA Map_GameOver_CursorY
-	EOR #$08
-	STA Map_GameOver_CursorY
-
-	JMP PRG010_C748	 ; Jump to PRG010_C748
-
-PRG010_C72B:
-
-	; Player not pressing UP or DOWN...
-
-	LDA <Pad_Input
-	AND #PAD_START
-	BEQ PRG010_C748	 ; If Player is NOT pressing START, jump to PRG010_C748
-
-	; Play the starry entrance sound (this is never heard!)
-	LDA #SND_MAPENTERWORLD
-	STA Sound_QLevel1
-
-	LDX #$09	 ; X = 9 (Player selects END)
-	LDA Map_GameOver_CursorY
-
-	AND #$08
-	BNE PRG010_C741	 ; If Player selected "END", jump to PRG010_C741
-
-	LDX #$02	 ; X = 2 (Player selects CONTINUE)
-
-PRG010_C741:
-	STX GameOver_State	 ; Set GameOver_State appropriately
-
-	; Map_UnusedGOFlag = $F8 
-	LDA #$f8
-	STA <Map_UnusedGOFlag
-
-PRG010_C748:
-	; Clear all the map object Y to $F8 (off-screen)!
-	LDY #$0d	 ; Y = $D
-	LDA #$f8	 ; A = $F8
-PRG010_C74C:
-	STA Map_Object_ActY,Y	 ; -> map object's Y
-	DEY		 ; Y--
-	BPL PRG010_C74C	 ; While Y >= 0, loop!
-
-	JMP PRG010_C75D	 ; Jump to PRG010_C75D
-
-GameOver_DeadPlayerSprite:
-	.byte $64, $61, $00, $50	; Left half
-	.byte $64, $61, $40, $58	; Right half
 	
-PRG010_C75D:
+	;free space
+	.ds 200
 
-	; Set game over action cursor Y
-	LDA Map_GameOver_CursorY
-	STA Sprite_RAM+$94
-
-	; Set game over action cursor pattern
-	LDA #$6f
-	STA Sprite_RAM+$95
-
-	; Set game over action cursor attributes
-	LDA #SPR_PAL0
-	STA Sprite_RAM+$96
-
-	; Set game over action cursor X
-	LDA #$68
-	STA Sprite_RAM+$97
-
-	; Generate the little "dead Player" sprite in the Game Over box
-PRG010_C772:
-	LDY #$07	 ; Y = 7
-PRG010_C774:
-	LDA GameOver_DeadPlayerSprite,Y	 ; Get dead player sprite byte
-	STA Sprite_RAM+$84,Y	 ; Store into Sprite_RAM
-
-	DEY		 ; Y--
-	BPL PRG010_C774	 ; While Y >= 0, loop!
-
-	RTS		 ; Return
-
-GameOver_Timeout:
-	LDA Map_Intro_Tick
-	BNE PRG010_C788	 ; If Map_Intro_Tick <> 0, jump to PRG010_C788
-
-	; Map_Intro_Tick = $10 -- short version
-	LDA #$10
-	STA Map_Intro_Tick
-
-PRG010_C788:
-	JSR WorldIntro_BoxTimer_NoSym	 ; Just delay until Map_Intro_Tick = 0
-
-	LDA GameOver_State
-	CMP #$04
-	BNE PRG010_C79D	 ; If GameOver_State <> 4 (4 means timer expired, went to next state), jump to PRG010_C79D (WorldMap_UpdateAndDraw)
-
-	; We're in state 4 now... (this will be for one cycle only, we're on our way out)
-
-	LDA <Horz_Scroll_Hi
-	BNE PRG010_C79A	 ; If not back on the first map screen yet, jump to PRG010_C79A
-
-	LDA <Horz_Scroll
-	BEQ PRG010_C79D	 ; If on the first map screen hard left, jump to PRG010_C79D (WorldMap_UpdateAndDraw)
-
-PRG010_C79A:
-
-	; In some way we're not all the way to the left on the map at this time...
-
-	INC GameOver_State	 ; GameOver_State++
-
-PRG010_C79D:
-	JMP WorldMap_UpdateAndDraw	 ; Jump to WorldMap_UpdateAndDraw
+;GameOver_Complete:
+;	LDA Map_Intro_Tick
+;	BNE PRG010_C6E2	 ; If Map_Intro_Tick <> 0, jump to PRG010_C6E2
+;
+;	; Map_Intro_Tick = $10
+;	LDA #$10
+;	STA Map_Intro_Tick
+;
+;PRG010_C6E2:
+;	JSR PRG010_C513
+;
+;	LDA Map_Intro_Tick
+;	BNE PRG010_C6EF	 ; If Map_Intro_Tick <> 0, jump to PRG010_C6EF
+;
+;	LDA #$00
+;	STA Map_Object_ActY
+;
+;PRG010_C6EF:
+;	JMP WorldMap_UpdateAndDraw	 ; Jump to WorldMap_UpdateAndDraw
+;
+;GameOver_Loop:
+;	LDA GameOver_State
+;	JSR DynJump
+;
+;	; THESE MUST FOLLOW DynJump FOR THE DYNAMIC JUMP TO WORK!!
+;	.word GameOver_WaitOnBGM	; 0: Wait for "Game Over" music to finish
+;	.word GameOver_DoMenu		; 1: Player selects action
+;
+;	; Player selected CONTINUE...
+;	.word Map_Intro_Erase1Strip	; 2: Erase the Gameover box
+;	.word GameOver_Timeout		; 3: Short timeout before we decide what to do next
+;	.word GameOver_TwirlToStart	; 4: Player twirls back to map start (jumps to State 8 after this)
+;	.word GameOver_TwirlFromAfar	; 5: Player twirling in from far away; pretty much straight left
+;	.word GameOver_AlignToStartY	; 6: Player aligns to starting map Y
+;	.word GameOver_ReturnToStartX	; 7: Player slides back to starting X
+;	.word GameOver_Complete		; 8: Complete the sequence
+;
+;	; NOTE: GameOver_State = 9 is handled specially outside of this routine
+;
+;GameOver_WaitOnBGM:
+;	LDA SndCur_Music1	 
+;	BNE PRG010_C712	 ; If Game Over music is still playing, jump to PRG010_C712
+;
+;	INC GameOver_State	 ; GameOver_State++
+;
+;PRG010_C712:
+;	JMP PRG010_C772	 ; Jump to PRG010_C772
+;
+;GameOver_DoMenu:
+;	LDA <Pad_Input
+;	AND #(PAD_UP | PAD_DOWN)
+;	BEQ PRG010_C72B	 ; If Player is pressing neither UP nor DOWN, jump to PRG010_C72B
+;
+;	; Play the bleep noise
+;	LDA #SND_MAPPATHMOVE
+;	STA Sound_QMap
+;
+;	; Switch between $60/$68 (cursor up and down)
+;	LDA Map_GameOver_CursorY
+;	EOR #$08
+;	STA Map_GameOver_CursorY
+;
+;	JMP PRG010_C748	 ; Jump to PRG010_C748
+;
+;PRG010_C72B:
+;
+;	; Player not pressing UP or DOWN...
+;
+;	LDA <Pad_Input
+;	AND #PAD_START
+;	BEQ PRG010_C748	 ; If Player is NOT pressing START, jump to PRG010_C748
+;
+;	; Play the starry entrance sound (this is never heard!)
+;	LDA #SND_MAPENTERWORLD
+;	STA Sound_QLevel1
+;
+;	LDX #$09	 ; X = 9 (Player selects END)
+;	LDA Map_GameOver_CursorY
+;
+;	AND #$08
+;	BNE PRG010_C741	 ; If Player selected "END", jump to PRG010_C741
+;
+;	LDX #$02	 ; X = 2 (Player selects CONTINUE)
+;
+;PRG010_C741:
+;	STX GameOver_State	 ; Set GameOver_State appropriately
+;
+;	; Map_UnusedGOFlag = $F8 
+;	LDA #$f8
+;	STA <Map_UnusedGOFlag
+;
+;PRG010_C748:
+;	; Clear all the map object Y to $F8 (off-screen)!
+;	LDY #$0d	 ; Y = $D
+;	LDA #$f8	 ; A = $F8
+;PRG010_C74C:
+;	STA Map_Object_ActY,Y	 ; -> map object's Y
+;	DEY		 ; Y--
+;	BPL PRG010_C74C	 ; While Y >= 0, loop!
+;
+;	JMP PRG010_C75D	 ; Jump to PRG010_C75D
+;
+;GameOver_DeadPlayerSprite:
+;	.byte $64, $61, $00, $50	; Left half
+;	.byte $64, $61, $40, $58	; Right half
+;	
+;PRG010_C75D:
+;
+;	; Set game over action cursor Y
+;	LDA Map_GameOver_CursorY
+;	STA Sprite_RAM+$94
+;
+;	; Set game over action cursor pattern
+;	LDA #$6f
+;	STA Sprite_RAM+$95
+;
+;	; Set game over action cursor attributes
+;	LDA #SPR_PAL0
+;	STA Sprite_RAM+$96
+;
+;	; Set game over action cursor X
+;	LDA #$68
+;	STA Sprite_RAM+$97
+;
+;	; Generate the little "dead Player" sprite in the Game Over box
+;PRG010_C772:
+;	LDY #$07	 ; Y = 7
+;PRG010_C774:
+;	LDA GameOver_DeadPlayerSprite,Y	 ; Get dead player sprite byte
+;	STA Sprite_RAM+$84,Y	 ; Store into Sprite_RAM
+;
+;	DEY		 ; Y--
+;	BPL PRG010_C774	 ; While Y >= 0, loop!
+;
+;	RTS		 ; Return
+;
+;GameOver_Timeout:
+;	LDA Map_Intro_Tick
+;	BNE PRG010_C788	 ; If Map_Intro_Tick <> 0, jump to PRG010_C788
+;
+;	; Map_Intro_Tick = $10 -- short version
+;	LDA #$10
+;	STA Map_Intro_Tick
+;
+;PRG010_C788:
+;	JSR WorldIntro_BoxTimer_NoSym	 ; Just delay until Map_Intro_Tick = 0
+;
+;	LDA GameOver_State
+;	CMP #$04
+;	BNE PRG010_C79D	 ; If GameOver_State <> 4 (4 means timer expired, went to next state), jump to PRG010_C79D (WorldMap_UpdateAndDraw)
+;
+;	; We're in state 4 now... (this will be for one cycle only, we're on our way out)
+;
+;	LDA <Horz_Scroll_Hi
+;	BNE PRG010_C79A	 ; If not back on the first map screen yet, jump to PRG010_C79A
+;
+;	LDA <Horz_Scroll
+;	BEQ PRG010_C79D	 ; If on the first map screen hard left, jump to PRG010_C79D (WorldMap_UpdateAndDraw)
+;
+;PRG010_C79A:
+;
+;	; In some way we're not all the way to the left on the map at this time...
+;
+;	INC GameOver_State	 ; GameOver_State++
+;
+;PRG010_C79D:
+;	JMP WorldMap_UpdateAndDraw	 ; Jump to WorldMap_UpdateAndDraw
 
 MO_SwitchToMO_D:
 	; Kind of a silly and pointless Map_Operation; maybe they intended for more here?

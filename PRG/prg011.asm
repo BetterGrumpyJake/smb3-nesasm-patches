@@ -842,223 +842,224 @@ PRG011_A5AA:
 PRG011_A5DC:
 	RTS		 ; Return
 
-
-GameOver_TwirlToStart:
-	LDX Player_Current	 
-
-	LDA <Map_SkidBack
-	BNE PRG011_A63D	 ; If Map_SkidBack is set, jump to PRG011_A63D
-
-	LDY World_Num	 ; Y = World_Num
-
-	LDA <World_Map_Y,X
-	SUB Map_Y_Starts,Y
-	STA <Map_Skid_DeltaY
-
-	LDA <World_Map_X,X
-	SUB #$20
-	STA <Map_Skid_DeltaX
-
-	LDA #$00
-	STA <Map_Skid_TravDirs
-	STA <Map_Skid_DeltaFracX
-	STA <Map_Skid_DeltaFracY
-
-	LDA <World_Map_X,X
-	CMP #32
-	BGE PRG011_A610	 ; If Player's Map X >= 32 (the common start X of all maps), jump to PRG011_A610
-
-	; Player's Map X < 32...
-
-	; Set bit 0 on Map_Skid_TravDirs (travel right instead of left)
-	LDA #$01
-	STA <Map_Skid_TravDirs
-
-	; Negate Map_Skid_DeltaX
-	LDA #$ff
-	EOR <Map_Skid_DeltaX
-	TAY
-	INY
-	STY <Map_Skid_DeltaX
-
-PRG011_A610:
-	LDY World_Num	 ; Y = World_Num
-
-	LDA <World_Map_Y,X
-	CMP Map_Y_Starts,Y
-	BGE PRG011_A628	 ; If Player's Map Y >= the starting Y of the map, jump to PRG011_A628
-
-	; Player's Map Y < the starting Y of the map...
-
-	; Negate Map_Skid_DeltaY
-	LDA #$ff
-	EOR <Map_Skid_DeltaY
-	TAY
-	INY
-	STY <Map_Skid_DeltaY
-
-	; Set bit 1 on Map_Skid_TravDirs (travel down instead of up)
-	LDA <Map_Skid_TravDirs
-	ORA #$02
-	STA <Map_Skid_TravDirs
-
-PRG011_A628:
-
-	; Lowest 4 bits of Map_Skid_DeltaY/X -> Upper 4 bits of Map_Skid_DeltaFracY/X
-	LDY #$04	 ; Y = 4
-PRG011_A62A:
-	CLC		 ; Clear carry
-	LSR <Map_Skid_DeltaY		; Bit 0 of Map_Skid_DeltaY -> carry
-	ROR <Map_Skid_DeltaFracY		; Set as bit 7 of Map_Skid_DeltaFracY
-
-	CLC		 ; Clear carry
-	LSR <Map_Skid_DeltaX		; Bit 0 of Map_Skid_DeltaX -> carry
-	ROR <Map_Skid_DeltaFracX		; Set as bit 7 of Map_Skid_DeltaFracX
-
-	DEY			; Y--
-	BPL PRG011_A62A		; While Y >= 0, loop!
-
-	; Map_Skid_Counter = $20
-	LDA #$20
-	STA <Map_Skid_Counter
-
-	INC <Map_SkidBack		 ; Set Map_SkidBack
-
-PRG011_A63D:
-
-	; Skid sound
-	LDA #SND_LEVELSKID
-	STA Sound_QLevel2
-
-	LDA <Map_Skid_TravDirs
-	AND #$01
-	BEQ PRG011_A65E	 ; If Player is traveling left, jump to PRG011_A65E
-
-	; Traveling to the right...
-
-	; Map_Skid_FracX += Map_Skid_DeltaFracX
-	LDA <Map_Skid_FracX
-	ADD <Map_Skid_DeltaFracX
-	STA <Map_Skid_FracX
-
-	; Add and carry into the full X
-	LDA <World_Map_X,X
-	ADC <Map_Skid_DeltaX
-	STA <World_Map_X,X
-
-	; Any additional carry into Map XHi
-	LDA <World_Map_XHi,X
-	ADC #$00
-	STA <World_Map_XHi,X
-
-	JMP PRG011_A671	 ; Jump to PRG011_A671
-
-PRG011_A65E:
-
-	; Traveling to the left
-
-	; Map_Skid_FracX -= Map_Skid_DeltaFracX
-	LDA <Map_Skid_FracX
-	SUB <Map_Skid_DeltaFracX
-	STA <Map_Skid_FracX
-
-	; Subtract and carry into the full X
-	LDA <World_Map_X,X
-	SBC <Map_Skid_DeltaX
-	STA <World_Map_X,X
-
-	; Any additional carry into Map XHi
-	LDA <World_Map_XHi,X
-	SBC #$00
-	STA <World_Map_XHi,X
-
-PRG011_A671:
-	LDA <Map_Skid_TravDirs
-	AND #$02
-	BEQ PRG011_A687	 ; If Player is traveling up, jump to PRG011_A65E
-
-	; Traveling downward
-
-	; Map_Skid_FracY += Map_Skid_DeltaFracY
-	LDA <Map_Skid_FracY
-	ADD <Map_Skid_DeltaFracY
-	STA <Map_Skid_FracY
-
-	; Add and carry into the full Y
-	LDA <World_Map_Y,X
-	ADC <Map_Skid_DeltaY
-	STA <World_Map_Y,X
-
-	JMP PRG011_A694	 ; Jump to PRG011_A694
-
-PRG011_A687:
-
-	; Traveling downward
-
-	; Map_Skid_FracY -= Map_Skid_DeltaFracY
-	LDA <Map_Skid_FracY
-	SUB <Map_Skid_DeltaFracY
-	STA <Map_Skid_FracY
-
-	; Subtract and carry into the full Y
-	LDA <World_Map_Y,X
-	SBC <Map_Skid_DeltaY
-	STA <World_Map_Y,X
-
-PRG011_A694:
-	DEC <Map_Skid_Counter	; Map_Skid_Counter--
-	BNE PRG011_A6BC	 ; If Map_Skid_Counter <> 0, jump to PRG011_A6BC
-
-PRG011_A698:
-	; GameOver_State = 8 (we've landed, we're done)
-	LDA #$08
-	STA GameOver_State
-
-	LDX Player_Current	 ; X = Player_Current
-
-	LDA #$00
-	STA <Map_SkidBack
-	STA World_Map_Twirl,X	 ; Twirling is done
-	STA Map_Prev_XOff2,X
-	STA Map_Prev_XHi2,X
-
-	; Set the previous values at the twirl landing spot
-
-	; Map_Previous_Y = World_Map_Y
-	LDA <World_Map_Y,X
-	STA Map_Previous_Y,X
-
-	; Map_Previous_X/Hi = Map_Previous_X/Hi
-	LDA <World_Map_XHi,X
-	STA Map_Previous_XHi,X
-	LDA <World_Map_X,X
-	STA Map_Previous_X,X
-
-PRG011_A6BC:
-	JMP WorldMap_UpdateAndDraw	 ; Update and draw world map and don't come back
-
-
-GameOver_TwirlFromAfar:
-	LDX Player_Current	 ; X = Player_Current
-
-	; Map X -= 2 (Player flying from way off goes directly left)
-	LDA <World_Map_X,X
-	SUB #$02
-	STA <World_Map_X,X
-	LDA <World_Map_XHi,X
-	SBC #$00
-	STA <World_Map_XHi,X
-
-	LDA <World_Map_X,X
-	SUB <Horz_Scroll
-	BNE PRG011_A6E4	 ; If Player Map X <> Horz_Scroll, jump to PRG011_A6E4
-
-	LDA #$00
-	STA Map_Prev_XOff,X
-	STA Map_Prev_XHi,X
-	STA Map_Entered_XHi,X
-
-	INC GameOver_State	 ; GameOver_State++
+	;free space
+	.ds 263
+;GameOver_TwirlToStart:
+;	LDX Player_Current	 
+;
+;	LDA <Map_SkidBack
+;	BNE PRG011_A63D	 ; If Map_SkidBack is set, jump to PRG011_A63D
+;
+;	LDY World_Num	 ; Y = World_Num
+;
+;	LDA <World_Map_Y,X
+;	SUB Map_Y_Starts,Y
+;	STA <Map_Skid_DeltaY
+;
+;	LDA <World_Map_X,X
+;	SUB #$20
+;	STA <Map_Skid_DeltaX
+;
+;	LDA #$00
+;	STA <Map_Skid_TravDirs
+;	STA <Map_Skid_DeltaFracX
+;	STA <Map_Skid_DeltaFracY
+;
+;	LDA <World_Map_X,X
+;	CMP #32
+;	BGE PRG011_A610	 ; If Player's Map X >= 32 (the common start X of all maps), jump to PRG011_A610
+;
+;	; Player's Map X < 32...
+;
+;	; Set bit 0 on Map_Skid_TravDirs (travel right instead of left)
+;	LDA #$01
+;	STA <Map_Skid_TravDirs
+;
+;	; Negate Map_Skid_DeltaX
+;	LDA #$ff
+;	EOR <Map_Skid_DeltaX
+;	TAY
+;	INY
+;	STY <Map_Skid_DeltaX
+;
+;PRG011_A610:
+;	LDY World_Num	 ; Y = World_Num
+;
+;	LDA <World_Map_Y,X
+;	CMP Map_Y_Starts,Y
+;	BGE PRG011_A628	 ; If Player's Map Y >= the starting Y of the map, jump to PRG011_A628
+;
+;	; Player's Map Y < the starting Y of the map...
+;
+;	; Negate Map_Skid_DeltaY
+;	LDA #$ff
+;	EOR <Map_Skid_DeltaY
+;	TAY
+;	INY
+;	STY <Map_Skid_DeltaY
+;
+;	; Set bit 1 on Map_Skid_TravDirs (travel down instead of up)
+;	LDA <Map_Skid_TravDirs
+;	ORA #$02
+;	STA <Map_Skid_TravDirs
+;
+;PRG011_A628:
+;
+;	; Lowest 4 bits of Map_Skid_DeltaY/X -> Upper 4 bits of Map_Skid_DeltaFracY/X
+;	LDY #$04	 ; Y = 4
+;PRG011_A62A:
+;	CLC		 ; Clear carry
+;	LSR <Map_Skid_DeltaY		; Bit 0 of Map_Skid_DeltaY -> carry
+;	ROR <Map_Skid_DeltaFracY		; Set as bit 7 of Map_Skid_DeltaFracY
+;
+;	CLC		 ; Clear carry
+;	LSR <Map_Skid_DeltaX		; Bit 0 of Map_Skid_DeltaX -> carry
+;	ROR <Map_Skid_DeltaFracX		; Set as bit 7 of Map_Skid_DeltaFracX
+;
+;	DEY			; Y--
+;	BPL PRG011_A62A		; While Y >= 0, loop!
+;
+;	; Map_Skid_Counter = $20
+;	LDA #$20
+;	STA <Map_Skid_Counter
+;
+;	INC <Map_SkidBack		 ; Set Map_SkidBack
+;
+;PRG011_A63D:
+;
+;	; Skid sound
+;	LDA #SND_LEVELSKID
+;	STA Sound_QLevel2
+;
+;	LDA <Map_Skid_TravDirs
+;	AND #$01
+;	BEQ PRG011_A65E	 ; If Player is traveling left, jump to PRG011_A65E
+;
+;	; Traveling to the right...
+;
+;	; Map_Skid_FracX += Map_Skid_DeltaFracX
+;	LDA <Map_Skid_FracX
+;	ADD <Map_Skid_DeltaFracX
+;	STA <Map_Skid_FracX
+;
+;	; Add and carry into the full X
+;	LDA <World_Map_X,X
+;	ADC <Map_Skid_DeltaX
+;	STA <World_Map_X,X
+;
+;	; Any additional carry into Map XHi
+;	LDA <World_Map_XHi,X
+;	ADC #$00
+;	STA <World_Map_XHi,X
+;
+;	JMP PRG011_A671	 ; Jump to PRG011_A671
+;
+;PRG011_A65E:
+;
+;	; Traveling to the left
+;
+;	; Map_Skid_FracX -= Map_Skid_DeltaFracX
+;	LDA <Map_Skid_FracX
+;	SUB <Map_Skid_DeltaFracX
+;	STA <Map_Skid_FracX
+;
+;	; Subtract and carry into the full X
+;	LDA <World_Map_X,X
+;	SBC <Map_Skid_DeltaX
+;	STA <World_Map_X,X
+;
+;	; Any additional carry into Map XHi
+;	LDA <World_Map_XHi,X
+;	SBC #$00
+;	STA <World_Map_XHi,X
+;
+;PRG011_A671:
+;	LDA <Map_Skid_TravDirs
+;	AND #$02
+;	BEQ PRG011_A687	 ; If Player is traveling up, jump to PRG011_A65E
+;
+;	; Traveling downward
+;
+;	; Map_Skid_FracY += Map_Skid_DeltaFracY
+;	LDA <Map_Skid_FracY
+;	ADD <Map_Skid_DeltaFracY
+;	STA <Map_Skid_FracY
+;
+;	; Add and carry into the full Y
+;	LDA <World_Map_Y,X
+;	ADC <Map_Skid_DeltaY
+;	STA <World_Map_Y,X
+;
+;	JMP PRG011_A694	 ; Jump to PRG011_A694
+;
+;PRG011_A687:
+;
+;	; Traveling downward
+;
+;	; Map_Skid_FracY -= Map_Skid_DeltaFracY
+;	LDA <Map_Skid_FracY
+;	SUB <Map_Skid_DeltaFracY
+;	STA <Map_Skid_FracY
+;
+;	; Subtract and carry into the full Y
+;	LDA <World_Map_Y,X
+;	SBC <Map_Skid_DeltaY
+;	STA <World_Map_Y,X
+;
+;PRG011_A694:
+;	DEC <Map_Skid_Counter	; Map_Skid_Counter--
+;	BNE PRG011_A6BC	 ; If Map_Skid_Counter <> 0, jump to PRG011_A6BC
+;
+;PRG011_A698:
+;	; GameOver_State = 8 (we've landed, we're done)
+;	LDA #$08
+;	STA GameOver_State
+;
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	LDA #$00
+;	STA <Map_SkidBack
+;	STA World_Map_Twirl,X	 ; Twirling is done
+;	STA Map_Prev_XOff2,X
+;	STA Map_Prev_XHi2,X
+;
+;	; Set the previous values at the twirl landing spot
+;
+;	; Map_Previous_Y = World_Map_Y
+;	LDA <World_Map_Y,X
+;	STA Map_Previous_Y,X
+;
+;	; Map_Previous_X/Hi = Map_Previous_X/Hi
+;	LDA <World_Map_XHi,X
+;	STA Map_Previous_XHi,X
+;	LDA <World_Map_X,X
+;	STA Map_Previous_X,X
+;
+;PRG011_A6BC:
+;	JMP WorldMap_UpdateAndDraw	 ; Update and draw world map and don't come back
+;
+;
+;GameOver_TwirlFromAfar:
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	; Map X -= 2 (Player flying from way off goes directly left)
+;	LDA <World_Map_X,X
+;	SUB #$02
+;	STA <World_Map_X,X
+;	LDA <World_Map_XHi,X
+;	SBC #$00
+;	STA <World_Map_XHi,X
+;
+;	LDA <World_Map_X,X
+;	SUB <Horz_Scroll
+;	BNE PRG011_A6E4	 ; If Player Map X <> Horz_Scroll, jump to PRG011_A6E4
+;
+;	LDA #$00
+;	STA Map_Prev_XOff,X
+;	STA Map_Prev_XHi,X
+;	STA Map_Entered_XHi,X
+;
+;	INC GameOver_State	 ; GameOver_State++
 
 PRG011_A6E4:
 
@@ -1113,41 +1114,42 @@ Map_DrawBorderForPlayer:
 PRG011_A727:
 	RTS		 ; Return
 
+	;free space
+	.ds 46
+;GameOver_AlignToStartY
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	; Enter from right side
+;	LDA #240
+;	STA <World_Map_X,X
+;
+;	LDY World_Num		 ; Y = World_Num
+;	LDA Map_Y_Starts,Y	 ; Get start Y
+;	STA <World_Map_Y,X	 ; Set Player at start Y
+;
+;	INC GameOver_State	 ; GameOver_State++
+;	JMP PRG011_A6E4	 	; Jump to PRG011_A6E4
+;
+;GameOver_ReturnToStartX:
+;	LDX Player_Current	 ; X = Player_Current
+;
+;	; Player's Map X -= 2 (skidding towards Start panel)
+;	LDA <World_Map_X,X
+;	SUB #$02
+;	STA <World_Map_X,X
+;
+;	CMP #$20
+;	BNE PRG011_A74E	 ; If Player is not at $20 (fixed start point X), jump to PRG011_A74E
+;
+;	JMP PRG011_A698	 ; Jump to PRG011_A698
 
-GameOver_AlignToStartY
-	LDX Player_Current	 ; X = Player_Current
-
-	; Enter from right side
-	LDA #240
-	STA <World_Map_X,X
-
-	LDY World_Num		 ; Y = World_Num
-	LDA Map_Y_Starts,Y	 ; Get start Y
-	STA <World_Map_Y,X	 ; Set Player at start Y
-
-	INC GameOver_State	 ; GameOver_State++
-	JMP PRG011_A6E4	 	; Jump to PRG011_A6E4
-
-GameOver_ReturnToStartX:
-	LDX Player_Current	 ; X = Player_Current
-
-	; Player's Map X -= 2 (skidding towards Start panel)
-	LDA <World_Map_X,X
-	SUB #$02
-	STA <World_Map_X,X
-
-	CMP #$20
-	BNE PRG011_A74E	 ; If Player is not at $20 (fixed start point X), jump to PRG011_A74E
-
-	JMP PRG011_A698	 ; Jump to PRG011_A698
-
-PRG011_A74E:
-
-	; Play skidding sound (actually pointless from where it jumps)
-	LDA #SND_LEVELSKID
-	STA Sound_QLevel2
-
-	JMP PRG011_A6E4	 ; Jump to PRG011_A6E4
+;PRG011_A74E:
+;
+;	; Play skidding sound (actually pointless from where it jumps)
+;	LDA #SND_LEVELSKID
+;	STA Sound_QLevel2
+;
+;	JMP PRG011_A6E4	 ; Jump to PRG011_A6E4
 
 MO_SkidToPrev:
 	LDX Player_Current	 ; X = Player_Current

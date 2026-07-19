@@ -2035,7 +2035,7 @@ OBJSTATE_POOFDEATH	= 8	; "Poof" Death (e.g. Piranha death)
 	; NOTE: sharing
 	World_EnterState:		; State variable during "world X" intro entrance, set to 3 when entering a level; overlaps GameOver_State
 	CineKing_State:			; State of King-got-his-wand-back sequence
-	GameOver_State:		.ds 1	; State variable used during "Gameover!" sequence only; overlaps World_EnterState
+	GameOver_State:		.ds 1	; GameOver_State UNUSED, State variable used during "Gameover!" sequence only; overlaps World_EnterState
 
 	Map_Operation:		.ds 1	; Map_Operation: Current "operation" happening on map (See Map_DoOperation in PRG010)
 
@@ -2741,9 +2741,9 @@ CFIRE_LASER		= $15	; Laser fire
 	Inventory_Coins2:	.ds 1	; Luigi's coins
 	Map_Unused7DC6:		.ds 5	; $7DC6-$7DCA? Indexed by Map_Unused738, value used in dead routine in PRG011 @ $A2AF
 
-	Map_GameOver_CursorY:	.ds 1	; Game Over popup cursor Y ($60/$68)
+	;Map_GameOver_CursorY:	.ds 1	; Game Over popup cursor Y ($60/$68)
 
-				.ds 9	; $7DCC-$7DD4 unused
+				.ds 10	; $7DCB-$7DD4 unused
 
 	Map_PrevMoveDir:	.ds 1	; Last SUCCESSFUL (allowed) movement direction on map R01 L02 D04 U08
 

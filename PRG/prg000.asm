@@ -5782,6 +5782,7 @@ Player_Die:
 	STA Player_StarInv
 	STA Player_Statue
 	STA Level_PSwitchCnt
+	STA ShoeStompFlag
 
 	LDA #$01
 	STA Player_QueueSuit	 ; Queue change to "small"

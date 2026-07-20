@@ -5950,3 +5950,15 @@ GetWakeupTimer:
 _get_wakeup_timer_std:
 	LDA Objects_Timer3,X
 	RTS
+
+;NOTE: this works fine only because the shell never wakes up
+MultiBounceShell:
+	LDA Level_ObjectID,X
+	CMP #$8F
+	BNE NonMultiBounce
+	INC Objects_HitCount,X		;2 bounce shell
+
+NonMultiBounce:
+	LDA #OBJSTATE_SHELLED
+	STA Objects_State,X
+	RTS

@@ -4032,8 +4032,11 @@ PRG000_D323:
 
 Object_SetShellState:
 	; Set Objects_State to Shelled
-	LDA #OBJSTATE_SHELLED
-	STA Objects_State,X
+	;LDA #OBJSTATE_SHELLED
+	;STA Objects_State,X
+	JSR MultiBounceShell
+	NOP
+	NOP
 
 	; Set timer 3 = $FF (wake up timer)
 	LDA #$ff

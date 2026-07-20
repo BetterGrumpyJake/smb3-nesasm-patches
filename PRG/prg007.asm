@@ -6147,10 +6147,13 @@ CFire_BulletBill:
 	BNE PRG007_BF28		; If Cannon Fire has fallen off screen horizontally, jump to PRG007_BF28 (RTS)
 
 	; Reset Cannon Fire timer to $80-$9F, random
-	LDA RandomN,X
-	AND #$1f
-	ORA #$80
-	STA CannonFire_Timer,X
+	LDA #$80
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    STA CannonFire_Timer,X
 
 	LDA CannonFire_X,X
 	SUB <Horz_Scroll

@@ -3955,8 +3955,9 @@ PRG000_D2B4:
 	ORA #SND_PLAYERSWIM
 	STA Sound_QPlayer
 
-	DEC Objects_HitCount,X	; HitCount--
-	BPL PRG000_D2B3	 ; If hits remain, jump to PRG000_D2B3 (RTS)
+	JSR MultiBounceShell
+	;DEC Objects_HitCount,X	; HitCount--
+	;BPL PRG000_D2B3	 ; If hits remain, jump to PRG000_D2B3 (RTS)
 
 	LDA ObjGroupRel_Idx	 ; A = object group relative index
 	ASL A		 ; Shift left 1 (2 byte index)
@@ -4032,11 +4033,8 @@ PRG000_D323:
 
 Object_SetShellState:
 	; Set Objects_State to Shelled
-	;LDA #OBJSTATE_SHELLED
-	;STA Objects_State,X
-	JSR MultiBounceShell
-	NOP
-	NOP
+	LDA #OBJSTATE_SHELLED
+	STA Objects_State,X
 
 	; Set timer 3 = $FF (wake up timer)
 	LDA #$ff

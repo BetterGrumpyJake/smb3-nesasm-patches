@@ -5955,10 +5955,14 @@ _get_wakeup_timer_std:
 MultiBounceShell:
 	LDA Level_ObjectID,X
 	CMP #$8F
-	BNE NonMultiBounce
-	INC Objects_HitCount,X		;2 bounce shell
+	BEQ HitsRemain
 
 NonMultiBounce:
-	LDA #OBJSTATE_SHELLED
-	STA Objects_State,X
+	DEC Objects_HitCount,X	; HitCount--
+	BMI MultiBounceRet	 ; If hits remain, jump to MultiBounceRet (RTS)
+
+HitsRemain:
+	PLA
+	PLA
+MultiBounceRet:
 	RTS

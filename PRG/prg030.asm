@@ -1124,11 +1124,13 @@ PRG030_881D:
 	AND #$1f	 
 	STA Map_EntTran_BVAddrL+2
 
-	LDA #$30
+	LDA #$00
 	STA Map_EntTran_Cnt	 ; Map_EntTran_Cnt = $30
 
-	LDA #SND_MAPENTERLEVEL
-	STA Sound_QMap	 ; Play "enter level" sound effect!
+	;LDA #SND_MAPENTERLEVEL
+	;STA Sound_QMap	 ; Play "enter level" sound effect!
+	LDA #MUS1_STOPMUSIC 
+	STA Sound_QMusic1
 
 	; Loop until V-Blank is not occurring
 PRG030_883E:

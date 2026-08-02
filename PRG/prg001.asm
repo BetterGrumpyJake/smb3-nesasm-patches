@@ -41,7 +41,7 @@ ObjectGroup00_InitJumpTable:
 	.word ObjInit_PUpMush	; Object $0D - OBJ_POWERUP_MUSHROOM
 	.word ObjInit_Koopaling	; Object $0E - OBJ_BOSS_KOOPALING
 	.word ObjInit_DoNothing	; Object $0F
-	.word ObjInit_HoldNote	; Object $10
+	.word ObjInit_DoNothing	; Object $10
 	.word ObjInit_DoNothing	; Object $11
 	.word ObjInit_DoNothing	; Object $12
 	.word ObjInit_DoNothing	; Object $13
@@ -444,9 +444,6 @@ ObjP08:	.byte $FB, $FB, $FB, $FB, $BB, $B9, $B9, $BB, $BF, $BD
 HOLDNOTE_BUMPLENGTH = 8			;how many frames for bounce animation, using 8 so you can place above munchers
 HOLDNOTE_FLOATFRAMES = 12		;how many frames for holding A float/extended jump height
 HOLDNOTE_MAXBOB = -$10			;cap on the blocks upward bob (more negative = higher; $00 = no bob)
-
-ObjInit_HoldNote:
-	RTS							;spawns at rest, gravity settles it
 
 ObjNorm_HoldNote:
 	JSR Object_DeleteOffScreen

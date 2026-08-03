@@ -295,7 +295,7 @@ Object_BoundBox:
 
 Object_AttrFlags:
 	; Defines flags which set attributes of objects
-	.byte OAT_BOUNDBOX00	; Object $00
+	.byte OAT_BOUNDBOX01 | OAT_WEAPONIMMUNITY | OAT_HITNOTKILL | OAT_BOUNCEOFFOTHERS	; Object $00
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $01
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $02
 	.byte OAT_BOUNDBOX00	; Object $03
@@ -566,25 +566,25 @@ PRG000_C3E7:
 ; FIXME: Anybody want to claim this?
 ; Looks like maybe a leftover debug routine for some kind of "float around" mode maybe!!
 ; $C3EA 
-	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player X velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_XVel
-
-	LDA <Pad_Holding
-	LSR A
-	LSR A
-	AND #((PAD_UP | PAD_DOWN) >> 2)
-	TAY		 ; Y = 1 or 2
-
-	; Set Player Y velocity directly??
-	LDA PRG000_C3E7,Y
-	STA <Player_YVel
-
-	RTS		 ; Return
+;	LDA <Pad_Holding
+;	AND #(PAD_LEFT | PAD_RIGHT)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player X velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_XVel
+;
+;	LDA <Pad_Holding
+;	LSR A
+;	LSR A
+;	AND #((PAD_UP | PAD_DOWN) >> 2)
+;	TAY		 ; Y = 1 or 2
+;
+;	; Set Player Y velocity directly??
+;	LDA PRG000_C3E7,Y
+;	STA <Player_YVel
+;
+;	RTS		 ; Return
 
 	; Offsets into Sprite_RAM used by objects
 SprRamOffsets:
@@ -1781,13 +1781,13 @@ PRG000_C918:
 ; FIXME: Anybody want to claim this?
 ; Appears to be a debug routine that would toggle the Player to be invincible by pressing SELECT
 ; $C91B
-	LDA <Pad_Input
-	AND #PAD_SELECT
-	BEQ PRG000_C927	 ; If Player is NOT pressing SELECT, jump to PRG000_C927
-
-	; Toggle invincibility flag
-	EOR Player_DebugNoHitFlag
-	STA Player_DebugNoHitFlag
+;	LDA <Pad_Input
+;	AND #PAD_SELECT
+;	BEQ PRG000_C927	 ; If Player is NOT pressing SELECT, jump to PRG000_C927
+;
+;	; Toggle invincibility flag
+;	EOR Player_DebugNoHitFlag
+;	STA Player_DebugNoHitFlag
 
 PRG000_C927:
 	LDA Splash_DisTimer
@@ -2283,6 +2283,9 @@ PRG000_CB7B:
 
 	LDA Level_ObjectID,X
 
+	CMP #OBJ_SPRITEKILLER
+	BEQ PRG000_CB86
+
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CB86		; If this is a Bob-omb exploding, jump to PRG000_CB86
 
@@ -2293,6 +2296,7 @@ PRG000_CB86:
 
 	; Have object flip same way as Player
 	LDA <Player_FlipBits
+	EOR #SPR_HFLIP
 	STA Objects_FlipBits,X
 
 	JMP Object_ShakeAndDraw	 ; Draw object and never come back!
@@ -2584,7 +2588,7 @@ PRG000_CCF4:
 
 PRG000_CCF7: 
 	JSR Object_HandleBumpUnderneath	 ; Handle the kicked shelled object getting hit from underneath
- 
+
 	TXA 
 	ADD <Counter_1 
 	LSR A 
@@ -2840,6 +2844,9 @@ Player_KickObject:
 	STA Objects_Timer2,X
 
 	LDA Level_ObjectID,X
+	
+	CMP #OBJ_SPRITEKILLER
+	BEQ PRG000_CE54
 
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CE54	 ; If this is a Bob-omb ready to explode, jump to PRG000_CE54
@@ -3103,10 +3110,15 @@ PRG000_CF49:
 	ORA #SND_PLAYERKICK
 	STA Sound_QPlayer
 
+	LDA Level_ObjectID,X
+	CMP #OBJ_SPRITEKILLER
+	BEQ DoNotKill
+
 	; Object which was held is dead!
 	LDA #OBJSTATE_KILLED
 	STA Objects_State,X
 
+DoNotKill:
 	; Y velocity = -$30 (fly up a bit)
 	LDA #-$30
 	STA <Objects_YVel,X
@@ -3434,6 +3446,9 @@ ObjectHeld_WakeUpDir:	.byte $40, $00
 Object_ShellDoWakeUp:
 
 	; If object is a Bob-omb, jump to PRG000_D0EC, otherwise jump to PRG000_D101
+	LDA Level_ObjectID,X
+	CMP #OBJ_SPRITEKILLER		;skip holdnote
+    BEQ PRG000_D100
 	LDA Level_ObjectID,X	  
 	CMP #OBJ_BOBOMBEXPLODE 
 	BEQ PRG000_D0EC 

@@ -445,12 +445,13 @@ ObjNorm_SpriteKiller
 	JSR Object_DeleteOffScreen
 	JSR Object_ShakeAndDraw
 	
-	LDA <Player_HaltGame
+	LDA <Player_HaltGame				;if gameplay halted RTS
 	BNE SpriteKiller_Ret
 
-	JSR Object_Move
-	JSR Object_BumpOffOthers
+	JSR Object_Move						;move, when thrown
+	JSR Object_BumpOffOthers			;bump off other objects
 	
+;world detection stuff
 	LDA <Objects_DetStat,X
 	AND #$04
 	BEQ WallCheck
@@ -496,24 +497,36 @@ WallCheck:
 	ROR <Objects_XVel,X
 
 SpriteKiller_HitTest:
-	JSR Object_HitTest
-	BCC SpriteKiller_Ret
+	JSR Object_HitTest				;mario to object hit test
+	BCC SpriteKiller_Ret			;carry clear = no collision
 	
-	LDA Objects_PlayerHitStat,X	;did mario land on it from above
+	LDA Objects_PlayerHitStat,X		;did mario land on it from above
 	AND #$01
 	BEQ	SpriteKiller_Carry
 	
-	LDA <Player_YVel			;rising, not a real land
+	LDA <Player_YVel				;rising, not a real land
 	BMI SpriteKiller_Ret
+	
+;snap to top	
+	LDA <Objects_Y,X
+	SUB #28
+	STA <Player_Y
+	
+	LDA <Objects_YHi,X
+	SBC #0
+	STA <Player_YHi
+
 	LDA #$00
-	STA <Player_InAir
+	STA <Player_InAir				;set player as on ground
+	;LDA #$06
+	;STA Player_AllowAirJump		;sets the allowairjump that allows a jump, decrements every frame
 	
 SpriteKiller_Carry:
-	BIT <Pad_Holding			;otherwise grab it if holding button
+	BIT <Pad_Holding				;otherwise grab it if holding button
 	BVC SpriteKiller_Ret
-	LDA Player_ISHolding_OLD
+	LDA Player_ISHolding_OLD		;check if was holding
 	BNE SpriteKiller_Ret
-	LDA #OBJSTATE_HELD
+	LDA #OBJSTATE_HELD				;hold it
 	STA Objects_State,X
 
 SpriteKiller_Ret:

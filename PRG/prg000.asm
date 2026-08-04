@@ -274,8 +274,24 @@ OTDO_Water:	.byte $04, $08
 
 	; Defines the "bounding box" 
 	; Selected by Object_AttrFlags lower 4 bits
+	
+;	COL1 - X offset from sprite X (left edge)
+;	COL2 - Offset to right (width) ----->
+;	COL3 - Y offset from sprite Y (top edge)
+;	COL4 - Offset to bottom (height) |
+;									\|/
+;	COL1 -------> COL2
+;	 _______________	COL3
+;	|				|    |
+;	|				|	 |
+;	|				|	 | 
+;	|	BBOX		|	 |  
+;	|				|	 |
+;	|				|	\|/
+;	|_______________|	COL4
+	
 Object_BoundBox:
-	;    Left Right Bot Top - offsets applied to sprite X/Y
+	;    Left Right Top Bot - offsets applied to sprite X/Y
 	.byte  2,   4,   2,   8	; 0
 	.byte  1,  13,   2,   8	; 1
 	.byte  2,  12,   2,  24	; 2
@@ -5187,8 +5203,24 @@ PRG000_D82B:
 	; Temp_Var2 - offset to right bounding box (width)
 	; Temp_Var5 - top of bounding box
 	; Temp_Var6 - offset to bottom bounding box (height)
+	
+;	COL1 - X offset from sprite X (left edge)
+;	COL2 - Offset to right (width) ----->
+;	COL3 - Y offset from sprite Y (top edge)
+;	COL4 - Offset to bottom (height) |
+;									\|/
+;	COL1 -------> COL2
+;	 _______________	COL3
+;	|				|    |
+;	|				|	 |
+;	|				|	 | 
+;	|	BBOX		|	 |  
+;	|				|	 |
+;	|				|	\|/
+;	|_______________|	COL4
+
 Player_BoundBox:
-	;    Left Right  Bot Top - offsets applied to sprite X/Y
+	;  Left Right Top Bot - offsets applied to sprite X/Y
 	.byte 4,  8, 17, 13	; small/ducking
 	.byte 3, 10,  5, 25	; otherwise
 

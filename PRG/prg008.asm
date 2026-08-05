@@ -1367,50 +1367,62 @@ PRG008_A6E5:
 	STA <Pad_Holding	; Otherwise, disable all directional inputs
 
 PRG008_A6F2:
-	LDY <Player_Suit
-	BEQ PRG008_A70E	 	; If Player is small, jump to PRG008_A70E
+	LDY <Player_Suit		;cannot duck, clear and exit
+	BEQ PRG008_A70E	 		; If Player is small, jump to PRG008_A70E
 
-	CPY #PLAYERSUIT_FROG
-	BEQ PRG008_A70E	 	; If Player is Frog, jump to PRG008_A70E
+	CPY #PLAYERSUIT_FROG	;cannot duck, clear and exit
+	BEQ PRG008_A70E	 		; If Player is Frog, jump to PRG008_A70E
 
 	LDA Player_IsHolding
 	ORA Player_Slide
-	ORA Player_Kuribo
-	BNE PRG008_A70E	 	; If Player is holding something, sliding down a slope, or in a Kuribo's shoe, jump to PRG008_A70E 
+	ORA Player_Kuribo		;cannot duck, clear and exit
+	BNE PRG008_A70E	 		; If Player is holding something, sliding down a slope, or in a Kuribo's shoe, jump to PRG008_A70E 
 
-	LDA <Player_InAir
-	BEQ PRG008_A71C	 	; If Player is NOT mid air, jump to PRG008_A71C
+	LDA <Player_InAir		;on ground, clear and recheck inputs
+	BEQ PRG008_A71C	 		; If Player is NOT mid air, jump to PRG008_A71C
 
-	LDA Player_InWater
-	BEQ PRG008_A715	 	; If Player is NOT in water, jump to PRG008_A715
+	LDA Player_InWater		;airborne, preserve duck state
+	BEQ PRG008_A736	 		; If Player is NOT in water, jump to PRG008_A736
 
 PRG008_A70E:
 	; Forcefully disable any ducking
-	LDA #$00
-	STA Player_IsDucking	; Player_IsDucking = 0
+	LDY #$00
+	;STA Player_IsDucking	; Player_IsDucking = 0
+	BEQ PRG008_A733	 		; Jump (technically always) to PRG008_A733
 
-	BEQ PRG008_A736	 	; Jump (technically always) to PRG008_A736
-
-PRG008_A715:
-	LDA Player_IsDucking
-	BNE PRG008_A733	 	; If Player is ducking down, jump to PRG008_A733
-	BEQ PRG008_A736	 	; Otherwise, jump to PRG008_A736
+;PRG008_A715:
+	;LDA Player_IsDucking
+	;BNE PRG008_A733	 	; If Player is ducking down, jump to PRG008_A733
+	;BEQ PRG008_A736	 	; Otherwise, jump to PRG008_A736
 
 PRG008_A71C:
 	LDA #$00
 	STA Player_IsDucking	; Player_IsDucking = 0
 
 	LDA Level_SlopeEn
-	BEQ PRG008_A72B	 	; If slopes are not enabled, jump to PRG008_A72B
+	BEQ PRG008_A72B	 		; If slopes are not enabled, jump to PRG008_A72B
 
 	LDA Player_SlideRate 
-	BNE PRG008_A736	 	; If Player has a slide magnitude, jump to PRG008_A736
+	BNE PRG008_A736	 		; If Player has a slide magnitude, jump to PRG008_A736
 
 PRG008_A72B:
 	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT | PAD_UP | PAD_DOWN)
-	CMP #PAD_DOWN
-	BNE PRG008_A736	 	; If Player is not just holding down, jump to PRG008_A736
+	;AND #(PAD_LEFT | PAD_RIGHT | PAD_UP | PAD_DOWN)
+	;CMP #PAD_DOWN
+	;BNE PRG008_A736	 	; If Player is not just holding down, jump to PRG008_A736
+	AND #PAD_DOWN
+	BEQ PRG008_A736			;if player is holding down at all, jmp to PRG008_A736
+
+	LDA <Pad_Holding
+	AND #~(PAD_LEFT | PAD_RIGHT)
+	STA <Pad_Holding		;disable left/right movement while ducked
+	
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 PRG008_A733:
 	STY Player_IsDucking	; Set ducking flag (uses non-zero suit value)

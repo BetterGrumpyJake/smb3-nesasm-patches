@@ -1205,7 +1205,7 @@ Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
 	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
-;	.byte $08, $04
+	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
 Player_SomersaultFlipBits:
@@ -1313,10 +1313,10 @@ Player_ControlJmp:
 
 ; FIXME: Anybody want to claim this?
 ; $A6B0 
-	ORA <Temp_Var4
-	JSR Player_ApplyXVelocity
-	JSR Player_ApplyYVelocity
-	JMP Player_Draw29
+;	ORA <Temp_Var4
+;	JSR Player_ApplyXVelocity
+;	JSR Player_ApplyYVelocity
+;	JMP Player_Draw29
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Player_Control
@@ -1367,50 +1367,55 @@ PRG008_A6E5:
 	STA <Pad_Holding	; Otherwise, disable all directional inputs
 
 PRG008_A6F2:
-	LDY <Player_Suit
-	BEQ PRG008_A70E	 	; If Player is small, jump to PRG008_A70E
+	LDY <Player_Suit		;cannot duck, clear and exit
+	BEQ PRG008_A70E	 		; If Player is small, jump to PRG008_A70E
 
-	CPY #PLAYERSUIT_FROG
-	BEQ PRG008_A70E	 	; If Player is Frog, jump to PRG008_A70E
+	CPY #PLAYERSUIT_FROG	;cannot duck, clear and exit
+	BEQ PRG008_A70E	 		; If Player is Frog, jump to PRG008_A70E
 
 	LDA Player_IsHolding
 	ORA Player_Slide
-	ORA Player_Kuribo
-	BNE PRG008_A70E	 	; If Player is holding something, sliding down a slope, or in a Kuribo's shoe, jump to PRG008_A70E 
+	ORA Player_Kuribo		;cannot duck, clear and exit
+	BNE PRG008_A70E	 		; If Player is holding something, sliding down a slope, or in a Kuribo's shoe, jump to PRG008_A70E 
 
-	LDA <Player_InAir
-	BEQ PRG008_A71C	 	; If Player is NOT mid air, jump to PRG008_A71C
+	LDA <Player_InAir		;on ground, clear and recheck inputs
+	BEQ PRG008_A71C	 		; If Player is NOT mid air, jump to PRG008_A71C
 
-	LDA Player_InWater
-	BEQ PRG008_A715	 	; If Player is NOT in water, jump to PRG008_A715
+	LDA Player_InWater		;airborne, preserve duck state
+	BEQ PRG008_A736	 		; If Player is NOT in water, jump to PRG008_A736
 
 PRG008_A70E:
 	; Forcefully disable any ducking
-	LDA #$00
-	STA Player_IsDucking	; Player_IsDucking = 0
+	LDY #$00
+	;STA Player_IsDucking	; Player_IsDucking = 0
+	BEQ PRG008_A733	 		; Jump (technically always) to PRG008_A733
 
-	BEQ PRG008_A736	 	; Jump (technically always) to PRG008_A736
-
-PRG008_A715:
-	LDA Player_IsDucking
-	BNE PRG008_A733	 	; If Player is ducking down, jump to PRG008_A733
-	BEQ PRG008_A736	 	; Otherwise, jump to PRG008_A736
+;PRG008_A715:
+	;LDA Player_IsDucking
+	;BNE PRG008_A733	 	; If Player is ducking down, jump to PRG008_A733
+	;BEQ PRG008_A736	 	; Otherwise, jump to PRG008_A736
 
 PRG008_A71C:
 	LDA #$00
 	STA Player_IsDucking	; Player_IsDucking = 0
 
 	LDA Level_SlopeEn
-	BEQ PRG008_A72B	 	; If slopes are not enabled, jump to PRG008_A72B
+	BEQ PRG008_A72B	 		; If slopes are not enabled, jump to PRG008_A72B
 
 	LDA Player_SlideRate 
-	BNE PRG008_A736	 	; If Player has a slide magnitude, jump to PRG008_A736
+	BNE PRG008_A736	 		; If Player has a slide magnitude, jump to PRG008_A736
 
 PRG008_A72B:
 	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT | PAD_UP | PAD_DOWN)
-	CMP #PAD_DOWN
-	BNE PRG008_A736	 	; If Player is not just holding down, jump to PRG008_A736
+	;AND #(PAD_LEFT | PAD_RIGHT | PAD_UP | PAD_DOWN)
+	;CMP #PAD_DOWN
+	;BNE PRG008_A736	 	; If Player is not just holding down, jump to PRG008_A736
+	AND #PAD_DOWN
+	BEQ PRG008_A736			;if player is not holding down at all, jmp to PRG008_A736
+
+	LDA <Pad_Holding
+	AND #~(PAD_LEFT | PAD_RIGHT)
+	STA <Pad_Holding		;disable left/right movement while ducked
 
 PRG008_A733:
 	STY Player_IsDucking	; Set ducking flag (uses non-zero suit value)
@@ -1484,7 +1489,7 @@ PRG008_A77E:
 	BLT PRG008_A7AD	 ; If tile index is less than value in Tile_AttrTable (not solid for wall/ceiling), jump to PRG008_A7AD
 
 	LDA <Player_InAir
-	ORA Player_InWater
+	;ORA Player_InWater		;allow water, if you are big in a 1 tile wide tunnel your screwed though. that was same as vanilla though
 	ORA Level_PipeMove
 	BNE PRG008_A7AD	 	; If Player is mid air, in water, or moving in a pipe, jump to PRG008_A7AD
 
@@ -1493,30 +1498,28 @@ PRG008_A77E:
 	; A is logically zero here...
 
 	; Stop Player horizontally, disable controls
-	STA <Player_XVel
-	STA <Pad_Input
+	STA <Player_XVel		;stop left/right movement
+	;STA <Pad_Input
+	LDA <Player_Suit		;if >0(small), duck
+	STA Player_IsDucking
 
 	;AND #~PAD_A
 	;STA <Pad_Input	; ?? it's still zero?
-	NOP
-	NOP
 
+	LDX Level_Tile_Quad
+	LDA <Temp_Var2
+	CMP Tile_AttrTable,X
+	BGE PRG008_A7AD
+	
 	; Player_LowClearance = 1 (Player is in a "low clearance" situation!)
-	LDA #$01
-	STA Player_LowClearance
+	LDA #$08
+	;STA Player_LowClearance
 
 	; This makes the Player "slide" when he's in a space too narrow
-	;ADD <Player_X
-	;STA <Player_X	 ; Player_X += 1
-	;BCC PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
-	;INC <Player_XHi	 ; Otherwise, apply carry
-	
-	LDA <Player_X
-	SEC
-	SBC #$01
-	STA <Player_X	 ; Player_X += 1
-	BCS PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
-	DEC <Player_XHi	 ; Otherwise, apply carry
+	ADD <Player_Y
+	STA <Player_Y	 ; Player_Y += 1
+	BCC PRG008_A7AD	 ; If not carry, jump to PRG008_A7AD
+	INC <Player_YHi	 ; Otherwise, apply carry
 
 PRG008_A7AD:
 

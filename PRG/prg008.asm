@@ -4645,7 +4645,7 @@ PRG008_B57E:
 PRG008_B59C:
 	LDA <Player_Y
 	AND #$0f	; Relative to tile vertical position
-	CMP #$06
+	CMP #$09			;fixes niche circumstances, like in a 1 tile tunnel with a lift in it
 	BGE PRG008_B5BB	 ; If Player's vertical tile position >= 6, jump to PRG008_B5BB
 
 	LDA <Player_Y
@@ -6586,7 +6586,7 @@ PRG008_BE4E:
 	STA <Player_YVel	 ; Halt Player vertically 
 
 	LDA <Player_Y
-	ADD #$06
+	ADD #$09
 	STA <Player_Y		; Force Player down by 6 pixels (fall)
 
 	INC <Player_InAir	 ; Set Player as in air

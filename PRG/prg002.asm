@@ -5235,7 +5235,8 @@ PlayerPlatform_Collide:
 	LDA <Player_SpriteY
 	ADD #24
 	CMP <Objects_SpriteY,X
-	BGE PRG002_BABE	 ; If Player's bottom is beneath object's top, jump to PRG002_BABE
+	;BGE PRG002_BABE	 ; If Player's bottom is beneath object's top, jump to PRG002_BABE
+	BGE PRG002_BADA
 
 	LDA <Player_YVel
 	BMI PRG002_BABD	 ; If Player is moving upward, jump to PRG002_BABD
@@ -5250,85 +5251,97 @@ PRG002_BABE:
 
 	; Check if Player is hitting off bottom of platform
 
-	LDA #-$08	; A = -8 unless small or ducking
+	;LDA #-$08	; A = -8 unless small or ducking
 
-	LDY <Player_Suit
-	BEQ PRG002_BAC9	 ; If Player is small, jump to PRG002_BAC9
+	;LDY <Player_Suit
+	;BEQ PRG002_BAC9	 ; If Player is small, jump to PRG002_BAC9
 
-	LDY Player_IsDucking
-	BEQ PRG002_BACB	 ; If Player is NOT ducking, jump to PRG002_BACB
+	;LDY Player_IsDucking
+	;BEQ PRG002_BACB	 ; If Player is NOT ducking, jump to PRG002_BACB
+	.byte $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA
 
 PRG002_BAC9:
-	LDA #$08	 ; A = 8 if small or ducking
+	;LDA #$08	 ; A = 8 if small or ducking
+	NOP
+	NOP
 
 PRG002_BACB:
-	ADD <Player_SpriteY
-	CMP <Objects_SpriteY,X
-	BLT PRG002_BADC	 ; If Player's Sprite top is near object's top, jump to PRG002_BADC
+	;ADD <Player_SpriteY
+	;CMP <Objects_SpriteY,X
+	;BLT PRG002_BADC	 ; If Player's Sprite top is near object's top, jump to PRG002_BADC
 
-	LDA <Player_YVel
-	BPL PRG002_BADA	 ; If Player is falling, jump to PRG002_BADA
+	;LDA <Player_YVel
+	;BPL PRG002_BADA	 ; If Player is falling, jump to PRG002_BADA
 
 	; Player hits head off platform
-	LDA #$10
-	STA <Player_YVel
+	;LDA #$10
+	;STA <Player_YVel
+	.byte $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA
 
 PRG002_BADA:
 	CLC		 ; Clear carry (no collision)
 	RTS		 ; Return
 
 PRG002_BADC:
-	LDA <Objects_XVel,X
-	BEQ PRG002_BAF4	 ; If platform is not moving horizontally, jump to PRG002_BAF4
+	;LDA <Objects_XVel,X
+	;BEQ PRG002_BAF4	 ; If platform is not moving horizontally, jump to PRG002_BAF4
 
 	; Platform is moving horizontally...
 
-	LDA <Player_X
-	SUB <Objects_X,X	; Difference between Player and Platform X
-	EOR <Objects_XVel,X	; Most importantly, check if sign differs from velocity
+	;LDA <Player_X
+	;SUB <Objects_X,X	; Difference between Player and Platform X
+	;EOR <Objects_XVel,X	; Most importantly, check if sign differs from velocity
 
-	CLC		 ; Clear carry (no collision)
-	BMI PRG002_BAEF	 ; If signs differ, jump to PRG002_BAEF
+	;CLC		 ; Clear carry (no collision)
+	;BMI PRG002_BAEF	 ; If signs differ, jump to PRG002_BAEF
 
 	; Otherwise, set Player's X velocity to platform's X velocity
-	LDA <Objects_XVel,X
-	STA <Player_XVel
+	;LDA <Objects_XVel,X
+	;STA <Player_XVel
+	.byte $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA
+	.byte $EA, $EA
 
 PRG002_BAEE:
 	RTS		 ; Return
 
-
 PRG002_BAEF:
 
 	; Halt Player's movement
-	LDA #$00
-	STA <Player_XVel
+	;LDA #$00
+	;STA <Player_XVel
 
-	RTS		 ; Return
+	;RTS		 ; Return
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 PRG002_BAF4:
 
 	; Platform is not moving horizontally... 
 
-	JSR Level_ObjCalcXDiffs
+	;JSR Level_ObjCalcXDiffs
 
-	INY		 ; Y = 1 or 2, depending on Player's relative position
+	;INY		 ; Y = 1 or 2, depending on Player's relative position
 
-	LDA <Pad_Holding
-	AND #(PAD_LEFT | PAD_RIGHT)
-	STA <Temp_Var1	 ; Temp_Var1 is non-zero if Player is pressing left/right
+	;LDA <Pad_Holding
+	;AND #(PAD_LEFT | PAD_RIGHT)
+	;STA <Temp_Var1	 ; Temp_Var1 is non-zero if Player is pressing left/right
 
-	CPY <Temp_Var1	 ; Check if Player is pressing a direction favorable to his position
+	;CPY <Temp_Var1	 ; Check if Player is pressing a direction favorable to his position
 
-	CLC		 ; Clear carry (no collision)
+	;CLC		 ; Clear carry (no collision)
 
-	BNE PRG002_BAEF	 ; If Player is pressing against it, jump to PRG002_BAEF (halt Player's movement)
+	;BNE PRG002_BAEF	 ; If Player is pressing against it, jump to PRG002_BAEF (halt Player's movement)
 
 	; Player pushing with platform
-	LDA PlayerPushWithPlatform_XVel-1,Y
-	STA <Player_XVel
+	;LDA PlayerPushWithPlatform_XVel-1,Y
+	;STA <Player_XVel
 
-	RTS		 ; Return
+	;RTS		 ; Return
+	.byte $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA, $EA
+	.byte $EA, $EA, $EA, $EA, $EA
 
 PlayerPushWithPlatform_XVel:	.byte $04, -$04
 

@@ -2285,6 +2285,9 @@ PRG000_CB7B:
 
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CB86		; If this is a Bob-omb exploding, jump to PRG000_CB86
+	
+	CMP #OBJ_HOLDNOTE		;skip holdnote
+	BEQ SkipSpriteFlip
 
 	CMP #OBJ_BOBOMB
 	BNE PRG000_CB8E		; If this is not a Bob-omb of any sort, jump to PRG000_CB8E
@@ -2295,14 +2298,12 @@ PRG000_CB86:
 	LDA <Player_FlipBits
 	STA Objects_FlipBits,X
 
+SkipSpriteFlip:
 	JMP Object_ShakeAndDraw	 ; Draw object and never come back!
 
 PRG000_CB8E:
 	JSR Object_ShakeAndDrawMirrored	 ; Draw mirrored sprite
 
-	LDY Level_ObjectID,X
-	CPY #OBJ_HOLDNOTE		;skip holdnote
-	BEQ PRG000_CBB3
 	CPY #OBJ_ICEBLOCK
 	BEQ PRG000_CBB3	 ; If object is an Iceblock, jump to PRG000_CBB3 (RTS)
 

@@ -168,7 +168,7 @@ ObjectGroup00_Attributes:
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $0D - OBJ_POWERUP_MUSHROOM
 	.byte OA1_PAL2 | OA1_HEIGHT32 | OA1_WIDTH24	; Object $0E - OBJ_BOSS_KOOPALING
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8	; Object $0F
-	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $10
+	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $10
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8	; Object $11
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8	; Object $12
 	.byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8	; Object $13
@@ -308,7 +308,7 @@ ObjectGroup00_PatTableSel:
 	.byte OPTS_NOCHANGE	; Object $0D - OBJ_POWERUP_MUSHROOM
 	.byte OPTS_NOCHANGE	; Object $0E - OBJ_BOSS_KOOPALING
 	.byte OPTS_NOCHANGE	; Object $0F
-	.byte OPTS_SETPT5 | 15	; Object $10
+	.byte OPTS_NOCHANGE	; Object $10
 	.byte OPTS_NOCHANGE	; Object $11
 	.byte OPTS_NOCHANGE	; Object $12
 	.byte OPTS_NOCHANGE	; Object $13
@@ -409,7 +409,7 @@ ObjP03:
 ObjP07:
 ObjP0E:
 ObjP0F:
-ObjP10:	.byte $81, $81, $81, $81, $81, $81
+ObjP10:	.byte $79, $7B, $79, $7B, $79, $7B
 ObjP11:
 ObjP12:
 ObjP13:
@@ -448,7 +448,7 @@ HOLDNOTE_MAXBOB = -$10			;cap on the blocks upward bob (more negative = higher; 
 ObjNorm_HoldNote:
 	JSR Object_DeleteOffScreen
 	
-	JSR Object_ShakeAndDrawMirrored
+	JSR Object_ShakeAndDraw
 
 	LDA <Player_HaltGame
 	BNE HoldNote_Ret2

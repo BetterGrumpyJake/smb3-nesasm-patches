@@ -4292,8 +4292,6 @@ GroundTroop_Draw:
 	LDA Level_ObjectID,X
 	CMP #OBJ_BUZZYBEATLE
 	BLT Troopa_Draw	 ; If this is one of the regular troopas or paratroopas, jump to Troopa_Draw
-	CMP #OBJ_SHELLEDTROOPA
-	BEQ Troopa_Draw
 
 	CMP #OBJ_BIGGREENTROOPA
 	BLT PRG004_B4B6	 ; If this is not one of the giant troopas, jump to PRG004_B4B6
@@ -4412,8 +4410,6 @@ PRG004_B520:
 	LDA Level_ObjectID,X
 	CMP #OBJ_PARATROOPAGREENHOP
 	BLT PRG004_B55D	 ; If this is not a paratroopa, jump to PRG004_B55D
-	CMP #OBJ_SHELLEDTROOPA
-	BEQ PRG004_B55D
 
 	LDA Sprite_RAM+$00,Y
 	CMP #$f8

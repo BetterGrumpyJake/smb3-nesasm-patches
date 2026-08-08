@@ -3273,6 +3273,7 @@ KILLACT_NORMALSTATE	= 9	; 9: Just do "Normal" state while killed
 
 ; Object IDs
 
+OBJ_GALOOMBA = $00
 OBJ_BOUNCEDOWNUP	= $06	; Down/up block bounce effect object
 OBJ_WARPHIDE		= $07	; Hidden object that jumps you to the secret warp whistle in 1-3
 OBJ_PSWITCHDOOR		= $08	; Door that appears under influence of P-Switch

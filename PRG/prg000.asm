@@ -311,7 +311,7 @@ Object_BoundBox:
 
 Object_AttrFlags:
 	; Defines flags which set attributes of objects
-	.byte OAT_BOUNDBOX00	; Object $00
+	.byte OAT_BOUNDBOX01 | OAT_BOUNCEOFFOTHERS	; Object $00
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $01
 	.byte OAT_BOUNDBOX01 | OAT_FIREIMMUNITY | OAT_HITNOTKILL	; Object $02
 	.byte OAT_BOUNDBOX00	; Object $03
@@ -2301,6 +2301,9 @@ PRG000_CB7B:
 
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CB86		; If this is a Bob-omb exploding, jump to PRG000_CB86
+	
+	CMP #OBJ_GALOOMBA
+	BEQ Draw_Galoomba
 
 	CMP #OBJ_BOBOMB
 	BNE PRG000_CB8E		; If this is not a Bob-omb of any sort, jump to PRG000_CB8E
@@ -2312,10 +2315,15 @@ PRG000_CB86:
 	STA Objects_FlipBits,X
 
 	JMP Object_ShakeAndDraw	 ; Draw object and never come back!
+	
+Draw_Galoomba:
+	JSR Object_ShakeAndDraw
+	JMP SkipDrawMirrored
 
 PRG000_CB8E:
 	JSR Object_ShakeAndDrawMirrored	 ; Draw mirrored sprite
 
+SkipDrawMirrored:
 	LDY Level_ObjectID,X
 	CPY #OBJ_ICEBLOCK
 	BEQ PRG000_CBB3	 ; If object is an Iceblock, jump to PRG000_CBB3 (RTS)
@@ -2859,6 +2867,9 @@ Player_KickObject:
 
 	CMP #OBJ_BOBOMBEXPLODE
 	BEQ PRG000_CE54	 ; If this is a Bob-omb ready to explode, jump to PRG000_CE54
+	
+	CMP #OBJ_GALOOMBA
+	BEQ PRG000_CE54
 
 	CMP #OBJ_BOBOMB	 
 	BNE PRG000_CE79	 ; If this is NOT a Bob-omb, jump to PRG000_CE79
@@ -3557,8 +3568,15 @@ PRG000_D120:
  
 	BEQ PRG000_D155	 ; Jump (technically always) to PRG000_D155
 
-PRG000_D147: 
+PRG000_D147:
+	LDA Level_ObjectID,X
+	CMP #OBJ_GALOOMBA
+	BNE NotGaloombaWakeUp
 
+	LDA #-$20					;give the galoomba a pop up when waking up
+	STA <Objects_YVel,X
+
+NotGaloombaWakeUp:
 	; Held object did NOT impact... (time to wake up!)
 
 	; Set object state to Normal
@@ -6544,79 +6562,79 @@ Object_AnySprOffscreen:
 ; FIXME: Anybody want to claim this?
 ; Appears it would return a free object slot
 ; $DD5B 
-	LDY #$04	; Y = 4
-PRG000_DD5D:
-	LDA Objects_State,Y
-	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
-
-	DEY		 ; Y--
-	BPL PRG000_DD5D	 ; While Y >= 0, loop
-
-PRG000_DD65:
-	RTS		 ; Return
+;	LDY #$04	; Y = 4
+;PRG000_DD5D:
+;	LDA Objects_State,Y
+;	BEQ PRG000_DD65	 ; If this object slot is dead/empty, jump to PRG000_DD65
+;
+;	DEY		 ; Y--
+;	BPL PRG000_DD5D	 ; While Y >= 0, loop
+;
+;PRG000_DD65:
+;	RTS		 ; Return
 
 
 ; FIXME: Anybody want to claim this?
 ; Appears to apply offsets to Player X/Y (Temp_Var11/Temp_Var10) and get a tile there
 ; $DD66 
 
-	; Temp_Var13 = Player_YHi
-	LDA <Player_YHi
-	STA <Temp_Var13
-
-	; Temp_Var14 = Temp_Var10 (? input var?) + Player_Y
-	LDA <Temp_Var10
-	ADD <Player_Y
-	STA <Temp_Var14
-
-	BCC PRG000_DD75	 ; If no carry, jump to PRG000_DD75
-
-	INC <Temp_Var13		 ; Apply carry
-
-PRG000_DD75:
-	LDA <Temp_Var13
-	BNE PRG000_DD84	 ; If Temp_Var13 <> 0 (Player is on lower screen), jump to PRG000_DD84
-
-	; Temp_Var14 -= 16
-	LDA <Temp_Var14
-	SUB #16
-	STA <Temp_Var14
-	BCS PRG000_DD84	 ; If carry set, jump to PRG000_DD84
-
-	DEC <Temp_Var13		 ; Apply carry
-
-PRG000_DD84:
-
-	; Temp_Var15 = Player_XHi
-	LDA <Player_XHi
-	STA <Temp_Var15
-
-	LDA <Temp_Var11
-	BPL PRG000_DD8E	 ; If Temp_Var11 (? input var?) >= 0, jump to PRG000_DD8E
-
-	DEC <Temp_Var15		 ; Otherwise, Temp_Var15--
-
-PRG000_DD8E:
-
-	; Temp_Var16 = Player_X + Temp_Var11 (? input var)
-	LDA <Player_X
-	ADD <Temp_Var11
-	STA <Temp_Var16
-	BCC PRG000_DD99	 ; If no carry, jump to PRG000_DD99
-
-	INC <Temp_Var15		 ; Apply carry
-
-PRG000_DD99:
-	; Backup X/Y
-	STY <Temp_Var10
-	STX <Temp_Var11
-
-	JSR Player_GetTileAndSlope_Normal
-
-	; Restore X/Y
-	LDY <Temp_Var10
-	LDX <Temp_Var11
-	RTS		 ; Return
+;	; Temp_Var13 = Player_YHi
+;	LDA <Player_YHi
+;	STA <Temp_Var13
+;
+;	; Temp_Var14 = Temp_Var10 (? input var?) + Player_Y
+;	LDA <Temp_Var10
+;	ADD <Player_Y
+;	STA <Temp_Var14
+;
+;	BCC PRG000_DD75	 ; If no carry, jump to PRG000_DD75
+;
+;	INC <Temp_Var13		 ; Apply carry
+;
+;PRG000_DD75:
+;	LDA <Temp_Var13
+;	BNE PRG000_DD84	 ; If Temp_Var13 <> 0 (Player is on lower screen), jump to PRG000_DD84
+;
+;	; Temp_Var14 -= 16
+;	LDA <Temp_Var14
+;	SUB #16
+;	STA <Temp_Var14
+;	BCS PRG000_DD84	 ; If carry set, jump to PRG000_DD84
+;
+;	DEC <Temp_Var13		 ; Apply carry
+;
+;PRG000_DD84:
+;
+;	; Temp_Var15 = Player_XHi
+;	LDA <Player_XHi
+;	STA <Temp_Var15
+;
+;	LDA <Temp_Var11
+;	BPL PRG000_DD8E	 ; If Temp_Var11 (? input var?) >= 0, jump to PRG000_DD8E
+;
+;	DEC <Temp_Var15		 ; Otherwise, Temp_Var15--
+;
+;PRG000_DD8E:
+;
+;	; Temp_Var16 = Player_X + Temp_Var11 (? input var)
+;	LDA <Player_X
+;	ADD <Temp_Var11
+;	STA <Temp_Var16
+;	BCC PRG000_DD99	 ; If no carry, jump to PRG000_DD99
+;
+;	INC <Temp_Var15		 ; Apply carry
+;
+;PRG000_DD99:
+;	; Backup X/Y
+;	STY <Temp_Var10
+;	STX <Temp_Var11
+;
+;	JSR Player_GetTileAndSlope_Normal
+;
+;	; Restore X/Y
+;	LDY <Temp_Var10
+;	LDX <Temp_Var11
+;	RTS		 ; Return
 
 
 

@@ -415,7 +415,7 @@ ObjP69:
 	.byte $81, $83, $85, $87, $89, $89
 ObjP54:
 	.byte $91, $93, $91, $93
-ObjP55:
+ObjP55:	; walking.............held.....kicked?
 	.byte $B1, $B3, $B5, $B7, $A7, $B9, $A7, $B9
 ObjP50:
 	.byte $9D, $BF, $BB, $BD, $BB, $BD, $BB, $BD

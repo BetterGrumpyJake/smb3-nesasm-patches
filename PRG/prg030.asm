@@ -5992,7 +5992,10 @@ DropTrickVel:
 SetThrowDirection:
 	LDA #$00						;clear objects drop flag on rethrow
 	STA Objects_UpDrop,X			;in case shell was dropped and then recaught before hitting the ground clear		
-	
+
+	LDA Player_ISHolding_OLD		;if mario wasn't actually holding the object just kick it
+	BEQ ThrowReturn
+
 	LDA <Pad_Holding				;check if holding up
 	AND #PAD_UP		
 	BNE ThrowReturn					;if not holding up check down

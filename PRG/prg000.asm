@@ -2825,10 +2825,14 @@ PRG000_CE54:
 	STA Objects_State,X
 	
 	;allows any holdable object to be up thrown/dropped
-	LDY ThrowDirection			;throw direction check
-	BEQ Object_RegThrow			;if up/down thrown do velocites, otherwise do regular throw
+	LDY ThrowDirection				;throw direction check
+	BEQ Object_RegThrow				;if up/down thrown do velocites, otherwise do regular throw
+
+	LDA #$00						;clear throwdirection
+	STA ThrowDirection
+
 	JSR SkipShellStuff_30
-	BNE PRG000_CE76				;technically always
+	BNE PRG000_CE76					;technically always
 
 Object_RegThrow:
 	; Set Y vel to -$20 (bounce up)

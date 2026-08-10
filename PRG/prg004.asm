@@ -1281,6 +1281,9 @@ ObjInit_Thwomp:
 	; Var4 = origin Y
 	LDA <Objects_Y,X
 	STA <Objects_Var4,X
+	
+	LDA <Objects_YHi,X
+	STA Objects_Var3,X
 
 Thwomp_Center:
 	; center the X
@@ -1291,6 +1294,10 @@ Thwomp_Center:
 PRG004_A676:
 	RTS		 ; Return
 
+Thwomp_XVel: .byte 120, -120		;right/left speed
+Thwomp_Return = -60					;-16 default, what to store to yvel during return to origin
+Thwomp_Fall = 16					;4=default, how much to add to thwomps y vel while falling
+Thwomp_GroundTimer = 0				;64=default, how long thwomp stays on the ground
 
 ObjNorm_Thwomp:
 	JSR Thwomp_Draw	 ; Draw Thwomp; if not in normal state, we don't come back!
@@ -1298,7 +1305,7 @@ ObjNorm_Thwomp:
 	LDA <Player_HaltGame
 	BNE PRG004_A676	 ; If gameplay halted, jump to PRG004_A676 (RTS)
 
-	JSR Object_DeleteOffScreen	; Delete object if it falls off-screen
+	;JSR Object_DeleteOffScreen	; Delete object if it falls off-screen
 	JSR Player_HitEnemy	 	; Do Player to Thwomp collision
 
 	LDA <Objects_Var5,X	 ; Var5 is internal state
@@ -1309,18 +1316,17 @@ ObjNorm_Thwomp:
 	.word Thwomp_FallToGround
 	.word Thwomp_ReturnToOrigin
 
-Thwomp_WaitForPlayer
+Thwomp_WaitForPlayer:
+	JSR Level_ObjCalcXDiffs			;Y=0 or 1 from this depending if mario is on the right/left
 	JSR Object_AnySprOffscreen
-	BNE PRG004_A6A6	 ; If any sprite is off-screen, jump to PRG004_A6A6 (RTS)
-
-	JSR Level_ObjCalcXDiffs
+	BNE Thwomp_Move	 				; If any sprite is off-screen, jump to PRG004_A6A6 (RTS)
 
 	LDA <Temp_Var16
-	ADD #$24
-	CMP #$50
-	BGE PRG004_A6A6	 ; If Player is too far away, jump to PRG004_A6A6 (RTS)
+	ADD #$00
+	CMP #$09
+	BGE Thwomp_Move	 				;player to far, do nothing, jump to PRG004_A6A6 (RTS)
 
-	INC <Objects_Var5,X	 ; Var5++ (next internal state)
+	INC <Objects_Var5,X	 			; Var5++ (next internal state)
 
 	; Stop Thwomp's vertical movement
 	LDA #$00
@@ -1328,6 +1334,12 @@ Thwomp_WaitForPlayer
 
 PRG004_A6A6:
 	RTS		 ; Return
+	
+Thwomp_Move:
+	LDA Thwomp_XVel,Y				;Y=Thwomp_XVel(0) or Thwomp_XVel(1)
+	STA <Objects_XVel,X
+	JSR Object_ApplyXVel			;apply the vel
+	RTS
 
 Thwomp_FallToGround:
 	JSR Object_ApplyYVel_NoLimit	 ; Apply Y Velocity
@@ -1337,7 +1349,7 @@ Thwomp_FallToGround:
 	BGE PRG004_A6B4	 ; If Thwomp is falling >= $70, jump to PRG004_A6B4
 
 	; Thwomp fall Y Vel += 4
-	ADC #$04
+	ADC #Thwomp_Fall
 	STA <Objects_YVel,X
 
 PRG004_A6B4:
@@ -1359,7 +1371,7 @@ PRG004_A6B4:
 	STA Sound_QLevel1
 
 	; Set timer to $40
-	LDA #$40
+	LDA #Thwomp_GroundTimer
 	STA Objects_Timer,X
 
 	INC <Objects_Var5,X	 ; Var5++ (next internal state)
@@ -1371,19 +1383,29 @@ Thwomp_ReturnToOrigin:
 	LDA Objects_Timer,X 
 	BNE PRG004_A6EC	 ; If timer is not expired, jump to PRG004_A6EC (RTS)
 
-	LDA <Objects_Y,X
-	CMP <Objects_Var4,X
-	BNE PRG004_A6E5	 ; If Thwomp has not returned to his origin Y, jump to PRG004_A6E5
+	LDA <Objects_Var4,X
+	CMP <Objects_Y,X
+	LDA Objects_Var3,X
+	SBC <Objects_YHi,X
+							;if origin Y < current Y, thwomp is still below origin
+	BLT PRG004_A6E5	 		; If Thwomp has not returned to his origin Y, jump to PRG004_A6E5
+
+	LDA <Objects_Var4,X
+	STA <Objects_Y,X		;snap to origin if it went past
+	LDA Objects_Var3,X
+	STA <Objects_YHi,X
 
 	; Var5 = 0 (return to original internal state)
 	LDA #$00
 	STA <Objects_Var5,X
+	STA <Objects_YVel,X
+	STA Objects_YVelFrac,X
 
 	RTS		 ; Return
 
 PRG004_A6E5:
 	; Set Thwomp Y velocity to -$10
-	LDA #-$10
+	LDA #Thwomp_Return
 	STA <Objects_YVel,X
 
 	JSR Object_ApplyYVel_NoLimit	 ; Apply Y velocity

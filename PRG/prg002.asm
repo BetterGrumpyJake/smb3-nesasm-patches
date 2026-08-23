@@ -34,7 +34,7 @@ ObjectGroup01_InitJumpTable:
 	.word ObjInit_DoNothing		; Object $2B - OBJ_GOOMBAINSHOE
 	.word ObjInit_CloudPlatform	; Object $2C - OBJ_CLOUDPLATFORM
 	.word ObjInit_ChasingFish	; Object $2D - OBJ_BIGBERTHA
-	.word ObjInit_InvisibleLift	; Object $2E - OBJ_INVISIBLELIFT
+	.word ObjInit_DoNothing		; Object $2E - Neb Anchor Lift
 	.word ObjInit_DoNothing		; Object $2F - OBJ_BOO
 	.word ObjInit_HotFootShy	; Object $30 - OBJ_HOTFOOT_SHY
 	.word ObjInit_Stretch		; Object $31 - OBJ_BOOSTRETCH
@@ -76,7 +76,7 @@ ObjectGroup01_NormalJumpTable:
 	.word ObjNorm_GoombaInShoe	; Object $2B - OBJ_GOOMBAINSHOE
 	.word ObjNorm_CloudPlat		; Object $2C - OBJ_CLOUDPLATFORM
 	.word ObjNorm_BigBertha		; Object $2D - OBJ_BIGBERTHA
-	.word ObjNorm_InvisibleLift	; Object $2E - OBJ_INVISIBLELIFT
+	.word ObjNorm_AnchorLift	; Object $2E - Neb Anchor Lift
 	.word ObjNorm_Boo		; Object $2F - OBJ_BOO
 	.word ObjNorm_HotfootShy	; Object $30 - OBJ_HOTFOOT_SHY
 	.word ObjNorm_Stretch		; Object $31 - OBJ_BOOSTRETCH
@@ -119,7 +119,7 @@ ObjectGroup01_CollideJumpTable:
 	.word ObjHit_GoombaInShoe	; Object $2B - OBJ_GOOMBAINSHOE
 	.word ObjHit_CloudPlat		; Object $2C - OBJ_CLOUDPLATFORM
 	.word ObjHit_DoNothing		; Object $2D - OBJ_BIGBERTHA
-	.word ObjHit_DoNothing		; Object $2E - OBJ_INVISIBLELIFT
+	.word ObjHit_DoNothing		; Object $2E - Neb Anchor Lift
 	.word Player_GetHurt		; Object $2F - OBJ_BOO
 	.word Player_GetHurt		; Object $30 - OBJ_HOTFOOT_SHY
 	.word Player_GetHurt		; Object $31 - OBJ_BOOSTRETCH
@@ -161,7 +161,7 @@ ObjectGroup01_Attributes:
 	.byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $2B - OBJ_GOOMBAINSHOE
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH48	; Object $2C - OBJ_CLOUDPLATFORM
 	.byte OA1_PAL1 | OA1_HEIGHT32 | OA1_WIDTH24	; Object $2D - OBJ_BIGBERTHA
-	.byte OA1_PAL2 | OA1_HEIGHT16 | OA1_WIDTH32	; Object $2E - OBJ_INVISIBLELIFT
+	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH24	; Object $2E - Neb Anchor Lift
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $2F - OBJ_BOO
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH8	; Object $30 - OBJ_HOTFOOT_SHY
 	.byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16	; Object $31 - OBJ_BOOSTRETCH
@@ -209,7 +209,7 @@ ObjectGroup01_Attributes2:
 	.byte OA2_NOSHELLORSQUASH | OA2_TDOGRP1	; Object $2B - OBJ_GOOMBAINSHOE
 	.byte OA2_TDOGRP2	; Object $2C - OBJ_CLOUDPLATFORM
 	.byte OA2_TDOGRP0	; Object $2D - OBJ_BIGBERTHA
-	.byte OA2_TDOGRP2	; Object $2E - OBJ_INVISIBLELIFT
+	.byte OA2_TDOGRP2	; Object $2E - Neb Anchor Lift
 	.byte OA2_TDOGRP1	; Object $2F - OBJ_BOO
 	.byte OA2_TDOGRP0	; Object $30 - OBJ_HOTFOOT_SHY
 	.byte OA2_TDOGRP1	; Object $31 - OBJ_BOOSTRETCH
@@ -251,7 +251,7 @@ ObjectGroup01_Attributes3:
 	.byte OA3_HALT_KURIBOSPECIAL 	; Object $2B - OBJ_GOOMBAINSHOE
 	.byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE	; Object $2C - OBJ_CLOUDPLATFORM
 	.byte OA3_HALT_NORMALONLY 	; Object $2D - OBJ_BIGBERTHA
-	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $2E - OBJ_INVISIBLELIFT
+	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $2E - Neb Anchor Lift CUSTOM
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $2F - OBJ_BOO
 	.byte OA3_HALT_HOTFOOTSPECIAL | OA3_TAILATKIMMUNE	; Object $30 - OBJ_HOTFOOT_SHY
 	.byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE	; Object $31 - OBJ_BOOSTRETCH
@@ -293,7 +293,7 @@ ObjectGroup01_PatTableSel:
 	.byte OPTS_SETPT5 | $0B	; Object $2B - OBJ_GOOMBAINSHOE
 	.byte OPTS_SETPT5 | $0E	; Object $2C - OBJ_CLOUDPLATFORM
 	.byte OPTS_SETPT5 | $1A	; Object $2D - OBJ_BIGBERTHA
-	.byte OPTS_SETPT6 | $13	; Object $2E - OBJ_INVISIBLELIFT
+	.byte OPTS_SETPT5 | $37	; Object $2E - Neb Anchor Lift CUSTOM
 	.byte OPTS_SETPT5 | $12	; Object $2F - OBJ_BOO
 	.byte OPTS_SETPT5 | $12	; Object $30 - OBJ_HOTFOOT_SHY
 	.byte OPTS_SETPT5 | $12	; Object $31 - OBJ_BOOSTRETCH
@@ -335,7 +335,7 @@ ObjectGroup01_KillAction:
 	.byte KILLACT_STANDARD	; Object $2B - OBJ_GOOMBAINSHOE
 	.byte KILLACT_STANDARD	; Object $2C - OBJ_CLOUDPLATFORM
 	.byte KILLACT_NORMALSTATE	; Object $2D - OBJ_BIGBERTHA
-	.byte KILLACT_STANDARD	; Object $2E - OBJ_INVISIBLELIFT
+	.byte KILLACT_STANDARD	; Object $2E - Neb Anchor Lift CUSTOM
 	.byte KILLACT_STANDARD	; Object $2F - OBJ_BOO
 	.byte KILLACT_POOFDEATH	; Object $30 - OBJ_HOTFOOT_SHY
 	.byte KILLACT_POOFDEATH	; Object $31 - OBJ_BOOSTRETCH
@@ -450,7 +450,7 @@ ObjP43:
 ObjP3A:
 	.byte $71, $E1, $E3, $E1, $E3, $71
 ObjP2E:
-	.byte $E1, $E3, $E1, $E3
+	.byte $a1, $a5, $a1 ; Neb Anchor Lift CUSTOM
 ObjP41:
 	.byte $51, $51, $53, $53, $55, $55, $F7, $F7, $F9, $F9, $FB, $FB, $E3, $E3, $E5, $E5, $F5, $F5, $FD, $FD, $FD, $FD, $FD, $FD, $E3, $E3, $E5, $E5, $F5, $F5, $D1, $D3, $D5, $D7
 ObjP40:
@@ -1999,126 +1999,99 @@ PRG002_A9AD:
 	JSR Object_DeleteOrDraw	 ; Delete Stretch if he falls off-screen, or draw him
 	JMP Object_HitTestRespond	 ; Do collision test and respond, and don't come back!
 
-ObjInit_InvisibleLift:
-
-	; Object appears 11 pixels below placement
-	LDA <Objects_Y,X
-	ADD #11
-	STA <Objects_Y,X
-	BCC PRG002_A9C1	
-	INC <Objects_YHi,X
-PRG002_A9C1:
-
-	RTS		 ; Return
-
-ObjNorm_InvisibleLift:
-	JSR Object_DeleteOffScreen	 ; Delete object if it falls off-screen
-	JSR Object_CalcSpriteXY_NoHi	 ; Calculate the Sprite X and Sprite Y
-
-	LDA <Objects_Var5,X
-	BNE PRG002_A9D2	 ; If Var5 <> 0 (Lift activated), jump to PRG002_A9D2
+ObjNorm_AnchorLift: 			; Neb Anchor Platform starts here
+	JSR InvisiLift_Draw
+	JSR Object_DeleteOffScreen	; Delete object if it falls off-screen
 
 	LDA <Player_HaltGame
-	BNE PRG002_A9C1	 ; If gameplay is halted, jump to PRG002_A9C1 (RTS)
-	BEQ PRG002_A9F5	 ; Otherwise, jump to PRG002_A9F5
+	BNE Anchor_Ret	 			; If gameplay is halted, jump to PRG002_A9C1 (RTS)
 
-PRG002_A9D2:
-
-	; Lift activated...
-
-	JSR InvisiLift_Draw	 ; Draw the lift
-
-	LDA <Player_HaltGame
-	BNE PRG002_A9C1	 ; If gameplay is halted, jump to PRG002_A9C1 (RTS)
-
-	; Lift accelerates to -$20
-	LDA <Objects_YVel,X
-	SUB #$04
-	CMP #-$20
-	BGE PRG002_A9E4
-	LDA #-$20
-PRG002_A9E4:
-
-	LDY <Objects_YHi,X
-	BNE PRG002_A9F0	 ; If lift is on lower part of screen, jump to PRG002_A9F0
-
-	; Lift is on higher part of screen...
-
-	LDY <Objects_Y,X
-	CPY #64
-	BGE PRG002_A9F0	 ; If lift's Y >= 64, jump to PRG002_A9F0
-
-	LDA #$00	 ; Otherwise, halt!
-
-PRG002_A9F0:
-	STA <Objects_YVel,X	 ; Update Y Velocity
-	JSR Object_ApplyYVel	 ; Apply Y Velocity
-
-PRG002_A9F5:
-
-	; Don't worry about carry since this platform doesn't move horizontally
-	LDA #$00
-	STA Object_VelCarry
+	LDA #$20
+	STA <Objects_YVel,X 		; Y velocity = $20 downward
+	JSR Object_ApplyYVel		; Apply Y velocity
+	JSR Object_ApplyXVel		;must follow applyYvel, it trusts X without restoring it from SlotIndexBackup
 
 	JSR PlayerPlatform_Collide
-	BCC PRG002_AA03	 ; If Player is not being carried by lift, jump to PRG002_AA03 (RTS)
+	BCS Anchor_Ret	 			;we are on top of the anchor, RTS
 
-	; Otherwise, Var5 = 1 (lift activated)
-	LDA #$01
-	STA <Objects_Var5,X
-
-PRG002_AA03:
-	RTS		 ; Return
-
+								;otherwise set to upwards velocity
+	LDA #-$2A
+	STA <Objects_YVel,X 		; Y velocity = -$2a upward (-$0a this frame as $20 was already applied)
+	JMP Object_ApplyYVel		; Apply Y velocity and don't come back
 
 InvisiLift_Draw:
-	JSR Object_ShakeAndCalcSprite	 ; Calculate sprite data
+;Y=our sprite block base
+;0=anchor body left, 4=anchor body middle, 8=anchor body right
+;12=anchor middle top, 16=anchor chain#1, 20=anchor chain#2
 
-	; Strip any horizontal or vertical flips from flip bits
-	LDA <Temp_Var3
-	AND #%00111111
+;4 bytes per sprite, Y pos, Tile #, Attributes, X pos
+
+	JSR Object_DrawWide			; Draw the main anchor
+ 
+	LDA Sprite_RAM+10,Y			; Flips the edge of the anchor sprite
+	ORA #SPR_HFLIP
+	STA Sprite_RAM+10,Y
+
+	LDA Objects_SprHVis,X
+	ORA Objects_SprVVis,X
+	BNE Anchor_Ret				; Any off-screen flags, don't draw the anchor top or chain (RTS)
+
+	; Anchor top
+	LDA <Objects_SpriteY,X
+	STA <Temp_Var1				; Temp_Var1 = Sprite Y
+	SUB #16	
+	STA <Temp_Var1				; Temp_Var1 -= 16
+
+	STA Sprite_RAM+12,Y			; Set Sprite Y
+
+	LDA <Objects_SpriteX,X	
+	ADD #$08	
+	STA <Temp_Var2				; Temp_Var2 = Sprite X + 8
+	STA Sprite_RAM+15,Y			; Set sprite X
+
+	LDA #$a3					; Set pattern of anchor top
+	STA Sprite_RAM+13,Y
+
+	LDA Objects_SprAttr,X		; Set attribute of anchor top
+	STA Sprite_RAM+14,Y
+
+;draw anchor chains
+;Y still is beginning of sprite block base, we need to add 16 for our loop for the 5th sprite and 
+;then the INY will move it to the next sprite base+20 for our 6th sprite
+
+	TYA							;get original block base
+	ADD #16						;add 16
+	TAY							;begin chain using 5th sprite, then increment to 6th and final
+
+	LDA #$02					;2 links to draw, store in temp var for our loop
 	STA <Temp_Var3
+AnchorDrawChain:
+	LDA <Temp_Var1
+	SUB #16
+	STA <Temp_Var1	 			; Temp_Var1 -= 16 (next link up) for sprite Y
+	BCC Anchor_Ret	 			; If we're done with the chain, jump to PRG001_A702
 
-	LDA <Counter_1
-	LSR A	
+	STA Sprite_RAM,Y 			; Set sprite Y
 
-	PHP		 ; Save CPU state
-	BCC PRG002_AA17	 ; Every other tick, jump to PRG002_AA17
+	LDA #$a7	 				; Pattern of anchor chain link
+	STA Sprite_RAM+1,Y
 
-	; Otherwise, use Sprite_RAM offset +8
-	TYA
-	ADC #$07
-	TAY
+	LDA Objects_SprAttr,X		; Set attribute
+	STA Sprite_RAM+2,Y
 
-PRG002_AA17:
-	JSR Object_Draw16x16Sprite	; Draw the first half of lift
+	LDA <Temp_Var2				; Set sprite X
+	STA Sprite_RAM+3,Y
 
-	LDA <Temp_Var7
-	PLP		 ; Restore CPU state
-	BCS PRG002_AA21	 ; Every other opposite tick, jump to PRG002_AA21
+	INY
+	INY
+	INY
+	INY		 					; Y += 4 (next sprite)
 
-	; Otherwise, use Sprite_RAM offset +8
-	ADC #$08
+	DEC <Temp_Var3				;decrement our loop
+	BNE AnchorDrawChain			;run loop, or RTS if loop hits 0
 
-PRG002_AA21:
-	TAY		 ; Sprite_RAM offset -> 'Y'
-
-	; X += 2 (starting sprite tile)
-	INX
-	INX
-
-	; +16 for second part of lift
-	LDA #16
-	ADD <Temp_Var2
-	STA <Temp_Var2
-
-	; Use latter horizontal visibility bits
-	ASL <Temp_Var8
-	ASL <Temp_Var8
-	JSR Object_Draw16x16Sprite	 ; Draw the second half of lift
-
-	LDX <SlotIndexBackup		 ; X = object slot index
-	RTS		 ; Return
+Anchor_Ret:
+	RTS		 					; Return
 
 ObjInit_CloudPlatFast:
 
@@ -6328,8 +6301,8 @@ PRG002_BFD3:
 	RTS		 ; Return
 
 	; ?? Someone wanna claim this?
-PRG002_BFD4:
-	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
-	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
-	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
+;PRG002_BFD4:
+;	.byte $FC, $A9, $00, $22, $0B, $01, $A9, $22, $14, $01, $A9, $22, $29, $04, $A9, $FC
+;	.byte $FC, $A9, $22, $33, $04, $A9, $FC, $FC, $A9, $22, $4A, $04, $A9, $A9, $FC, $A9
+;	.byte $22, $52, $04, $A9, $FC, $A9, $A9, $22, $6C, $48, $A9, $00
 

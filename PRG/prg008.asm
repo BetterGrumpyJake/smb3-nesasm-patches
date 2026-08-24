@@ -4738,8 +4738,8 @@ PRG008_B604:
 	ORA #SND_LEVELCOIN
 	STA Sound_QLevel1
 
-	LDA #$00
-	STA Level_Tile_GndR	; Clear this tile detect (probably to prevent "double collecting" a coin the Player is straddling)
+	;LDA #$00
+	;STA Level_Tile_GndR	; Clear this tile detect (probably to prevent "double collecting" a coin the Player is straddling)
 
 	JMP PRG008_B652	 ; Jump to PRG008_B652
 

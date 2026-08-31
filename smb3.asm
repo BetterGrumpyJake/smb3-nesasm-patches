@@ -3655,7 +3655,7 @@ TILEA_DOOR1		= $42	; Doorway 1, typically black in appearance (apparently wired 
 TILEA_DOOR2		= $43	; Doorway 2, typically red in appearance
 TILEA_INVISCOIN		= $44	; Invisible coin block
 TILEA_INVIS1UP		= $45	; Invisible 1-up
-TILEA_NOTECOINHEAVEN	= $46	; Placeholder for invisible note block that takes you to coin heaven
+TILEA_NOTECOINHEAVEN	= $71	;make coin heave noteblock visible and not the invisible one
 
 TILEA_BLOCKEMPTY	= $5F	; Used up ? block type empty block
 

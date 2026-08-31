@@ -1062,7 +1062,8 @@ PRG001_A527:
 
 	; Temp_Var16 = bumper X
 	LDA <Objects_X,X
-	STA <Temp_Var16	 
+	STA <Temp_Var16
+	STA Level_BlockChgXLo		;used for noteblock bust
 
 	; Temp_Var13 = bumper Y Hi
 	LDA <Objects_YHi,X
@@ -1071,8 +1072,23 @@ PRG001_A527:
 	; Temp_Var14 = bumper Y, grid aligned
 	LDA <Objects_Y,X
 	AND #$f0	
-	STA <Temp_Var14	
+	STA <Temp_Var14
+	STA Level_BlockChgYLo		;used for noteblock bust
 
+;noteblock 1 time use check and bust
+	LDA <Temp_Var12
+	CMP #CHNGTILE_COINHEAVEN
+	BNE NoteBust_Skip	 		;noteblock check
+
+	LDY Objects_Timer2,X
+	BEQ NoteBust_Skip	 		;if timer2=0 this was not a high bounce restore noteblock normally
+
+	LDA #CHNGTILE_DELETETOBG
+	STA <Temp_Var12		 		;erase noteblock
+
+	JSR PRG001_BC6D		 		;bowsers brick bust
+
+NoteBust_Skip:
 	JSR BlockBump_Init
 
 	LDA Objects_Var2,X
@@ -1097,17 +1113,16 @@ PRG001_A527:
 	BNE PRG001_A56E	 ; If Player is in water, jump to PRG001_A56E (RTS)
 
 	; Flag to go to coin heaven
-	LDA #$80
-	STA Level_CoinHeav
+	;LDA #$80						;remove coin heaven note block entry
+	;STA Level_CoinHeav
 
 	; Bounce into coin heaven sound
-	LDA Sound_QLevel1
-	ORA #SND_LEVELVINE
-	STA Sound_QLevel1
+	;LDA Sound_QLevel1
+	;ORA #SND_LEVELVINE
+	;STA Sound_QLevel1
 
 PRG001_A56E:
 	RTS		 ; Return
-
 
 PRG001_A56F:
 	LDA Level_BlkBump_Pos-6,X
@@ -1233,7 +1248,7 @@ PRG001_A5FD:
 	; Palette select for a bounce block
 BounceBlock_Pal:
 	.byte SPR_PAL1	; 0 (possibly unused / Note Block)
-	.byte SPR_PAL2	; 1 (coin heaven Note Block)
+	.byte SPR_PAL3	; 1 (coin heaven Note Block)
 	.byte SPR_PAL3	; 2 ("Metal plate" post-? block hit)
 	.byte SPR_PAL3	; 3 (used for empty brick)
 	.byte SPR_PAL1	; 4 (typical Note Block)

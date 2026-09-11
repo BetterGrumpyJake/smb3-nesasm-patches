@@ -3638,6 +3638,12 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 
 
 ; Commons (not really comprehensive)
+;;; CUSTOM TILES
+;SPRITESOLID:
+;Plains-Bank 3/Index 0x20-0x2F
+SPRITESOLID	= $01
+;;;
+
 TILEA_NOTEINVIS		= $03	; Invisible (until hit) note block
 TILEA_PSWITCHCOIN	= $05	; Coins invisible unless P-Switch is active
 
@@ -3856,7 +3862,6 @@ TILE1_WGROUNDTL		= $F6	; Underwater ground top left
 TILE1_WGROUNDML		= $F7	; Underwater ground middle-left
 TILE1_WGROUNDTR		= $F8	; Underwater ground top right
 TILE1_WGROUNDMR		= $F9	; Underwater ground middle-right
-
 
 ; Tileset 2 (Fortress style)
 TILE2_BLACK		= $02	; Solid black background

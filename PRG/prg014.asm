@@ -1177,7 +1177,7 @@ PRG014_CB15:
 LoadLevel_Blocks:
 	.byte TILEA_BRICK, TILEA_QBLOCKCOIN, TILEA_BRICKCOIN, TILEA_WOODBLOCK
 	.byte TILEA_GNOTE, TILEA_NOTE, TILEA_WOODBLOCKBOUNCE, TILEA_COIN
-	.byte TILEA_ICEBRICK	; This one is accessed by LoadLevel_IceBricks
+	.byte TILEA_ICEBRICK, SPRITESOLID	; These are accessed by LoadLevel_IceBricks/LoadLevel_SpriteSolid
 
 LoadLevel_BlockRun:
 	LDA LL_ShapeDef
@@ -1215,7 +1215,9 @@ PRG014_CB44:
 
 	RTS		 ; Return
 
-
+LoadLevel_SpriteSolid:
+	LDX #$09	 ; SpriteSolid in LoadLevel_BlockRun
+	JMP PRG014_CB2A	 ; Jump to PRG014_CB2A
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LoadLevel_IceBricks

@@ -128,7 +128,8 @@ Level_MinTileUWByQuad:
 	.byte $FF, $FF, $FF, $C1	;  3 Hills style
 	.byte $FF, $FF, $FF, $DA	;  4 High-Up style
 	.byte $FF, $FF, $FF, $DA	;  5 pipe world plant infestation
-	.byte $02, $3F, $8A, $C0	;  6 water world
+	;change minimum tile in water tileset quad1 to 01+
+	.byte $00, $3F, $8A, $C0	;  6 water world
 	.byte $FF, $FF, $FF, $DA	;  7 Toad House
 	.byte $FF, $FF, $8A, $DA	;  8 Vertical pipe maze
 	.byte $FF, $FF, $FF, $DA	;  9 desert levels

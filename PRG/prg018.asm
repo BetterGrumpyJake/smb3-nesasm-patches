@@ -20,7 +20,7 @@ Tile_Layout_TS6_TS7_TS8:
 	; I.e. tiles starting at index $00, $40, $80, $C0 are each on that respective palette
 
 	; Upper left 8x8 pattern per tile
-	.byte $FF, $FF, $FF, $05, $05, $E8, $FF, $99, $99, $FF, $62, $63, $7C, $7E, $FF, $FF ; Tiles $00 - $0F
+	.byte $FF, $80, $FF, $05, $05, $E8, $FF, $99, $99, $FF, $62, $63, $7C, $7E, $FF, $FF ; Tiles $00 - $0F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $B8, $B8 ; Tiles $20 - $2F
 	.byte $B8, $B8, $BC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -38,7 +38,7 @@ Tile_Layout_TS6_TS7_TS8:
 	.byte $02, $D7, $E0, $05, $94, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower left 8x8 pattern per tile
-	.byte $FF, $FF, $FF, $06, $D6, $E9, $99, $99, $99, $FF, $FD, $FF, $7D, $7F, $FF, $FF ; Tiles $00 - $0F
+	.byte $FF, $90, $FF, $06, $D6, $E9, $99, $99, $99, $FF, $FD, $FF, $7D, $7F, $FF, $FF ; Tiles $00 - $0F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $B9, $B9 ; Tiles $20 - $2F
 	.byte $B9, $B9, $BD, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -56,7 +56,7 @@ Tile_Layout_TS6_TS7_TS8:
 	.byte $12, $06, $E1, $06, $95, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Upper right 8x8 pattern per tile	
-	.byte $FF, $FF, $FF, $07, $07, $EA, $99, $FF, $99, $FF, $62, $63, $7C, $7E, $FF, $FF ; Tiles $00 - $0F
+	.byte $FF, $81, $FF, $07, $07, $EA, $99, $FF, $99, $FF, $62, $63, $7C, $7E, $FF, $FF ; Tiles $00 - $0F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $BA, $BA ; Tiles $20 - $2F
 	.byte $BA, $BA, $BE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -74,7 +74,7 @@ Tile_Layout_TS6_TS7_TS8:
 	.byte $03, $D7, $E2, $07, $96, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower right 8x8 pattern per tile
-	.byte $FF, $FF, $FF, $08, $D6, $EB, $99, $99, $FF, $FF, $FD, $FF, $7D, $7F, $FF, $FF ; Tiles $00 - $0F
+	.byte $FF, $91, $FF, $08, $D6, $EB, $99, $99, $FF, $FF, $FD, $FF, $7D, $7F, $FF, $FF ; Tiles $00 - $0F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $10 - $1F
 	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $BB, $BB ; Tiles $20 - $2F
 	.byte $BB, $BB, $BF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -288,7 +288,8 @@ LoadLevel_Generator_TS678:
 	.word LoadLevel_UnderwaterCirclesH	; 54 - Horizontal run of the little circles
 	.word LoadLevel_DonutLifts		; 55 - Run of donut lifts
 	.word LoadLevel_UpwardSpikes		; 56 - Run of upward pointing spikes
-	.word LoadLevel_WaterFill		; 57 - Rectangle of water tiles 
+	.word LoadLevel_WaterFill		; 57 - Rectangle of water tiles
+	.word LoadLevel_SpriteSolid
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LeveLoad_FixedSizeGen_TS678

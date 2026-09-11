@@ -3642,6 +3642,7 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 ;SPRITESOLID:
 ;TS1: Plains: Bank 3/Index 0x20-0x2F
 ;TS2: Fortress: Bank 3/Index 0xF0-0xFF
+;TS3: Hills: Bank 5/Index 0x40-0x4F
 SPRITESOLID	= $01
 ;;;
 

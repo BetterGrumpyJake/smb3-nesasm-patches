@@ -3647,6 +3647,7 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 ;TS5/TS11/TS13: PRG19: Plant/Giant/Cloudy: Bank 3/Index 0x80-0x8F
 ;TS6/TS7/TS8: PRG18: Water/Toad/Pipe: Bank 3/Index 0xE0-0xEF
 	;in TS6/Water this tile acts like water, i did not bother making an air variant
+;TS9: PRG20: Desert: Bank 3/Index 0xF0-0xFF
 SPRITESOLID	= $01
 ;;;
 

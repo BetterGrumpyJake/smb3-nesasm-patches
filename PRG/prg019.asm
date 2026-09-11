@@ -20,7 +20,7 @@ Tile_Layout_TS5_TS11_TS13:
 	; I.e. tiles starting at index $00, $40, $80, $C0 are each on that respective palette
 
 	; Upper left 8x8 pattern per tile
-	.byte $FC, $2B, $2C, $05, $05, $E8, $2E, $FC, $FC, $38, $05, $2D, $2D, $23, $05, $05 ; Tiles $00 - $0F
+	.byte $FC, $80, $2C, $05, $05, $E8, $2E, $FC, $FC, $38, $05, $2D, $2D, $23, $05, $05 ; Tiles $00 - $0F
 	.byte $FC, $2B, $FF, $FF, $FF, $58, $64, $FC, $FC, $FC, $FC, $6D, $FC, $5E, $7F, $0C ; Tiles $10 - $1F
 	.byte $4F, $FD, $FD, $FD, $FD, $12, $12, $FF, $FF, $FF, $FF, $FF, $D0, $D0, $B8, $B8 ; Tiles $20 - $2F
 	.byte $B8, $B8, $BC, $94, $B0, $B1, $FD, $FD, $12, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -38,7 +38,7 @@ Tile_Layout_TS5_TS11_TS13:
 	.byte $4C, $D7, $E0, $05, $63, $0A, $28, $2A, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower left 8x8 pattern per tile
-	.byte $FC, $1B, $3C, $06, $D6, $E9, $3E, $38, $FC, $FC, $0E, $06, $06, $06, $48, $4A ; Tiles $00 - $0F
+	.byte $FC, $90, $3C, $06, $D6, $E9, $3E, $38, $FC, $FC, $0E, $06, $06, $06, $48, $4A ; Tiles $00 - $0F
 	.byte $1A, $2A, $FF, $FF, $FF, $68, $6A, $FC, $5E, $5F, $FC, $6D, $FC, $FC, $FC, $1C ; Tiles $10 - $1F
 	.byte $1E, $FD, $16, $FD, $5A, $22, $13, $FF, $FF, $FF, $FF, $FF, $D1, $D1, $B9, $B9 ; Tiles $20 - $2F
 	.byte $B9, $B9, $BD, $95, $B1, $B0, $16, $5A, $13, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -56,7 +56,7 @@ Tile_Layout_TS5_TS11_TS13:
 	.byte $5C, $06, $E1, $06, $18, $1A, $38, $3A, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Upper right 8x8 pattern per tile	
-	.byte $FC, $FC, $2D, $07, $07, $EA, $2F, $FC, $38, $FC, $06, $2E, $21, $2E, $07, $07 ; Tiles $00 - $0F
+	.byte $FC, $81, $2D, $07, $07, $EA, $2F, $FC, $38, $FC, $06, $2E, $21, $2E, $07, $07 ; Tiles $00 - $0F
 	.byte $FC, $FC, $FF, $FF, $FF, $5B, $6F, $FC, $FC, $FC, $6D, $FC, $7D, $5E, $FC, $4F ; Tiles $10 - $1F
 	.byte $0F, $FD, $27, $10, $10, $FD, $FD, $FF, $FF, $FF, $FF, $FF, $D2, $D2, $BA, $BA ; Tiles $20 - $2F
 	.byte $BA, $BA, $BE, $96, $B0, $B1, $27, $10, $FD, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -74,7 +74,7 @@ Tile_Layout_TS5_TS11_TS13:
 	.byte $4D, $D7, $E2, $07, $09, $0B, $29, $2B, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower right 8x8 pattern per tile
-	.byte $FC, $FC, $3D, $08, $D6, $EB, $3F, $FC, $FC, $38, $0F, $08, $08, $08, $49, $4B ; Tiles $00 - $0F
+	.byte $FC, $91, $3D, $08, $D6, $EB, $3F, $FC, $FC, $38, $0F, $08, $08, $08, $49, $4B ; Tiles $00 - $0F
 	.byte $6E, $6E, $FF, $FF, $FF, $69, $6B, $7E, $5E, $FC, $6D, $FC, $FC, $FC, $FC, $1D ; Tiles $10 - $1F
 	.byte $1F, $FD, $17, $20, $11, $FD, $59, $FF, $FF, $FF, $FF, $FF, $D3, $D3, $BB, $BB ; Tiles $20 - $2F
 	.byte $BB, $BB, $BF, $97, $B1, $B0, $17, $11, $59, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -223,7 +223,7 @@ LoadLevel_Generator_TS051113:
 	.word LoadLevel_VGroundPipe5Run		; 49 - Vertical ground pipe 5 (exits to common end area)
 	.word LoadLevel_HRightWallPipeRun3	; 50 - Horizontal right-hand wall pipe 3 (no entrance)
 	.word LoadLevel_Lava			; 51 - Lava?  Not used in these modes I don't think... (it's green in Tileset 5/13!)
-
+	.word LoadLevel_SpriteSolid
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LeveLoad_FixedSizeGen_TS051113

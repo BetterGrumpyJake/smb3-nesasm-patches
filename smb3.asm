@@ -3640,10 +3640,11 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 ; Commons (not really comprehensive)
 ;;; CUSTOM TILES
 ;SPRITESOLID:
-;TS1: Plains: Bank 3/Index 0x20-0x2F
-;TS2: Fortress: Bank 3/Index 0xF0-0xFF
-;TS3: Hills: Bank 5/Index 0x40-0x4F
-;TS4/TS12: Sky/Ice: Bank 3/Index 0xB0-0xBF
+;TS1: PRG15: Plains: Bank 3/Index 0x20-0x2F
+;TS2: PRG21: Fortress: Bank 3/Index 0xF0-0xFF
+;TS3: PRG16: Hills: Bank 5/Index 0x40-0x4F
+;TS4/TS12: PRG17: Sky/Ice: Bank 3/Index 0xB0-0xBF
+;TS5/TS11/TS13: PRG19: Plant/Giant/Cloudy: Bank 3/Index 0x80-0x8F
 SPRITESOLID	= $01
 ;;;
 

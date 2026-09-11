@@ -20,7 +20,7 @@ Tile_Layout_TS4_TS12:
 	; I.e. tiles starting at index $00, $40, $80, $C0 are each on that respective palette
 
 	; Upper left 8x8 pattern per tile
-	.byte $FC, $3B, $05, $05, $05, $E8, $05, $05, $05, $44, $05, $05, $49, $4B, $10, $28 ; Tiles $00 - $0F
+	.byte $FC, $80, $05, $05, $05, $E8, $05, $05, $05, $44, $05, $05, $49, $4B, $10, $28 ; Tiles $00 - $0F
 	.byte $28, $60, $39, $62, $64, $09, $66, $FC, $FC, $FC, $FC, $23, $FC, $13, $6B, $0B ; Tiles $10 - $1F
 	.byte $7D, $7D, $00, $18, $18, $18, $FF, $FF, $FF, $FF, $FF, $FF, $4C, $FF, $B8, $B8 ; Tiles $20 - $2F
 	.byte $B8, $B8, $BC, $FF, $B0, $B1, $14, $1C, $4C, $4E, $0A, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -38,7 +38,7 @@ Tile_Layout_TS4_TS12:
 	.byte $C0, $D7, $E0, $05, $F0, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower left 8x8 pattern per tile
-	.byte $FC, $3A, $0A, $06, $D6, $E9, $7C, $7C, $06, $FD, $47, $06, $06, $06, $10, $28 ; Tiles $00 - $0F
+	.byte $FC, $90, $0A, $06, $D6, $E9, $7C, $7C, $06, $FD, $47, $06, $06, $06, $10, $28 ; Tiles $00 - $0F
 	.byte $28, $64, $09, $66, $64, $09, $66, $FC, $13, $69, $FC, $23, $FC, $FC, $FC, $06 ; Tiles $10 - $1F
 	.byte $06, $06, $10, $28, $28, $28, $FF, $FF, $FF, $FF, $FF, $FF, $4D, $FF, $B9, $B9 ; Tiles $20 - $2F
 	.byte $B9, $B9, $BD, $FF, $B1, $B0, $24, $2C, $0E, $1E, $0B, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -56,7 +56,7 @@ Tile_Layout_TS4_TS12:
 	.byte $C1, $06, $E1, $06, $F2, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Upper right 8x8 pattern per tile	
-	.byte $FC, $FC, $07, $07, $07, $EA, $07, $07, $07, $45, $07, $48, $4A, $07, $11, $11 ; Tiles $00 - $0F
+	.byte $FC, $81, $07, $07, $07, $EA, $07, $07, $07, $45, $07, $48, $4A, $07, $11, $11 ; Tiles $00 - $0F
 	.byte $29, $61, $39, $63, $65, $09, $67, $FC, $FC, $FC, $23, $FC, $6A, $13, $FC, $0D ; Tiles $10 - $1F
 	.byte $0D, $7F, $01, $01, $19, $01, $FF, $FF, $FF, $FF, $FF, $FF, $4E, $FF, $BA, $BA ; Tiles $20 - $2F
 	.byte $BA, $BA, $BE, $FF, $B0, $B1, $15, $1D, $4D, $4F, $0C, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -74,7 +74,7 @@ Tile_Layout_TS4_TS12:
 	.byte $C2, $D7, $E2, $07, $F1, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Tiles $F0 - $FF
 
 	; Lower right 8x8 pattern per tile
-	.byte $FC, $FC, $0C, $08, $D6, $EB, $0C, $7E, $46, $FD, $08, $08, $08, $08, $11, $11 ; Tiles $00 - $0F
+	.byte $FC, $91, $0C, $08, $D6, $EB, $0C, $7E, $46, $FD, $08, $08, $08, $08, $11, $11 ; Tiles $00 - $0F
 	.byte $29, $65, $09, $67, $65, $09, $67, $68, $13, $FC, $23, $FC, $FC, $FC, $FC, $08 ; Tiles $10 - $1F
 	.byte $08, $08, $11, $11, $29, $11, $FF, $FF, $FF, $FF, $FF, $FF, $4F, $FF, $BB, $BB ; Tiles $20 - $2F
 	.byte $BB, $BB, $BF, $FF, $B1, $B0, $25, $2D, $0F, $1F, $0D, $FF, $FF, $FF, $FF, $FF ; Tiles $30 - $3F
@@ -220,7 +220,7 @@ LoadLevel_Generator_TS4_TS12:
 	.word LoadLevel_LargeIceBlocks		; 52 - Run of large 2x2 ice blocks
 	.word LoadLevel_LittleCloudRun		; 53 - Put in a run of those little smiling Judgem's type clouds
 	.word LoadLevel_Muncher17		; 54 - Long run of munchers
-
+	.word LoadLevel_SpriteSolid
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

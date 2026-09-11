@@ -3641,6 +3641,7 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 ;;; CUSTOM TILES
 ;SPRITESOLID:
 ;TS1: PRG15: Plains: Bank 3/Index 0x20-0x2F
+	;this takes the place of the > ending level shape, could be reworked
 ;TS2: PRG21: Fortress: Bank 3/Index 0xF0-0xFF
 ;TS3: PRG16: Hills: Bank 5/Index 0x40-0x4F
 ;TS4/TS12: PRG17: Sky/Ice: Bank 3/Index 0xB0-0xBF
@@ -3648,6 +3649,9 @@ TILE_ALTFORT		= $EB	; Alternate color Mini-Fortress
 ;TS6/TS7/TS8: PRG18: Water/Toad/Pipe: Bank 3/Index 0xE0-0xEF
 	;in TS6/Water this tile acts like water, i did not bother making an air variant
 ;TS9: PRG20: Desert: Bank 3/Index 0xF0-0xFF
+;TS10: PRG23: Airship: Would need some thought put into the graphics you would want to lose
+	;PAT 00-7F: chr52, 53 PAT 80-FF: chr106, 107. does not animate
+;TS14: PRG13: Underground: Bank 5/Index 0x40-0x4F
 SPRITESOLID	= $01
 ;;;
 

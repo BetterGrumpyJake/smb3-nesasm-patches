@@ -5197,6 +5197,15 @@ PRG003_BA72:
 	STA <Objects_YVel,X
 
 PRG003_BAA0:
+	JSR Object_GetAttrAndMoveTiles
+
+	LDA Object_TileFeet	; A = detected tile index
+	CMP #SPRITESOLID
+	BNE Continue
+	
+	JMP Object_PoofDie
+
+Continue:
 	JMP Object_ApplyYVel_NoLimit	 ; Apply Y velocity and don't come back!
 
 	; Moves all tail segments based on screen scroll change
@@ -5229,6 +5238,7 @@ PRG003_BAB0:
 	BPL PRG003_BAB0	; While X >= 0, loop!
 
 	LDX <SlotIndexBackup		 ; X = object slot index
+
 	RTS		 ; Return
 
 FireChompTail_Patterns:

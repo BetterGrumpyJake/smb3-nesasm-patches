@@ -969,13 +969,12 @@ PRG000_C559:
 	LDA Object_TileWall	; A = detected tile index
 
 	CMP #SPRITESOLID
-	BEQ SpriteSolidBlock
+	BEQ KillSprite
 
 	CMP Tile_AttrTable+4,Y
 	BLT PRG000_C584	 	; If the tile's index < the beginning wall/ceiling solid tile for this quad, jump to PRG000_C584
 
 	; Object is touching solid wall tile
-SpriteSolidBlock:
 	LDA #$01		; A = 1
 
 	LDY <Objects_XVel,X
@@ -998,7 +997,7 @@ PRG000_C584:
 
 	LDA Object_TileFeet
 	CMP #SPRITESOLID
-	BEQ PRG000_C5A2
+	BEQ KillSprite
 
 	LDA Level_SlopeEn
 	BEQ PRG000_C59A	 	; If slopes are not enabled here, jump to PRG000_C59A
@@ -1026,6 +1025,9 @@ PRG000_C5A2:
 
 PRG000_C5A8:
 	RTS		 ; Return
+	
+KillSprite:
+	JMP Object_PoofDie
 
 PRG000_C5A9:
 
@@ -1033,7 +1035,7 @@ PRG000_C5A9:
 
 	LDA Object_TileFeet
 	CMP #SPRITESOLID
-	BEQ PRG000_C5B4
+	BEQ KillSprite
 
 	CMP Tile_AttrTable,Y
 	BGE PRG000_C5B4	 ; If tile is within range of the starting solid tile, jump to PRG000_C5B4
@@ -1050,7 +1052,7 @@ PRG000_C5BC:
 
 	; Any of the following tiles, jump to PRG000_C67F
 	CMP #SPRITESOLID
-	BEQ PRG000_C5D0
+	BEQ KillSprite
 
 	CMP #TILE3_VERTGROUNDL
 	BEQ PRG000_C5D0	

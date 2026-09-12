@@ -1,5 +1,5 @@
-	.word $BD33	; Alternate level layout
-	.word $C55B	; Alternate object layout
+	.word W308_EndL	; Alternate level layout
+	.word W308_EndO	; Alternate object layout
 	.byte LEVEL1_SIZE_08 | LEVEL1_YSTART_140
 	.byte LEVEL2_BGPAL_00 | LEVEL2_OBJPAL_08 | LEVEL2_XSTART_18 | LEVEL2_UNUSEDFLAG
 	.byte LEVEL3_TILESET_01 | LEVEL3_VSCROLL_LOCKLOW | LEVEL3_PIPENOTEXIT

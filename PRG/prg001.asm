@@ -1648,7 +1648,7 @@ PRG001_A810:
 	LDA #$e0
 	STA Player_StarInv
 
-	JMP PUp_GeneralCollect	 ; Jump to PUp_GeneralCollect
+	JMP PUp_JustPoints	 ; Jump to PUp_GeneralCollect
 
 PRG001_A818:
 
@@ -1680,7 +1680,7 @@ PRG001_A834:
 	JSR PowerUp_PlaySound	 ; Play Power Up sound
 
 PRG001_A837:
-	JMP PUp_GeneralCollect	 ; Jump to PUp_GeneralCollect
+	JMP PUp_JustPoints	 ; Jump to PUp_GeneralCollect
 
 
 ObjInit_PUpMush:
@@ -1781,12 +1781,17 @@ PRG001_A897:
 	JMP PRG001_A825	 ; Jump to PRG001_A825
 
 PRG001_A8AB:
-
 	; Do "growing" animation
 	LDA #$2f
 	STA Player_Grow
+	BNE PUp_JustPoints
 
 PUp_GeneralCollect:
+	;STA <Player_BackupSuit	; might use this if introducing different power restores, just doing mush right now
+	JSR Player_GetCardAndUpdate
+	LDX <SlotIndexBackup
+
+PUp_JustPoints:
 	; Get 1000 pts
 	LDA #$09
 	JSR Score_PopUp

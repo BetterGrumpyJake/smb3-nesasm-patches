@@ -5939,3 +5939,44 @@ PRG030_9FAF:
 
 ; NOTE: The remaining ROM space was all blank ($FF)
 
+BackupSuit:
+	; if player is in shoe or not small, do not use backup powerup
+	LDA Player_Kuribo
+	BNE NoBackup
+	; if player is not small, do not use backup powerup
+	LDA <Player_Suit
+	BNE NoBackup
+
+	LDA Player_Current
+	BEQ BackUpSuitMario	 ; If player = 0 (Mario), jump to PRG031_FCC6
+	LDA #(Inventory_Cards2 - Inventory_Cards)
+
+BackUpSuitMario:
+	; A is 0 (Mario cards) or $23 (Luigi cards)
+	; check if there is a backup powerup
+	TAY
+	LDA Inventory_Cards,Y
+	BEQ NoBackup
+	
+	; use backup powerup
+	STA Player_QueueSuit
+	
+	; Play the standard "Power Up" sound
+	LDA Sound_QLevel1
+	ORA #SND_LEVELPOWER
+	STA Sound_QLevel1
+
+	; Do "growing" animation
+	LDA #$2f
+	STA Player_Grow
+	
+	; clear backup powerup
+	LDA #$00
+	STA Inventory_Cards,Y
+	
+	; clear card
+	TAY
+	JSR StatusBar_DrawCardPiece
+	
+NoBackup:
+	RTS

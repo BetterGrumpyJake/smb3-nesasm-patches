@@ -2756,12 +2756,21 @@ PRGROM_Change_Both:	; $FC6F
 VertLevel_ScreenH:	.byte $00, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 VertLevel_ScreenL:	.byte $00, $F0, $E0, $D0, $C0, $B0, $A0, $90, $80, $70, $60, $50, $40, $30, $20, $10
 
+; ORIGINAL
 ; This stores the four tiles which make up a card (or absense of one)
 ;              -    M    F    S
-CardUL:	.byte $FE, $E0, $E4, $AC
-CardUR:	.byte $FE, $E1, $E6, $AD
-CardLL:	.byte $FE, $E2, $E7, $AE
-CardLR:	.byte $FE, $E3, $E8, $AF
+;CardUL:	.byte $FE, $E0, $E4, $AC
+;CardUR:	.byte $FE, $E1, $E6, $AD
+;CardLL:	.byte $FE, $E2, $E7, $AE
+;CardLR:	.byte $FE, $E3, $E8, $AF
+
+; CHANGED STAR TO USE MUSH GRAPHICS
+; This stores the four tiles which make up a card (or absense of one)
+;              -    M    F    S
+CardUL:	.byte $FE, $E0, $E0, $AC
+CardUR:	.byte $FE, $E1, $E1, $AD
+CardLL:	.byte $FE, $E2, $E2, $AE
+CardLR:	.byte $FE, $E3, $E3, $AF
 
 ; Each card's video start offset (lower byte)
 CardVStartU:	.byte $36, $39, $3C	; Upper half of card
@@ -2789,23 +2798,42 @@ StatusBar_Update_Cards:
 	LDA #(Inventory_Cards2 - Inventory_Cards)
 
 PRG031_FCC6:
-	; A is 0 (Mario) or $23 (Luigi)
+	; A is 0 (Mario cards) or $23 (Luigi cards)
+	TAY
 
-	STA <Temp_Var1	 ; Temp_Var1 = A
+	;STA <Temp_Var1	 ; Temp_Var1 = A
 
-	LDA #$02	 
-	STA <Temp_Var2	 ; Temp_Var2 = 2
+	;LDA #$02	 
+	;STA <Temp_Var2	 ; Temp_Var2 = 2
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 PRG031_FCCC:
-	LDY <Temp_Var1	 ; Y = Temp_Var1
+	;LDY <Temp_Var1	 ; Y = Temp_Var1
+	NOP
 
-	JSR StatusBar_DrawCardPiece	 ; Draw part of the card into the status bar
+	;JSR StatusBar_DrawCardPiece	 ; Draw part of the card into the status bar
 
-	INC <Temp_Var1
-	DEC <Temp_Var2
-	BPL PRG031_FCCC	 ; While Temp_Var2 >= 0, loop!
+	; don't need to do this, we are only using/drawing one card slot
+	;INC <Temp_Var1
+	;DEC <Temp_Var2
+	;BPL PRG031_FCCC	 ; While Temp_Var2 >= 0, loop!
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
-	RTS		 ; Return
+	;RTS		 ; Return
 
 StatusBar_DrawCardPiece:
 	STY <Temp_Var3	 	; Temp_Var3 = Y
@@ -2887,6 +2915,7 @@ PRG031_FD29:
 ; A = 0 (Mushroom), 1 = (Flower), 2 = (Star)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Player_GetCard:
+	LDA #$02	; used for card graphics, and for when it's used to queue suit
 	PHA		 ; Save which card we're getting
 
 	LDY Player_Current 
@@ -2898,11 +2927,17 @@ PRG031_FD4C:
 	LDA Inventory_Cards,Y
 	BEQ PRG031_FD67	 ; If this card is empty, jump to PRG031_FD67
 
-	INY		 ; Y++
-	CPY #$03
-	BEQ PRG031_FD5A	 ; If Mario's cards are full, jump to PRG031_FD5A
-	CPY #(Inventory_Cards2 - Inventory_Cards + 3)
-	BNE PRG031_FD4C	 ; If Luigi's cards are NOT full, jump to PRG031_FD4C
+	PLA	; pull the A we pushed
+	PLA	; RTS back to before Player_GetCardAndUpdate
+	PLA
+	RTS
+	;INY		 ; Y++
+	;CPY #$03
+	;BEQ PRG031_FD5A	 ; If Mario's cards are full, jump to PRG031_FD5A
+	;CPY #(Inventory_Cards2 - Inventory_Cards + 3)
+	;BNE PRG031_FD4C	 ; If Luigi's cards are NOT full, jump to PRG031_FD4C
+	NOP
+	NOP
 
 PRG031_FD5A:
 

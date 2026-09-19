@@ -5965,7 +5965,8 @@ EndLevelCard_DrawCard:
 PRG002_BE19:
 	JSR EndLevelCard_DrawCardBack	 ; Draw the card back (not really seen)
 
-	JSR EndLevelCard_SetFrameToCard	 ; Set frame to the newest card's frame
+	;JSR EndLevelCard_SetFrameToCard	 ; Set frame to the newest card's frame
+	LDA Objects_Var7,X	; card actually collected, ignore inventory
 	ASL A
 	ASL A
 	TAY		 ; Y = current frame * 4 (in the air, i.e. the triple card match)
@@ -6231,8 +6232,9 @@ PRG002_BF4B:
 	STA EndCard_Flag	 ; Flag end level card as grabbed
 
 	; Card actually has a slight leftward velocity?
-	LDA #-$01
-	STA <Objects_XVel,X
+	;LDA #-$01
+	;STA <Objects_XVel,X
+	NOP
 
 	; Card moves upward
 	LDA #-$28
@@ -6250,7 +6252,9 @@ PRG002_BF4B:
 
 	INY		 ; Y++ (1-3)
 	TYA		 ; -> 'A'
-	JSR Player_GetCard	; Give this card to the Player
+	
+	STA Objects_Var7,X	; store actual card gotten, just for the graphic
+	JSR Player_GetCardAndUpdate	; jump here for the PLA PLA in Player_GetCard
 
 	LDX <SlotIndexBackup		 ; X = object slot index
 

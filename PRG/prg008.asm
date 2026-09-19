@@ -1314,9 +1314,9 @@ Player_ControlJmp:
 ; FIXME: Anybody want to claim this?
 ; $A6B0 
 	ORA <Temp_Var4
-	JSR Player_ApplyXVelocity
-	JSR Player_ApplyYVelocity
-	JMP Player_Draw29
+	;JSR Player_ApplyXVelocity
+	;JSR Player_ApplyYVelocity
+	;JMP Player_Draw29
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Player_Control
@@ -1367,6 +1367,12 @@ PRG008_A6E5:
 	STA <Pad_Holding	; Otherwise, disable all directional inputs
 
 PRG008_A6F2:
+	LDA <Pad_Input	
+	AND #PAD_SELECT
+	BEQ PRG008_Continue	 ; If Player is NOT pressing SELECT, jump to PRG030_Continue
+	JSR BackupSuit
+
+PRG008_Continue:
 	LDY <Player_Suit
 	BEQ PRG008_A70E	 	; If Player is small, jump to PRG008_A70E
 

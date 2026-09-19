@@ -874,7 +874,7 @@ PLAYERSUIT_LAST		= PLAYERSUIT_HAMMER	; Marker for "last" suit (Debug cycler need
 	Player_WagCount:	.ds 1	; after wagging raccoon tail, until this hits zero, holding 'A' keeps your fall rate low
 	Player_IsDying:		.ds 1	; 0 = Not dying, 1 = Dying, 2 = Dropped off screen, 3 = Death due to TIME UP
 
-				.ds 1	; $F2 unused
+	Player_BackupSuit:	.ds 1	; $F2 unused
 
 	Obj01_Flag:		.ds 1	; Not sure what Obj01 is!! This blocks its left/right handler logic.
 

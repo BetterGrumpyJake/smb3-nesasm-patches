@@ -2184,6 +2184,9 @@ Player_StandOnPlatform:
 	; Flag Player as NOT mid-air
 	LDY #$00
 	STY <Player_InAir
+	
+	; this is cleared at PRG008_BA1B
+	INC Player_NoSlopeStick		; don't stick to slopes for a sec
 
 	LDA Object_VelCarry
 	BPL PRG002_AA7B	
@@ -2406,7 +2409,8 @@ PRG002_AB5E:
 
 	; Player collided with floater
 
-	ROL Player_NoSlopeStick	 	; Set Player_NoSlopeStick
+	; move the player_noslopestick to player_standonplatform
+	;ROL Player_NoSlopeStick	 	; Set Player_NoSlopeStick
 
 	LDA <Player_YVel
 	BEQ PRG002_AB86	 	; If Player is not moving vertically, jump to PRG002_AB86

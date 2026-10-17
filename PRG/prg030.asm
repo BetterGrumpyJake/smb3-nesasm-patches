@@ -5939,3 +5939,17 @@ PRG030_9FAF:
 
 ; NOTE: The remaining ROM space was all blank ($FF)
 
+FrogHoldingCheck:
+	LDY <Player_Suit
+	CPY #PLAYERSUIT_FROG
+	BNE CheckHolding
+	
+	LDY Player_Power
+	INY
+	BMI FrogHoldRTS	; z clear
+	
+CheckHolding:
+	LDA Player_IsHolding	; z set if not holding
+
+FrogHoldRTS:
+	RTS

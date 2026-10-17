@@ -1204,8 +1204,8 @@ Player_RootJumpVel:	.byte PLAYER_JUMP
 Player_SpeedJumpInc:	.byte $00, $02, $04, $08
 
 ; FIXME: Anybody want to claim this?
-	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
-	.byte $08, $04
+;	.byte $00, $03, $06, $08, $08, $08, $08, $06, $03, $00, $04, $08, $12, $16, $16, $12
+;	.byte $08, $04
 
 	; This sets the sprite's H/V flip bits for the somersault
 Player_SomersaultFlipBits:
@@ -2022,6 +2022,10 @@ GndMov_Frog:
 
 	LDA Player_IsHolding
 	BNE PRG008_AA23	 ; If Player is holding something, jump to PRG008_AA23
+	
+	LDA Player_Power
+	CMP #$7f
+	BEQ PRG008_AA23
 
 	LDA <Player_InAir
 	BEQ PRG008_AA00	 ; If Player is NOT in mid air, jump to PRG008_AA00
@@ -3179,7 +3183,7 @@ PRG008_AF05:
 	STA <Player_Frame ; Update Player_Frame!
 
 PRG008_AF0F:
-	LDA Player_IsHolding
+	JSR FrogHoldingCheck
 	BEQ PRG008_AF2F	 ; If Player is NOT holding something, jump to PRG008_AF2F
 
 	LDY <Player_WalkFrame	 ; Y = PRG008_AF2F
@@ -4328,7 +4332,7 @@ PRG008_B42E:
 	LDY Level_PipeMove	; Y = Level_PipeMove (movement command in $8x form)
 	BNE PRG008_B43F	 	; If Level_PipeMove <> 0, jump to PRG008_B43F
 
-	JSR PSwitch_SubstTileAndAttr	 ; Otherwise, substitute tile if effected by P-Switch
+	JSR Player_SubstTileAndAttr	 ; Otherwise, substitute tile if effected by P-Switch
 
 PRG008_B43F:
 	LDY <Temp_Var10	 ; Y = Player_YVel
@@ -4365,7 +4369,7 @@ PRG008_B458:
 	LDY Level_PipeMove	 ; Y = Level_PipeMove
 	BNE PRG008_B46C	 	; If Level_PipeMove <> 0, jump to PRG008_B46C
 
-	JSR PSwitch_SubstTileAndAttr	 ; Otherwise, substitute tile if effected by P-Switch
+	JSR Player_SubstTileAndAttr	 ; Otherwise, substitute tile if effected by P-Switch
 
 PRG008_B46C:
 	LDY #$00

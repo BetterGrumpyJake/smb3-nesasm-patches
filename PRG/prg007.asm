@@ -4488,13 +4488,19 @@ BoomerangCheck:
 	CMP #23
 	BGE SObj_RegCheck	 ; If Player is not close enough horizontally to cannonball, jump to PRG007_B445
 
+	LDA <Player_YVel
+	BMI SObj_RegCheck	 ; If Player is moving upward, don't land on the boomerang
 		; Player bounces off cannonball
-	LDA #-$40
-	STA <Player_YVel
+	LDA SpecialObj_YLo,X
+	SUB #28
+	STA <Player_Y
+	LDA SpecialObj_YHi,X
+	SBC #$00
+	STA <Player_YHi
 
-	; Cannonball kick sound
-	LDA #SND_PLAYERKICK
-	JSR PRG7Sound_QPlayer
+	LDA #$00
+	STA <Player_InAir				;set player as on ground
+
 
 BoomerangCheckRTS:
 	RTS
